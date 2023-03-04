@@ -7,6 +7,9 @@
     <groupId>jeff.flash</groupId>
     <artifactId>my-flashsale-system</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>common-lib</module>
+    </modules>
     <packaging>pom</packaging> <!-- 父項目打包為pom -->
 
     <!--  統一管理JAR包版本  -->
