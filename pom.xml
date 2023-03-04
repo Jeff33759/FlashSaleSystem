@@ -11,6 +11,7 @@
         <module>common-lib</module>
         <module>my-double-datasource-api</module>
         <module>core-processor</module>
+        <module>my-redis-api</module>
     </modules>
     <packaging>pom</packaging> <!-- 父項目打包為pom -->
 
