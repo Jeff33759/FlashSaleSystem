@@ -35,7 +35,11 @@
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
         <!-- 常用配置 -->
-
+        <dependency> <!-- 共用包 -->
+            <groupId>jeff.demo</groupId>
+            <artifactId>CommonLib</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 
