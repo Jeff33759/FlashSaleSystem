@@ -35,6 +35,11 @@
             <artifactId>my-double-datasource-api</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency> <!-- Redis相關 -->
+            <groupId>jeff.flash</groupId>
+            <artifactId>my-redis-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency> <!-- 共用包 -->
             <groupId>jeff.flash</groupId>
             <artifactId>common-lib</artifactId>
