@@ -9,6 +9,7 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>common-lib</module>
+        <module>my-double-datasource-api</module>
     </modules>
     <packaging>pom</packaging> <!-- 父項目打包為pom -->
 
