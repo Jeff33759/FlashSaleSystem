@@ -36,8 +36,8 @@
         </dependency>
         <!-- 常用配置 -->
         <dependency> <!-- 共用包 -->
-            <groupId>jeff.demo</groupId>
-            <artifactId>CommonLib</artifactId>
+            <groupId>jeff.flash</groupId>
+            <artifactId>common-lib</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
