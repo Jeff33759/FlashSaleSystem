@@ -10,6 +10,7 @@
     <modules>
         <module>common-lib</module>
         <module>my-double-datasource-api</module>
+        <module>core-processor</module>
     </modules>
     <packaging>pom</packaging> <!-- 父項目打包為pom -->
 
