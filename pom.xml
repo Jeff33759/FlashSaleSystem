@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>jeff.flash</groupId>
+    <artifactId>my-flashsale-system</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging> <!-- 父項目打包為pom -->
+
+    <!--  統一管理JAR包版本  -->
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <lombok.version>1.18.24</lombok.version>
+        <mysql.version>8.0.30</mysql.version> <!-- 嚴格匹配安裝的MySQL版本 -->
+        <spring.boot.ver>2.7.2</spring.boot.ver>
+        <spring.cloud.ver>2021.0.5</spring.cloud.ver> <!-- 嚴格匹配Spring Boot版本 -->
+    </properties>
+
+
+    <!--  在此規範引入JAR包的規格，用於讓子項目繼承這裡的屬性，如版本號  -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- spring boot 2.7.2 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.ver}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- spring cloud 2021.0.x aka Jubilee -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring.cloud.ver}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>${mysql.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+                <optional>true</optional>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+</project>
