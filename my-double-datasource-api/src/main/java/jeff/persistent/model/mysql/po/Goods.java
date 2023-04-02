@@ -24,7 +24,7 @@ public class Goods implements Serializable {
 
     private String name;
 
-    private Integer storage;
+    private Integer stock;
 
     private Integer price;
 

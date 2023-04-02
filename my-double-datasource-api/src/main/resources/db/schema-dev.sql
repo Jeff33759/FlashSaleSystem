@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS `goods`(
     `id` INT UNSIGNED AUTO_INCREMENT,
     `m_id` INT UNSIGNED COMMENT '新增此商品的會員ID(其會員身分必為企業主)',
     `name` VARCHAR(100) NOT NULL,
-    `storage` INT UNSIGNED DEFAULT 0 COMMENT '庫存數量，設定只為正數',
+    `stock` INT UNSIGNED DEFAULT 0 COMMENT '庫存數量，設定只為正數',
     `price` INT NOT NULL,
     FOREIGN KEY(`m_id`) REFERENCES `member`(id),
     PRIMARY KEY ( `id` )
