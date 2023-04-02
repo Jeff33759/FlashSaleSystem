@@ -5,7 +5,7 @@
     <parent>
         <artifactId>my-flashsale-system</artifactId>
         <groupId>jeff.flash</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>0.1.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -38,7 +38,7 @@
         <dependency> <!-- 共用包 -->
             <groupId>jeff.flash</groupId>
             <artifactId>common-lib</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>0.1.1-SNAPSHOT</version>
         </dependency>
 
     </dependencies>
