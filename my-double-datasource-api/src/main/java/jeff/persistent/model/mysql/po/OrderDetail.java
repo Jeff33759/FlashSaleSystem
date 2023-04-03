@@ -30,4 +30,10 @@ public class OrderDetail implements Serializable {
     @ManyToOne //預設飢餓載入
     private Goods goods;
 
+    /**
+     * 欲下訂的數量。
+     */
+    @Column(name = "quantity")
+    private int quantity;
+
 }

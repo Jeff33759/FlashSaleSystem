@@ -14,13 +14,19 @@ public class Goods implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /**
+     * 擁有此商品的賣家的會員ID
+     */
     @Transient
-    @Column(name = "m_id")
-    private Integer mId;
+    @Column(name = "s_m_id")
+    private Integer sMId;
 
-    @JoinColumn(name ="m_id")
+    /**
+     * 擁有此商品的賣家
+     */
+    @JoinColumn(name ="s_m_id")
     @ManyToOne //預設飢餓載入
-    private Member member;
+    private Member sellerMember;
 
     private String name;
 

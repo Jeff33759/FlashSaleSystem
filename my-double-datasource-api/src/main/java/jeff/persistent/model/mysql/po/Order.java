@@ -1,6 +1,7 @@
 package jeff.persistent.model.mysql.po;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -10,27 +11,41 @@ import java.util.Set;
 @Entity
 @Table(name = "order")
 @Data
+@Accessors(chain = true) //lombok支援建構子鏈式賦值
 public class Order implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    /**
+     * 賣家ID
+     */
     @Transient
-    @Column(name = "m_id")
-    private Integer mId;
+    @Column(name = "s_m_id")
+    private Integer sMId;
 
-    @JoinColumn(name ="m_id")
+    /**
+     * 賣家
+     */
+    @JoinColumn(name ="s_m_id")
     @ManyToOne //預設飢餓載入
-    private Member member;
+    private Member sellerMember;
 
+    /**
+     * 買家ID
+     */
     @Transient
-    @Column(name = "fs_id")
-    private Integer fsId;
+    @Column(name = "c_m_id")
+    private Integer cMId;
 
-    @JoinColumn(name ="fs_id")
+    /**
+     * 買家
+     */
+    @JoinColumn(name ="c_m_id")
     @ManyToOne //預設飢餓載入
-    private FlashSaleEvent flashSaleEvent;
+    private Member customerMember;
+
 
     private Integer total;
 

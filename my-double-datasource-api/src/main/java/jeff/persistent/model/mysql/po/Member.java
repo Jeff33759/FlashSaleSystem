@@ -1,6 +1,7 @@
 package jeff.persistent.model.mysql.po;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -8,6 +9,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "member")
 @Data
+@Accessors(chain = true) //lombok支援建構子鏈式賦值
 public class Member implements Serializable {
 
     @Id
@@ -17,7 +19,7 @@ public class Member implements Serializable {
     private String name;
 
     /**
-     * 1:一般會員(只能下單)，2:企業主(只能發單)
+     * 1:買家(只能下單)，2:賣家(只能發單)
      * */
     private Integer role;
 

@@ -31,6 +31,11 @@ public class SaleEvent implements Serializable {
     private Goods goods;
 
     /**
+     * 1:一般銷售案件，2:快閃銷售案件
+     */
+    private int type;
+
+    /**
      * 1: 上架中，2:下架中
      * */
     private Integer status;
