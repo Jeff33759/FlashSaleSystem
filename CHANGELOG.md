@@ -2,8 +2,14 @@
 
 ## [Unreleased]
 
+## [0.2.1-SNAPSHOT] - 2023-05-13
+
 ### Changed
 - DB的Schema更動，把快閃銷售案件跟一般銷售案件改成做在同張案件表裡，用type欄位區分案件類型
+
+### Added
+- 一般銷售案件的下單API
+- core-processor的Logging以及例外的處理
 
 ## [0.1.1-SNAPSHOT] - 2023-04-02
 
