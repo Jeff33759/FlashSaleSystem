@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
 
 @Entity
 @Table(name = "sale_event")
@@ -14,20 +15,12 @@ public class SaleEvent implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Transient
-    @Column(name = "m_id")
-    private Integer mId;
-
     @JoinColumn(name ="m_id")
-    @ManyToOne //預設飢餓載入
-    private Member member;
-
-    @Transient
-    @Column(name = "g_id")
-    private String gId;
+    @ManyToOne //預設飢餓載入，因為查詢銷售案件的場景，幾乎都會需要member，所以設飢餓載入，避免N+1 Query
+    private Members member;
 
     @JoinColumn(name ="g_id")
-    @ManyToOne //預設飢餓載入
+    @ManyToOne //預設飢餓載入，因為查詢銷售案件的場景，幾乎都會需要member，所以設飢餓載入，避免N+1 Query
     private Goods goods;
 
     /**
@@ -41,6 +34,6 @@ public class SaleEvent implements Serializable {
     private Integer status;
 
     @Column(name = "start_time")
-    private long startTime;
+    private Timestamp startTime;
 
 }

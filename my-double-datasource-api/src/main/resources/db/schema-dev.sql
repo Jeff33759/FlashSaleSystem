@@ -4,7 +4,7 @@ CREATE DATABASE IF NOT EXISTS db_dev_flash_sale_module DEFAULT CHARSET utf8 COLL
 
 USE db_dev_flash_sale_module;
 
-CREATE TABLE IF NOT EXISTS `member`(
+CREATE TABLE IF NOT EXISTS `members`(
     `id` INT UNSIGNED AUTO_INCREMENT,
     `name` VARCHAR(100) NOT NULL,
     `role` INT(1) DEFAULT 1 COMMENT '1:買家(只能下單)，2:賣家(只能發單)',
@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS `goods`(
     `name` VARCHAR(100) NOT NULL,
     `stock` INT UNSIGNED DEFAULT 0 COMMENT '庫存數量，設定只為正數',
     `price` INT NOT NULL,
-    FOREIGN KEY(`s_m_id`) REFERENCES `member`(id),
+    FOREIGN KEY(`s_m_id`) REFERENCES `members`(id),
     PRIMARY KEY ( `id` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='商品表';
 
@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS `sale_event`(
     PRIMARY KEY ( `id` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='一般銷售案件';
 
-CREATE TABLE IF NOT EXISTS `order`(
+CREATE TABLE IF NOT EXISTS `orders`(
     `id` INT UNSIGNED AUTO_INCREMENT,
     `s_m_id` INT UNSIGNED NOT NULL COMMENT '賣家的會員ID(其會員身分必為企業主)',
     `c_m_id` INT UNSIGNED NOT NULL COMMENT '買家的會員ID(其會員身分必為一般會員)',
@@ -42,18 +42,18 @@ CREATE TABLE IF NOT EXISTS `order`(
     `status` INT(1) DEFAULT 1 COMMENT '訂單狀態。1:進行中，2:已完成，3:已取消',
     `create_time` TIMESTAMP NOT NULL COMMENT '訂單創建時間',
     `fstr_id` VARCHAR(100) COMMENT 'flash_sale_temp_record搶購臨時表的對應id(如果有的話)，來自MongoDB',
-    FOREIGN KEY(`s_m_id`) REFERENCES `member`(id),
-    FOREIGN KEY(`c_m_id`) REFERENCES `member`(id),
+    FOREIGN KEY(`s_m_id`) REFERENCES `members`(id),
+    FOREIGN KEY(`c_m_id`) REFERENCES `members`(id),
     PRIMARY KEY ( `id` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='訂單表';
 
 
-CREATE TABLE IF NOT EXISTS `order_detail`(
+CREATE TABLE IF NOT EXISTS `orders_detail`(
     `id` INT UNSIGNED AUTO_INCREMENT,
     `o_id` INT UNSIGNED NOT NULL COMMENT '對應的訂單ID',
     `g_id` INT UNSIGNED NOT NULL COMMENT '對應的商品ID',
     `quantity` INT UNSIGNED NOT NULL COMMENT '下訂的數量',
-    FOREIGN KEY(`o_id`) REFERENCES `order`(id),
+    FOREIGN KEY(`o_id`) REFERENCES `orders`(id),
     FOREIGN KEY(`g_id`) REFERENCES `goods`(id),
     PRIMARY KEY ( `id` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='訂單明細表';

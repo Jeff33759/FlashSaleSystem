@@ -1,11 +1,11 @@
 package jeff.persistent.model.mysql.dao;
 
-import jeff.persistent.model.mysql.po.Member;
+import jeff.persistent.model.mysql.po.Members;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MemberDAO extends JpaRepository<Member, Integer> {
+public interface MemberDAO extends JpaRepository<Members, Integer> {
 
 
 }

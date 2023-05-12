@@ -5,12 +5,15 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.sql.Timestamp;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
-@Table(name = "member")
+@Table(name = "members")
 @Data
 @Accessors(chain = true) //lombok支援建構子鏈式賦值
-public class Member implements Serializable {
+public class Members implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,6 +32,13 @@ public class Member implements Serializable {
     private Integer status;
 
     @Column(name = "create_time")
-    private long createTime;
+    private Timestamp createTime;
+
+    /**
+     * 一對多的關聯設置，把主控方交給sellerMember
+     * 每當我查詢某會員時，不一定每次都要查出該會員發佈那些商品，只有特定頁面才要，所以設置成LAZY
+     */
+    @OneToMany(fetch = FetchType.LAZY ,mappedBy = "sellerMember", cascade = CascadeType.ALL)
+    Set<Goods> goodsSet = new HashSet<>();
 
 }
