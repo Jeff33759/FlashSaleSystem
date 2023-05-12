@@ -40,14 +40,33 @@ public class FlashSaleTempRecord implements Serializable {
     @Id
     private String id;
 
-    @Field("fs_id")
-    private String fsId;
+    /**
+     * 銷售案件表的ID。
+     */
+    @Field("se_id")
+    private String seId;
 
     @Field("g_id")
     private String gId;
 
-    @Field("flash_num")
-    private String flashNum;
+    /**
+     * 賣家ID
+     */
+    @Field("s_m_id")
+    private String sMId;
+
+    /**
+     * 買家ID
+     */
+    @Field("c_m_id")
+    private String cMId;
+
+    /**
+     * 交易編號，標示這個快閃銷售案件是第幾個被消費的。
+     * 例如現在發布一個快閃銷售案件，商品庫存數有50個，那麼在本表就會多出50筆資料，每筆資料代表一個庫存，本欄位代表的就是該庫存是50總庫存個裡面的第幾個。
+     */
+    @Field("trans_num")
+    private String transNum;
 
     /**
      * T:被搶購；F:未被搶購

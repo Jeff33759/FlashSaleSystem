@@ -1,5 +1,10 @@
 # 更新日誌
 
+## [Unreleased]
+
+### Changed
+- DB的Schema更動，把快閃銷售案件跟一般銷售案件改成做在同張案件表裡，用type欄位區分案件類型
+
 ## [0.1.1-SNAPSHOT] - 2023-04-02
 
 ### Added

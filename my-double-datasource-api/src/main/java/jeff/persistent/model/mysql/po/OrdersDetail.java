@@ -7,26 +7,27 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "goods")
+@Table(name = "orders_detail")
 @Data
 @Accessors(chain = true) //lombok支援建構子鏈式賦值
-public class Goods implements Serializable {
+public class OrdersDetail implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    /**
-     * 擁有此商品的賣家
-     */
-    @JoinColumn(name ="s_m_id")
+    @JoinColumn(name ="o_id")
     @ManyToOne(fetch = FetchType.LAZY) //預設飢餓載入，改延遲
-    private Members sellerMember;
+    private Orders orders;
 
-    private String name;
+    @JoinColumn(name ="g_id")
+    @ManyToOne //預設飢餓載入，改延遲
+    private Goods goods;
 
-    private Integer stock;
-
-    private Integer price;
+    /**
+     * 欲下訂的數量。
+     */
+    @Column(name = "quantity")
+    private Integer quantity;
 
 }
