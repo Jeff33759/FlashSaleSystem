@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Changed
+- DB的Schema更動，把快閃銷售案件跟一般銷售案件又拆回兩張表了。
+
 ## [0.2.1-SNAPSHOT] - 2023-05-13
 
 ### Changed
