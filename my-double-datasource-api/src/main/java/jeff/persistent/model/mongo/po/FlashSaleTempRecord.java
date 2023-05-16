@@ -43,8 +43,8 @@ public class FlashSaleTempRecord implements Serializable {
     /**
      * 銷售案件表的ID。
      */
-    @Field("se_id")
-    private String seId;
+    @Field("fse_id")
+    private String fseId;
 
     @Field("g_id")
     private String gId;
@@ -69,8 +69,9 @@ public class FlashSaleTempRecord implements Serializable {
     private String transNum;
 
     /**
-     * T:被搶購；F:未被搶購
+     * T:已被消費；F:未被消費
      * */
-    private boolean status;
+    @Field("is_consumed")
+    private Boolean isConsumed;
 
 }
