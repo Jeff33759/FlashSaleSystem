@@ -1,6 +1,5 @@
 package jeff.persistent.model.mysql.po;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -35,7 +34,7 @@ public class FlashSaleEvent {
      * 此筆資料是否已經被排程掃描過。
      * 1: 已被掃描、0: 未被掃描
      */
-    @Column(name = "has_been_scaned")
+    @Column(name = "has_been_scanned")
     private Integer hasBeenScaned;
 
 }

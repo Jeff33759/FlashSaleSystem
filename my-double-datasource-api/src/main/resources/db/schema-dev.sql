@@ -38,7 +38,7 @@ CREATE TABLE IF NOT EXISTS `flash_sale_event`(
     `is_public` BOOLEAN DEFAULT true COMMENT 't: 上架中，f:下架中',
     `start_time` TIMESTAMP NOT NULL COMMENT '上架時間',
     `end_time` TIMESTAMP NOT NULL COMMENT '預計下架時間',
-    `has_been_scaned` BOOLEAN DEFAULT false COMMENT 't: 已被排程掃描過，f:未被排程掃描過',
+    `has_been_scanned` BOOLEAN DEFAULT false COMMENT 't: 已被排程掃描過，f:未被排程掃描過',
     FOREIGN KEY(`g_id`) REFERENCES `goods`(id),
     PRIMARY KEY ( `id` )
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='一般銷售案件';
