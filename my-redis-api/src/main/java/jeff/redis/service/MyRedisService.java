@@ -9,15 +9,14 @@ import jeff.redis.exception.MyRedisNotFoundException;
 public interface MyRedisService {
 
     /**
-     * 輸入key，從Redis快取中拉取對應的資料。
+     * 輸入key，從Redis快取中拉取對應的資料(字串形式)。
      * 若該ID不存在於Redis，將會回傳Null，所以若外部呼叫者沒有做null check，可能造成NullPointException。
-     * 這邊不想要出現那種情況，因為NullPointException在維護者看來是意義很不明確的例外，
-     * 所以這裡設計成回傳Optional，
+     * 這邊不想要出現那種情況，因為NullPointException在維護者看來是意義很不明確的例外，所以設計成回傳Optional，
      * 強制外部呼叫者一定要Try catch。
      *
      * @return Json字串
      * */
-    String getDataByKey(String key) throws MyRedisNotFoundException;
+    String getDataStrByKey(String key) throws MyRedisNotFoundException;
 
     /**
      * 將json字串快取進Redis。

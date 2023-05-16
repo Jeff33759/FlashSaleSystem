@@ -22,7 +22,7 @@ public class MyRedisServiceImpl implements MyRedisService {
     private ObjectMapper mapper;
 
     @Override
-    public String getDataByKey(String key) throws MyRedisNotFoundException {
+    public String getDataStrByKey(String key) throws MyRedisNotFoundException {
         String jsonStr = sRedisTemplate.opsForValue().get(key);
         return Optional.ofNullable(jsonStr)
                 .orElseThrow(()->
@@ -36,7 +36,7 @@ public class MyRedisServiceImpl implements MyRedisService {
 
     @Override
     public Object getDataObjByKey(String key) throws MyRedisNotFoundException, JsonProcessingException {
-        String jsonStr = this.getDataByKey(key); // 若有值，則確定不為null
+        String jsonStr = this.getDataStrByKey(key); // 若有值，則確定不為null
         return mapper.readValue(jsonStr, Object.class);
     }
 
