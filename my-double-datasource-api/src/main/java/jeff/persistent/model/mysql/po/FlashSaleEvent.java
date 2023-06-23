@@ -20,9 +20,10 @@ public class FlashSaleEvent {
 
     /**
      * t: 上架中，f:下架中
+     * 預設為T。
      * */
     @Column(name = "is_public")
-    private Boolean isPublic;
+    private Boolean isPublic = true;
 
     @Column(name = "start_time")
     private Timestamp startTime;
@@ -32,9 +33,10 @@ public class FlashSaleEvent {
 
     /**
      * 此筆資料是否已經被排程掃描過。
-     * 1: 已被掃描、0: 未被掃描
+     * T: 已被掃描、F: 未被掃描
+     * 預設為F。
      */
     @Column(name = "has_been_scanned")
-    private Integer hasBeenScaned;
+    private Boolean hasBeenScaned = false;
 
 }

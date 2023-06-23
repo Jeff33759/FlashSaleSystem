@@ -1,8 +1,8 @@
 -- 用於develop環境的DB建置檔 --
 
-CREATE DATABASE IF NOT EXISTS db_dev_flash_sale_module DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE IF NOT EXISTS db_dev_flash_sale_mysql DEFAULT CHARSET utf8 COLLATE utf8_general_ci;
 
-USE db_dev_flash_sale_module;
+USE db_dev_flash_sale_mysql;
 
 CREATE TABLE IF NOT EXISTS `members`(
     `id` INT UNSIGNED AUTO_INCREMENT,
