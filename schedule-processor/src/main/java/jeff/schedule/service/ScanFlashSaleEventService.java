@@ -46,7 +46,7 @@ public class ScanFlashSaleEventService {
         });
 
         flashSaleEventList.forEach(fse -> {
-            fse.setHasBeenScaned(true); //標註此快閃銷售案件已經被掃描過
+            fse.setHasBeenScanned(true); //標註此快閃銷售案件已經被掃描過
         });
 
         flashSaleEventDAO.saveAll(flashSaleEventList);

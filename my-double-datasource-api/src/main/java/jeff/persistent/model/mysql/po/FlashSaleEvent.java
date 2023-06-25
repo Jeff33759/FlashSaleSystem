@@ -37,6 +37,6 @@ public class FlashSaleEvent {
      * 預設為F。
      */
     @Column(name = "has_been_scanned")
-    private Boolean hasBeenScaned = false;
+    private Boolean hasBeenScanned = false;
 
 }
