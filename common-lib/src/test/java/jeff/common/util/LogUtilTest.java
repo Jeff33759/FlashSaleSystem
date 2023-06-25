@@ -2,13 +2,11 @@ package jeff.common.util;
 
 import jeff.common.consts.MyLogType;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.mockito.Spy;
+import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = LogUtil.class)
 class LogUtilTest {
@@ -35,11 +33,11 @@ class LogUtilTest {
 
     @Test
     void GivenArgs_WhenComposeLogPrefixForNotify_ThenReturnExpectedString() {
-        this.prepareArgsForNotifyTestCase();
+        this.prepareArgsForSystemTestCase();
 
-        String actual = spyLogUtil.composeLogPrefixForNotify(this.stubMyLogType);
+        String actual = spyLogUtil.composeLogPrefixForSystem(this.stubMyLogType);
 
-        Assertions.assertEquals("[Notify][TestAPP][TestApp01]", actual);
+        Assertions.assertEquals("[SYS][TestAPP][TestApp01]", actual);
     }
 
     @Test
@@ -48,7 +46,7 @@ class LogUtilTest {
 
         String actual = spyLogUtil.composeLogPrefixForBusiness(this.stubMyLogType, this.stubMemberId, this.stubUUID);
 
-        Assertions.assertEquals("[Business][TestAPP][TestApp01][1][stubUUID]", actual);
+        Assertions.assertEquals("[BUS][TestAPP][TestApp01][1][stubUUID]", actual);
     }
 
     @Test
@@ -60,8 +58,45 @@ class LogUtilTest {
         Assertions.assertEquals(expectedLength, actual.length());
     }
 
-    private void prepareArgsForNotifyTestCase() {
-        this.stubMyLogType = MyLogType.NOTIFY;
+    @Test
+    void GivenArgsAndMockLogger_WhenLogInfo_ThenInvokeExpectedMethodOfLogger() {
+        Logger mockLogger = Mockito.mock(Logger.class);
+
+        spyLogUtil.logInfo(mockLogger, "stubPrefix", "stubMsg");
+
+        Mockito.verify(mockLogger, Mockito.times(1)).info("{} {}", "stubPrefix", "stubMsg");
+    }
+
+    @Test
+    void GivenArgsAndMockLogger_WhenLogDebug_ThenInvokeExpectedMethodOfLogger() {
+        Logger mockLogger = Mockito.mock(Logger.class);
+
+        spyLogUtil.logDebug(mockLogger, "stubPrefix", "stubMsg");
+
+        Mockito.verify(mockLogger, Mockito.times(1)).debug("{} {}", "stubPrefix", "stubMsg");
+    }
+
+    @Test
+    void GivenArgsAndMockLogger_WhenLogWarn_ThenInvokeExpectedMethodOfLogger() {
+        Logger mockLogger = Mockito.mock(Logger.class);
+
+        spyLogUtil.logWarn(mockLogger, "stubPrefix", "stubMsg");
+
+        Mockito.verify(mockLogger, Mockito.times(1)).warn("{} {}", "stubPrefix", "stubMsg");
+    }
+
+    @Test
+    void GivenArgsAndMockLogger_WhenLogError_ThenInvokeExpectedMethodOfLogger() {
+        Logger mockLogger = Mockito.mock(Logger.class);
+        Exception stubException = new Exception("stubMsg");
+
+        spyLogUtil.logError(mockLogger, "stubPrefix", stubException.getMessage(), stubException);
+
+        Mockito.verify(mockLogger, Mockito.times(1)).error("{} {} {}", "stubPrefix", stubException.getMessage(), stubException);
+    }
+
+    private void prepareArgsForSystemTestCase() {
+        this.stubMyLogType = MyLogType.SYSTEM;
     }
 
     private void prepareArgsForBusinessTestCase(Integer memberId, String uuid) {

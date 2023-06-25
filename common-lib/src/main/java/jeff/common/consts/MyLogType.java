@@ -5,9 +5,9 @@ package jeff.common.consts;
  */
 public enum MyLogType {
 
-    NOTIFY("Notify"), //系統通知
+    SYSTEM("SYS"), //系統通知
 
-    BUSINESS("Business"); //業務邏輯
+    BUSINESS("BUS"); //業務邏輯
 
     private String typeName;
 

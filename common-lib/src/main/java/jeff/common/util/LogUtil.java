@@ -1,7 +1,9 @@
 package jeff.common.util;
 
 import jeff.common.consts.MyLogType;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import java.util.UUID;
 
@@ -14,7 +16,10 @@ import java.util.UUID;
  * <p>
  * Log類型分為: 系統通知(例如通知初始化成功等等...)、業務邏輯
  * UUID用於紀錄一個請求的生命週期，因為有些微服務是reactive或者有用到服務降級，可能會有不同執行緒去處理同一個request flow的情形。
+ *
+ * 元件雖為單例，但因為log的封裝方法是無狀態，logger皆由外部傳入，所以應該是不會有執行緒安全的問題。
  */
+@Component
 public class LogUtil {
 
     @Value("${app.type}")
@@ -23,11 +28,28 @@ public class LogUtil {
     @Value("${app.instance.name}")
     private String appInstanceName;
 
+
+    public void logInfo(Logger logger, String logPrefix, String logMsg) {
+        logger.info("{} {}", logPrefix, logMsg);
+    }
+
+    public void logDebug(Logger logger, String logPrefix, String logMsg) {
+        logger.debug("{} {}", logPrefix, logMsg);
+    }
+
+    public void logWarn(Logger logger, String logPrefix, String logMsg) {
+        logger.warn("{} {}", logPrefix, logMsg);
+    }
+
+    public void logError(Logger logger, String logPrefix, String logMsg, Exception e) {
+        logger.error("{} {} {}", logPrefix, logMsg, e); // error級別的要印stackTrace
+    }
+
     /**
      * 組織系統通知Log的前綴。
      * 用String.format雖然效能較差，但可讀性較佳，考量到單個Log也不是什麼很大量的字串拼接，不用那麼看效能。
      */
-    public String composeLogPrefixForNotify(MyLogType myLogType) {
+    public String composeLogPrefixForSystem(MyLogType myLogType) {
         return String.format("[%s][%s][%s]",
                 myLogType.getTypeName(),
                 appType,
@@ -54,7 +76,7 @@ public class LogUtil {
      * UUID用於紀錄一個請求的生命週期，因為有些微服務是reactive或者有用到服務降級，可能會有不同執行緒去處理同一個request flow的情形。
      */
     public String generateUUIDForLogging() {
-        return UUID.randomUUID().toString().substring(0,6);
+        return UUID.randomUUID().toString().substring(0, 6);
     }
 
 }
