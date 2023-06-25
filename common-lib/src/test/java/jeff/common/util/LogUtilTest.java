@@ -6,6 +6,8 @@ import org.mockito.Spy;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = LogUtil.class)
@@ -47,6 +49,15 @@ class LogUtilTest {
         String actual = spyLogUtil.composeLogPrefixForBusiness(this.stubMyLogType, this.stubMemberId, this.stubUUID);
 
         Assertions.assertEquals("[Business][TestAPP][TestApp01][1][stubUUID]", actual);
+    }
+
+    @Test
+    void GivenArgs_WhenGenerateUUIDForLogging_ThenReturnExpectedLengthString() {
+        int expectedLength = 6;
+
+        String actual = spyLogUtil.generateUUIDForLogging();
+
+        Assertions.assertEquals(expectedLength, actual.length());
     }
 
     private void prepareArgsForNotifyTestCase() {

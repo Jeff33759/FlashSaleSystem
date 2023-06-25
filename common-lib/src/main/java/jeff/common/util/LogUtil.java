@@ -49,8 +49,12 @@ public class LogUtil {
         );
     }
 
-    public String generateUUID() {
-        return UUID.randomUUID().toString();
+    /**
+     * 製作一個專門給logging的隨機流水號。
+     * UUID用於紀錄一個請求的生命週期，因為有些微服務是reactive或者有用到服務降級，可能會有不同執行緒去處理同一個request flow的情形。
+     */
+    public String generateUUIDForLogging() {
+        return UUID.randomUUID().toString().substring(0,6);
     }
 
 }
