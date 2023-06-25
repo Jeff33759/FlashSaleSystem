@@ -1,0 +1,6 @@
+server:
+  port: 8010
+
+app:
+  instance:
+    name: Concurrency01
