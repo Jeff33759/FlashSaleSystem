@@ -1,6 +1,5 @@
 package jeff.common.util;
 
-import jeff.common.consts.MyLogType;
 import org.junit.jupiter.api.*;
 import org.mockito.Mockito;
 import org.mockito.Spy;
@@ -8,43 +7,32 @@ import org.slf4j.Logger;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
-@SpringBootTest(classes = LogUtil.class)
+@SpringBootTest(classes = LogUtilTest.class)
 class LogUtilTest {
 
     @Spy
     LogUtil spyLogUtil; //待測元件
 
-    MyLogType stubMyLogType;
-    Integer stubMemberId;
-    String stubUUID;
-
     @BeforeEach
     void stubMemberVarForTestCase() {
         ReflectionTestUtils.setField(spyLogUtil, "appType", "TestAPP");
         ReflectionTestUtils.setField(spyLogUtil, "appInstanceName", "TestApp01");
-    }
-
-    @AfterEach
-    void resetAllArgsForTestCase() {
-        stubMyLogType = null;
-        stubMemberId = null;
-        stubUUID = null;
+        ReflectionTestUtils.invokeMethod(spyLogUtil, "initVariableAfterTheSpringApplicationStartup");
     }
 
     @Test
-    void GivenArgs_WhenComposeLogPrefixForNotify_ThenReturnExpectedString() {
-        this.prepareArgsForSystemTestCase();
-
-        String actual = spyLogUtil.composeLogPrefixForSystem(this.stubMyLogType);
+    void GivenArgs_WhenComposeLogPrefixForSystem_ThenReturnExpectedString() {
+        String actual = spyLogUtil.composeLogPrefixForSystem();
 
         Assertions.assertEquals("[SYS][TestAPP][TestApp01]", actual);
     }
 
     @Test
     void GivenArgs_WhenComposeLogPrefixForBusiness_ThenReturnExpectedString() {
-        this.prepareArgsForBusinessTestCase(1, "stubUUID");
+        Integer stubMemberId = 1;
+        String stubUUID = "stubUUID";
 
-        String actual = spyLogUtil.composeLogPrefixForBusiness(this.stubMyLogType, this.stubMemberId, this.stubUUID);
+        String actual = spyLogUtil.composeLogPrefixForBusiness(stubMemberId, stubUUID);
 
         Assertions.assertEquals("[BUS][TestAPP][TestApp01][1][stubUUID]", actual);
     }
@@ -93,16 +81,6 @@ class LogUtilTest {
         spyLogUtil.logError(mockLogger, "stubPrefix", stubException.getMessage(), stubException);
 
         Mockito.verify(mockLogger, Mockito.times(1)).error("{} {} {}", "stubPrefix", stubException.getMessage(), stubException);
-    }
-
-    private void prepareArgsForSystemTestCase() {
-        this.stubMyLogType = MyLogType.SYSTEM;
-    }
-
-    private void prepareArgsForBusinessTestCase(Integer memberId, String uuid) {
-        this.stubMyLogType = MyLogType.BUSINESS;
-        this.stubMemberId = memberId;
-        this.stubUUID = uuid;
     }
 
 }
