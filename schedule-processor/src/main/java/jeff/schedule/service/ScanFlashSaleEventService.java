@@ -1,7 +1,7 @@
 package jeff.schedule.service;
 
-import jeff.persistent.model.mongo.dao.FlashSaleTempRecordRepo;
-import jeff.persistent.model.mongo.po.FlashSaleTempRecord;
+import jeff.persistent.model.mongo.dao.FlashSaleEventLogRepo;
+import jeff.persistent.model.mongo.po.FlashSaleEventLog;
 import jeff.persistent.model.mysql.dao.FlashSaleEventDAO;
 import jeff.persistent.model.mysql.po.FlashSaleEvent;
 import jeff.redis.util.MyRedisUtil;
@@ -24,25 +24,25 @@ public class ScanFlashSaleEventService {
     private FlashSaleEventDAO flashSaleEventDAO;
 
     @Autowired
-    private FlashSaleTempRecordRepo flashSaleTempRecordRepo;
+    private FlashSaleEventLogRepo flashSaleEventLogRepo;
 
     @Autowired
     private MyRedisUtil myRedisUtil;
 
     /**
-     * 搜尋未被掃描過的FlashSaleEvent，並且新增資料進Mongo臨時表同時也put進Redis。
+     * 搜尋未被掃描過的FlashSaleEvent，並且新增資料進Mongo Log表同時也put進Redis。
      *
      * @return 總共幾筆銷售案件被執行
      */
     public int executeTheProcessingFlow() {
         List<FlashSaleEvent> flashSaleEventList = flashSaleEventDAO.selectFlashSaleEventWhichIsPublicAndHasNotBeenScanned();
 
-        Map<Integer, List<FlashSaleTempRecord>> groupedFlashSaleTempRecordMap = this.generateMultiFlashSaleTempRecordListsGroupByFlashSaleEventId(flashSaleEventList); //分群
+        Map<Integer, List<FlashSaleEventLog>> groupedFlashSaleEventLogMap = this.generateMultiFlashSaleEventLogListsGroupByFlashSaleEventId(flashSaleEventList); //分群
         Map<Integer, Instant> expirationMap = this.generateExpiredInstantMapByFlashEventId(flashSaleEventList);
 
-        groupedFlashSaleTempRecordMap.forEach((fseId, flashSaleTempRecordList) -> {
-            flashSaleTempRecordRepo.saveAll(flashSaleTempRecordList); //將資料寫入Mongo臨時表
-            myRedisUtil.rightPushListByKey("fse_" + fseId, flashSaleTempRecordList, expirationMap.get(fseId)); //將資料寫入redis-list，以fseId為Key分群
+        groupedFlashSaleEventLogMap.forEach((fseId, flashSaleEventLogList) -> {
+            flashSaleEventLogRepo.saveAll(flashSaleEventLogList); //將資料寫入Mongo Log表
+            myRedisUtil.rightPushListByKey("fse_" + fseId, flashSaleEventLogList, expirationMap.get(fseId)); //將資料寫入redis-list，以fseId為Key分群
         });
 
         flashSaleEventList.forEach(fse -> {
@@ -54,33 +54,31 @@ public class ScanFlashSaleEventService {
     }
 
     /**
-     * 創建數個FlashSaleTempRecordList，根據flashSaleEventId去分群，同個fseId的FlashSaleTempRecordList放在同一群，並且每一群的FlashSaleTempRecordList都會從頭去計數交易順序編號。
+     * 創建數個FlashSaleEventLogList，根據flashSaleEventId去分群，同個fseId的FlashSaleEventLogList放在同一群，並且每一群的FlashSaleEventLogList都會從頭去計數交易順序編號。
      * 這個設計的前提是，一個商品只能對應一個正在上架中的快閃銷售案件，不能夠同一個商品被發布在兩個上架中的快閃銷售案件，否則這裡分群邏輯就要再設計。
      * 之所以要分群，是為了快閃銷售案件的"消費順序編號"，每一群的消費順序編號都是獨立計算的。
      */
-    private Map<Integer, List<FlashSaleTempRecord>> generateMultiFlashSaleTempRecordListsGroupByFlashSaleEventId(List<FlashSaleEvent> flashSaleEventList) {
-        Map<Integer, List<FlashSaleTempRecord>> groupsMap = new HashMap<>(); //群集Map，k=fseId
+    private Map<Integer, List<FlashSaleEventLog>> generateMultiFlashSaleEventLogListsGroupByFlashSaleEventId(List<FlashSaleEvent> flashSaleEventList) {
+        Map<Integer, List<FlashSaleEventLog>> groupsMap = new HashMap<>(); //群集Map，k=fseId
 
-        flashSaleEventList.forEach(fse -> { //分群+製作MongoDB臨時表的資料
-            groupsMap.put(fse.getId(), this.generateFlashSaleTempRecordListAccordingToGoodsStock(fse));
+        flashSaleEventList.forEach(fse -> { //分群+製作MongoDB Log表的資料
+            groupsMap.put(fse.getId(), this.generateFlashSaleEventLogListAccordingToGoodsStock(fse));
         });
 
         return groupsMap;
     }
 
     /**
-     * 根據商品的庫存量，新增要存入Mongo臨時表的資料。
-     * 例如現在某個限量商品庫存200個，針對該商品發布了一個快閃銷售活動，這時該快閃銷售活動就必須延伸出200筆Mongo臨時表資料存進DB，並且每筆資料都要從1計數交易順序編號。
-     * <p>
-     * FlashSaleTempRecord的買家ID統一先不賦值，有人消費時才給。
+     * 根據商品的庫存量，新增要存入Mongo Log表的資料。
+     * 例如現在某個限量商品庫存200個，針對該商品發布了一個快閃銷售活動，這時該快閃銷售活動就必須延伸出200筆Mongo Log表資料存進DB，並且每筆資料都要從1計數交易順序編號。
      */
-    private List<FlashSaleTempRecord> generateFlashSaleTempRecordListAccordingToGoodsStock(FlashSaleEvent flashSaleEvent) {
+    private List<FlashSaleEventLog> generateFlashSaleEventLogListAccordingToGoodsStock(FlashSaleEvent flashSaleEvent) {
         Integer stockOfGoods = flashSaleEvent.getGoods().getStock();
-        List<FlashSaleTempRecord> flashSaleTempRecordList = new ArrayList<>();
+        List<FlashSaleEventLog> flashSaleEventLogList = new ArrayList<>();
 
         for (int i = 1; i <= stockOfGoods; i++) {
-            flashSaleTempRecordList.add(
-                    new FlashSaleTempRecord()
+            flashSaleEventLogList.add(
+                    new FlashSaleEventLog() // 買家ID統一先不賦值，有人消費時才給。
                             .setFseId(flashSaleEvent.getId())
                             .setGId(flashSaleEvent.getGoods().getId())
                             .setSMId(flashSaleEvent.getGoods().getSellerMember().getId())
@@ -89,7 +87,7 @@ public class ScanFlashSaleEventService {
             );
         }
 
-        return flashSaleTempRecordList;
+        return flashSaleEventLogList;
     }
 
     /**

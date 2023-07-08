@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.dto.send.ResponseObject;
+import jeff.common.util.LogUtil;
 import jeff.core.entity.bo.OrderCreationFlowContext;
 import jeff.core.consts.DemoMember;
 import jeff.core.exception.OrderException;
@@ -29,16 +30,18 @@ public class NormalOrderServiceImpl implements OrderService {
     private OrderManager orderManager;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private LogUtil logUtil;
 
     /**
      * 目前因為還沒做認證相關的邏輯，所以下單的買家與賣家的Id都先寫死，外部就先不用傳了。
      *
      * @param param 範例資料: {"goods_list":[{"g_id":1,"g_name":"螺絲套組","quantity":20},...]}
-     * @return
      */
     @Override
-    public ResponseObject createOrder(JsonNode param) throws OrderException{
+    public ResponseObject createOrder(JsonNode param, String UUID) throws OrderException{
         OrderCreationFlowContext orderCreationFlowContext = generateContextForOrderCreationFlowByParam(param);
 
         try{
@@ -46,7 +49,7 @@ public class NormalOrderServiceImpl implements OrderService {
 
             return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("oId",newOrderId), "Create order successful.");
         } catch (DataAccessException dae) { //Spring JDBC當操作DB遇到問題時會拋出的例外的基類，先印log後，統一包裝成OrderException
-            log.warn("Some errors occurred when creating order, message:{}", dae.getMessage());
+            logUtil.logWarn(log, logUtil.composeLogPrefixForBusiness(DemoMember.CUSTOMER.getId(), UUID), String.format("Some errors occurred when creating order, message:%s", dae.getMessage()));
             throw new OrderException("Some errors occurred when creating order."); //會在此捕捉的，都是一些沒有預期到的DB相關的例外，前面有預期的例外，就會先包成OrderException了
         }
 

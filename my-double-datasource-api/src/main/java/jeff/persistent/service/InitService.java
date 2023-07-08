@@ -11,8 +11,8 @@ public interface InitService {
     void initAllDemoDataOfMySQL();
 
     /**
-     * 初始化MongoDB裡面的FlashSaleTempRecord表
+     * 初始化MongoDB裡面的FlashSaleEventLog表
      */
-    void initFlashSaleTempRecordDocumentOfMongoDB();
+    void initFlashSaleEventLogDocumentOfMongoDB();
 
 }

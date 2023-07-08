@@ -44,10 +44,10 @@ public class Orders implements Serializable {
     private Timestamp createTime;
 
     /**
-     * flash_sale_temp_record搶購臨時表的對應id(如果有的話)，來自MongoDB
+     * flash_sale_event_log搶購Log表的對應id(如果有的話)，來自MongoDB
      * */
-    @Column(name = "fstr_id")
-    private String fstrId;
+    @Column(name = "fsel_id")
+    private String fselId;
 
     /**
      * 為了讓查詢訂單時能夠順便抓出關聯的Detail。

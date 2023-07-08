@@ -1,20 +1,11 @@
 package jeff.persistent;
 
-import jeff.persistent.config.MySQLSourceConfig;
-import jeff.persistent.model.mongo.dao.FlashSaleTempRecordRepo;
 import jeff.persistent.service.InitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
-import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
-
-import javax.sql.DataSource;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * 在各應用啟動後，根據環境去決定是否要做一些例如初始化DB資料的行為。
@@ -48,7 +39,7 @@ public class DataSourceRunner implements CommandLineRunner {
     private void setupTheDevEnv() {
         if ("core-processor".equals(appType)) { //只有core-processor在Dev環境時，啟動要做Demo資料初始化。
             initService.initAllDemoDataOfMySQL();
-            initService.initFlashSaleTempRecordDocumentOfMongoDB();
+            initService.initFlashSaleEventLogDocumentOfMongoDB();
         }
     }
 

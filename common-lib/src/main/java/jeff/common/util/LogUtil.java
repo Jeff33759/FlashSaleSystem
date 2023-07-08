@@ -16,7 +16,7 @@ import java.util.UUID;
  * [Log類型][AppType][Server實例ID][Member Id][UUID] Log本體
  * <p>
  * Log類型分為: 系統通知(例如通知初始化成功等等...)、業務邏輯
- * UUID用於紀錄一個請求的生命週期，因為有些微服務是reactive或者有用到服務降級，可能會有不同執行緒去處理同一個request flow的情形。
+ * UUID用於紀錄一個請求處理流程的生命週期，因為有些微服務是reactive或者有用到服務降級，可能會有不同執行緒去處理同一個request operation flow的情形。
  * <p>
  * 元件雖為單例，但因為log的封裝方法是無狀態，logger皆由外部傳入，所以應該是不會有執行緒安全的問題。
  */
@@ -78,7 +78,7 @@ public class LogUtil {
     public String composeLogPrefixForBusiness(Integer memberId, String uuid) {
         return String.format("%s[%s][%s]",
                 this.PART_OF_LOG_PREFIX_FOR_BUSINESS,
-                memberId,
+                memberId == null ? "NULL" : memberId, //有些情況會取不到或者不需要特地取MemberId
                 uuid
         );
     }

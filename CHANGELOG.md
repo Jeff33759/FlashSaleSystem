@@ -4,11 +4,11 @@
 
 ### Changed
 - DB的Schema更動，把快閃銷售案件跟一般銷售案件又拆回兩張表了。
-- redis-api共用方法，系統啟動時清除redis所有資料
-- 系統啟動時清除mongo所有資料
+- 系統啟動時清除mongo、redis所有資料
 - 新增子專案high-concurrency-processor
 - 新增子專案Scheduler-processor
 - 新增排程:掃描快閃銷售案件進mongo
+- 統一Log格式(為了將來日誌中心化)、新增Log工具包
 
 ## [0.2.1-SNAPSHOT] - 2023-05-13
 

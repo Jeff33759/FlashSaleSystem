@@ -2,7 +2,6 @@ package jeff.persistent.config;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -16,7 +15,6 @@ import org.springframework.jdbc.datasource.init.ScriptUtils;
 import javax.annotation.PostConstruct;
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.util.List;
 
 /**
  * 建置DB的邏輯，一定要先於JPA相關元件的初始化。

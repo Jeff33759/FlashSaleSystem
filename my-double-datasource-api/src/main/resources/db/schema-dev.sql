@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `orders`(
     `total` INT DEFAULT 0 COMMENT '訂單總金額',
     `status` INT(1) DEFAULT 1 COMMENT '訂單狀態。1:進行中，2:已完成，3:已取消',
     `create_time` TIMESTAMP NOT NULL COMMENT '訂單創建時間',
-    `fstr_id` VARCHAR(100) COMMENT 'flash_sale_temp_record搶購臨時表的對應id(如果有的話)，來自MongoDB',
+    `fsel_id` VARCHAR(100) COMMENT 'flash_sale_event_log搶購紀錄表的對應id(如果有的話)，來自MongoDB',
     FOREIGN KEY(`s_m_id`) REFERENCES `members`(id),
     FOREIGN KEY(`c_m_id`) REFERENCES `members`(id),
     PRIMARY KEY ( `id` )

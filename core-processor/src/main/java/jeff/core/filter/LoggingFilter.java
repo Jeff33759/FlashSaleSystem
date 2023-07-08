@@ -1,13 +1,17 @@
 package jeff.core.filter;
 
+
+import jeff.common.util.LogUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
+import javax.servlet.*;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,12 +23,17 @@ import java.net.URLDecoder;
  */
 @Slf4j
 @Component
+@WebFilter
+@Order(10)
 public class LoggingFilter extends OncePerRequestFilter {
+
+    @Autowired
+    private LogUtil logUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        ContentCachingRequestWrapper reqWrapper = new ContentCachingRequestWrapper(request); //使用包裝器，讓請求物件的資料流可以被之後的元件重複讀取
-        ContentCachingResponseWrapper resWrapper = new ContentCachingResponseWrapper(response); //使用包裝器，讓回應物件的資料流可以被之後的元件重複讀取
+        ContentCachingRequestWrapper reqWrapper = (ContentCachingRequestWrapper) request;
+        ContentCachingResponseWrapper resWrapper = (ContentCachingResponseWrapper) response;
 
         filterChain.doFilter(reqWrapper, resWrapper);
 
@@ -36,10 +45,27 @@ public class LoggingFilter extends OncePerRequestFilter {
      * 針對API進行logging。
      */
     private void logAPI(ContentCachingRequestWrapper reqWrapper, ContentCachingResponseWrapper resWrapper) throws UnsupportedEncodingException {
-        log.info("The info of request, clientIP: {}, method: {}, path: {}, queryString: {}, body: {}",
-                reqWrapper.getRemoteAddr(), reqWrapper.getMethod(), reqWrapper.getServletPath(), decodeQueryString(reqWrapper.getQueryString()), convertContentByteArrToString(reqWrapper.getContentAsByteArray()));
+        logUtil.logInfo(
+                log,
+                logUtil.composeLogPrefixForBusiness(null, reqWrapper.getAttribute("UUID").toString()),
+                String.format(
+                        "The info of request, clientIP: %s, method: %s, path: %s, queryString: %s, body: %s",
+                        reqWrapper.getRemoteAddr(),
+                        reqWrapper.getMethod(),
+                        reqWrapper.getServletPath(),
+                        decodeQueryString(reqWrapper.getQueryString()),
+                        convertContentByteArrToString(reqWrapper.getContentAsByteArray())
+                )
+        );
 
-        log.info("The info of response, body: {}", convertContentByteArrToString(resWrapper.getContentAsByteArray()));
+        logUtil.logInfo(
+                log,
+                logUtil.composeLogPrefixForBusiness(null, reqWrapper.getAttribute("UUID").toString()),
+                String.format(
+                        "The info of response, body: %s",
+                        convertContentByteArrToString(resWrapper.getContentAsByteArray())
+                )
+        );
     }
 
     /**

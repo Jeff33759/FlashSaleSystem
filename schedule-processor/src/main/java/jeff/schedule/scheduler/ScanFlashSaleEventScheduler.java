@@ -1,5 +1,6 @@
 package jeff.schedule.scheduler;
 
+import jeff.common.util.LogUtil;
 import jeff.schedule.service.ScanFlashSaleEventService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,22 +20,25 @@ public class ScanFlashSaleEventScheduler {
     @Autowired
     private ScanFlashSaleEventService scanFlashSaleEventService;
 
+    @Autowired
+    private LogUtil logUtil;
+
     /**
      * 每5秒就去掃一次MySQL，看有沒有新發布的快閃銷售活動。
      */
     @Scheduled(initialDelay = 5000, fixedDelay = 5000)
     public void scanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis() {
-        log.info("ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is started.");
+        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), "ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is started.");
+
         Instant startTime = Instant.now();
-
         int executionAmount = scanFlashSaleEventService.executeTheProcessingFlow();
-
         Instant endTime = Instant.now();
-        log.info("ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is finished, executionTime: {}sec, beExecutedFlashSaleEventAmount: {}",
-                Duration.between(startTime, endTime).getSeconds(), executionAmount);
+
+        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), String.format(
+                "ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is finished, executionTime: %ssec, beExecutedFlashSaleEventAmount: %s",
+                Duration.between(startTime, endTime).getSeconds(), executionAmount
+        ));
     }
-
-
 
 
 }

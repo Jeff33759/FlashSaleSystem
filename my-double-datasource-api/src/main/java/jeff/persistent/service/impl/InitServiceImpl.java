@@ -1,7 +1,8 @@
 package jeff.persistent.service.impl;
 
+import jeff.common.util.LogUtil;
 import jeff.persistent.config.MySQLSourceConfig;
-import jeff.persistent.model.mongo.dao.FlashSaleTempRecordRepo;
+import jeff.persistent.model.mongo.dao.FlashSaleEventLogRepo;
 import jeff.persistent.service.InitService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,10 @@ public class InitServiceImpl implements InitService {
     private DataSource dataSource;
 
     @Autowired
-    private FlashSaleTempRecordRepo flashSaleTempRecordRepo;
+    private FlashSaleEventLogRepo flashSaleEventLogRepo;
+
+    @Autowired
+    private LogUtil logUtil;
 
     @Value("${mydb.script.init.demodata.patharr}")
     private List<String> initDemoDataSqlScriptPaths;
@@ -45,13 +49,13 @@ public class InitServiceImpl implements InitService {
                 throwables.printStackTrace();
             }
         });
-        log.info("All MySQL data has been cleaned and insert demo data successful.");
+        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), "All MySQL data has been cleaned and insert demo data successful.");
     }
 
     @Override
-    public void initFlashSaleTempRecordDocumentOfMongoDB() {
-        flashSaleTempRecordRepo.deleteAll(); // 相當於truncate操作
-        log.info("All mongo data has been cleaned.");
+    public void initFlashSaleEventLogDocumentOfMongoDB() {
+        flashSaleEventLogRepo.deleteAll(); // 相當於truncate操作
+        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), "All mongo data has been cleaned.");
     }
 
     private void executeSqlScript(String scriptPath) throws SQLException {

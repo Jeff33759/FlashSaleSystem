@@ -1,5 +1,6 @@
 package jeff.redis;
 
+import jeff.common.util.LogUtil;
 import jeff.redis.util.MyRedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +17,9 @@ public class RedisRunner implements CommandLineRunner {
 
     @Autowired
     private MyRedisUtil myRedisUtil;
+
+    @Autowired
+    private LogUtil logUtil;
 
     @Value("${app.type}")
     private String appType;
@@ -46,7 +50,7 @@ public class RedisRunner implements CommandLineRunner {
      */
     private void initRedisData() {
         myRedisUtil.removeAllKeys();
-        log.info("All redis data has been cleaned.");
+        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), "All redis data has been cleaned.");
     }
 
 }

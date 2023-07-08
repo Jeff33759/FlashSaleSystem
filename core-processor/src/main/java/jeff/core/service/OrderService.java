@@ -8,10 +8,7 @@ public interface OrderService {
 
     /**
      * 新增一筆訂單。
-     *
-     * @param orderInfo 訂單資訊
-     * @return
      */
-    ResponseObject createOrder(JsonNode orderInfo) throws OrderException;
+    ResponseObject createOrder(JsonNode param, String UUID) throws OrderException;
 
 }

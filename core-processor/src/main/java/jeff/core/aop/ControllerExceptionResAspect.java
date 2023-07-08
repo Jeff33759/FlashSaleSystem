@@ -2,8 +2,10 @@ package jeff.core.aop;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jeff.common.consts.MyLogType;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.dto.send.ResponseObject;
+import jeff.common.util.LogUtil;
 import jeff.core.exception.OrderException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +25,10 @@ import javax.annotation.PostConstruct;
 public class ControllerExceptionResAspect {
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
+
+    @Autowired
+    private LogUtil logUtil;
 
     /**
      * 不成功的操作目前定義大多數都是回空的content，因為很常用，所以做成單例常數，節省效能與記憶體空間。
@@ -34,7 +39,7 @@ public class ControllerExceptionResAspect {
      * 等Spring容器完成啟動後，確定各元件都註冊完畢不會有NULL，再對EMPTY_CONTENT賦值。
      */
     @PostConstruct
-    public void initVariableAfterTheSpringApplicationStartup() {
+    private void initVariableAfterTheSpringApplicationStartup() {
         EMPTY_CONTENT = objectMapper.createObjectNode();
     }
 
@@ -51,7 +56,7 @@ public class ControllerExceptionResAspect {
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseObject handleException(Exception e) {
-        log.error("Some errors occurred while processing request, message:{}", e.getMessage(), e); // error的例外要印得完整一些
+        logUtil.logError(log, logUtil.composeLogPrefixForSystem(), "Some errors occurred while processing request.", e);
         return new ResponseObject(ResponseCode.Failed.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
     }
 

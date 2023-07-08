@@ -37,7 +37,7 @@ import java.io.Serializable;
 @Document(collection = "flash_sale_event_log")
 @Data
 @Accessors(chain = true) //lombok支援建構子鏈式賦值
-public class FlashSaleTempRecord implements Serializable {
+public class FlashSaleEventLog implements Serializable {
 
     @Id
     private String id;
