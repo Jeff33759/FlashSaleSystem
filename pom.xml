@@ -14,6 +14,7 @@
         <module>my-redis-api</module>
         <module>high-concurrency-processor</module>
         <module>schedule-processor</module>
+        <module>my-test-lib</module> <!-- 自己寫的測試函式庫，裡面放一些專門用於測試的工具，也會依賴一些第三方測試函式庫。因為只有用於測試，所以各專案引用時，Scope可設為test，讓佈署時此函式庫不會跟著打包進去 -->
     </modules>
     <packaging>pom</packaging> <!-- 父項目打包為pom -->
 
