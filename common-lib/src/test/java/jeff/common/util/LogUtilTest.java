@@ -11,7 +11,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 class LogUtilTest {
 
     @Spy
-    LogUtil spyLogUtil; //待測元件
+    private LogUtil spyLogUtil; //待測元件
 
     @BeforeEach
     void stubMemberVarForTestCase() {

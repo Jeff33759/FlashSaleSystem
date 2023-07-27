@@ -4,17 +4,16 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Spy;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
 
-@SpringBootTest(classes = DateUtil.class)
+@SpringBootTest(classes = DateUtilTest.class)
 class DateUtilTest {
 
     @Spy
-    DateUtil spyDateUtil; //待測元件
+    private DateUtil spyDateUtil; //待測元件
 
     String stubTimeString;
     long stubMatchTimestamp;
