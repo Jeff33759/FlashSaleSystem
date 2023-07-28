@@ -33,6 +33,8 @@ import java.io.Serializable;
  * 因此表對於Schema沒有強烈要求，之後可能會根據業務需求而增減欄位，所以使用MongoDB來持久化。
  * 「發布->broker」的流程所以不用Mongo而是單純記Log，是因為認為RabbitMQ的Confirm設置已經足以保證「發布->broker」的訊息可靠度，所以選擇只記Log減少阻塞，盡量快速回應給客戶端。
  * 「broker->消費」的流程之所以用Mongo而不是單純記Log，是為了方便去下Where條件搜尋出對應的資料，且這個環節已經不是高併發場景，相對而言較不在意寫DB動作的阻塞。
+ *
+ * 之所以用NoSQL而不是用RDBMS，除了是Log可能會有Schema常變動的需求以外，由於NoSQL底層的搜尋演算法與RDBMS較為不同，在搜尋Log這種資料時查詢速度會比較快。
  * */
 @Document(collection = "flash_sale_event_log")
 @Data
