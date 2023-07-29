@@ -38,7 +38,7 @@ import java.io.Serializable;
  *
  * 「broker->消費」的流程，因為有使用Mongo去記錄快閃銷售案件訂單的Log，所以不同於把Log記在一般的Log檔，Mongo可以很方便地去下Where條件搜尋出對應的快閃訂單Log，且這個環節已經不是高併發場景，相對而言較不在意寫DB動作的阻塞，所以就想寫就寫也沒差。
  *
-// * Log的存放之所以用NoSQL而不是用RDBMS，除了是Log可能會有Schema常變動的需求以外，由於NoSQL底層的搜尋演算法與RDBMS較為不同，在搜尋Log這種資料時查詢速度會比較快；且目前Mongo相關函式庫，對reactive的支援度也比較好，所以比較好用在「high-concurrency-processor」專案上。
+ * Log的存放之所以用NoSQL而不是用RDBMS，除了是Log可能會有Schema常變動的需求以外，由於NoSQL底層的搜尋演算法與RDBMS較為不同，在搜尋Log這種資料時查詢速度會比較快；且目前Mongo相關函式庫，對reactive的支援度也比較好，所以比較好用在「high-concurrency-processor」專案上。
  * */
 @Document(collection = "flash_sale_event_log")
 @Data
