@@ -13,7 +13,8 @@ import java.util.UUID;
  * 將Log的格式統一化，方便對日誌中心去下條件搜尋對應Log。
  * <p>
  * 格式如下：
- * [Log類型][AppType][Server實例ID][Member Id][UUID] Log本體
+ * [Log類型][AppType][Server實例ID][請求者的Member Id][UUID] Log本體
+ * 請求者的MemberId要等到登入認證功能完才會用到，例如現在用JWT紀錄使用者狀態，那就會新增一個JWT解析過濾鏈，解析出使用者是誰後，設置入context，讓之後的業務邏輯都能存取到這個MemberId去做logging。
  * <p>
  * Log類型分為: 系統通知(例如通知初始化成功等等...)、業務邏輯
  * UUID用於紀錄一個請求處理流程的生命週期，因為有些微服務是reactive或者有用到服務降級，可能會有不同執行緒去處理同一個request operation flow的情形。
