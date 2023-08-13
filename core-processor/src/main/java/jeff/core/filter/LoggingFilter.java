@@ -1,13 +1,15 @@
 package jeff.core.filter;
 
 
+import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.util.LogUtil;
+import jeff.core.entity.bo.MyContentCachingReqWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StreamUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import javax.servlet.*;
@@ -17,9 +19,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 /**
  * 紀錄請求參數與回應的過濾器。
+ * 通常會是過濾鏈中的最後一層，所以到這裡的時候，MyRequestContext裡面該有的東西都會被賦值了，所以也可以進行log了。
+ * 但因為目前還沒實作登入認證，所以到這一層的時候MyRequestContext的AuthenticatedMemberId會是null。
  */
 @Slf4j
 @Component
@@ -32,38 +38,46 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        ContentCachingRequestWrapper reqWrapper = (ContentCachingRequestWrapper) request;
+        MyContentCachingReqWrapper reqWrapper = (MyContentCachingReqWrapper) request;
         ContentCachingResponseWrapper resWrapper = (ContentCachingResponseWrapper) response;
+        MyRequestContext myContext = (MyRequestContext) reqWrapper.getAttribute("myContext");
 
+        this.logBeforeAPI(reqWrapper, myContext);
         filterChain.doFilter(reqWrapper, resWrapper);
+        this.logAfterAPI(resWrapper, myContext);
 
-        logAPI(reqWrapper, resWrapper); //要放在doFilter下面，getContentAsByteArray才有東西
         resWrapper.copyBodyToResponse(); //若沒加這個，客戶端不會獲得body
     }
 
     /**
-     * 針對API進行logging。
+     * 在進入API邏輯前，先log請求相關參數。
      */
-    private void logAPI(ContentCachingRequestWrapper reqWrapper, ContentCachingResponseWrapper resWrapper) throws UnsupportedEncodingException {
+    private void logBeforeAPI(MyContentCachingReqWrapper reqWrapper, MyRequestContext myContext) throws IOException {
         logUtil.logInfo(
                 log,
-                logUtil.composeLogPrefixForBusiness(null, reqWrapper.getAttribute("UUID").toString()),
+                logUtil.composeLogPrefixForBusiness(myContext.getAuthenticatedMemberId(), myContext.getUUID()),
                 String.format(
                         "The info of request, clientIP: %s, method: %s, path: %s, queryString: %s, body: %s",
                         reqWrapper.getRemoteAddr(),
                         reqWrapper.getMethod(),
                         reqWrapper.getServletPath(),
                         decodeQueryString(reqWrapper.getQueryString()),
-                        convertContentByteArrToString(reqWrapper.getContentAsByteArray())
+                        StreamUtils.copyToString(reqWrapper.getInputStream(), StandardCharsets.UTF_8) //因為有覆寫過，所以這裡取出body，也不影響之後控制器再取用
                 )
         );
 
+    }
+
+    /**
+     * 在API邏輯做完後，log回應的相關參數。
+     */
+    private void logAfterAPI(ContentCachingResponseWrapper resWrapper, MyRequestContext myContext) {
         logUtil.logInfo(
                 log,
-                logUtil.composeLogPrefixForBusiness(null, reqWrapper.getAttribute("UUID").toString()),
+                logUtil.composeLogPrefixForBusiness(myContext.getAuthenticatedMemberId(), myContext.getUUID()),
                 String.format(
                         "The info of response, body: %s",
-                        convertContentByteArrToString(resWrapper.getContentAsByteArray())
+                        convertContentByteArrToUTF8String(resWrapper.getContentAsByteArray()) //要放在doFilter下面，getContentAsByteArray才有東西，因為getContentAsByteArray是獲取快取的資料，而快取要在原本的Stream被消耗後才會快取進去。
                 )
         );
     }
@@ -77,10 +91,10 @@ public class LoggingFilter extends OncePerRequestFilter {
     }
 
     /**
-     * 將byte資料轉換成字串
+     * 將byte資料轉換成字串，編碼為UTF-8
      */
-    private String convertContentByteArrToString(byte[] contentBytes) {
-        return new String(contentBytes);
+    private String convertContentByteArrToUTF8String(byte[] contentBytes) {
+        return new String(contentBytes, Charset.forName("UTF-8"));
     }
 
 }

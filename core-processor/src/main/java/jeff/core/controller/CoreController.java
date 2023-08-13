@@ -1,7 +1,9 @@
 package jeff.core.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
+import jeff.core.consts.DemoMember;
 import jeff.core.exception.OrderException;
 import jeff.core.service.OrderService;
 import jeff.core.service.SystemService;
@@ -30,8 +32,9 @@ public class CoreController {
      * 通常是購物車結帳後按下送出所打的API。
      */
     @PostMapping("/order/normal")
-    public ResponseEntity<ResponseObject> createAnOrderFromNormalSalesEvent(@RequestBody JsonNode param, @RequestAttribute String UUID) throws OrderException {
-        return ResponseEntity.ok(normalOrderService.createOrder(param, UUID));
+    public ResponseEntity<ResponseObject> createAnOrderFromNormalSalesEvent(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+        myRequestContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
+        return ResponseEntity.ok(normalOrderService.createOrder(param, myRequestContext));
     }
 
     /**

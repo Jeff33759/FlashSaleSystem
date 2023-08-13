@@ -1,12 +1,12 @@
 package jeff.core.filter;
 
+import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.util.LogUtil;
-import lombok.extern.slf4j.Slf4j;
+import jeff.core.entity.bo.MyContentCachingReqWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 import org.springframework.web.util.ContentCachingResponseWrapper;
 
 import javax.servlet.FilterChain;
@@ -29,10 +29,11 @@ public class UUIDFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        ContentCachingRequestWrapper reqWrapper = (ContentCachingRequestWrapper) request;
+        MyContentCachingReqWrapper reqWrapper = (MyContentCachingReqWrapper) request;
         ContentCachingResponseWrapper resWrapper = (ContentCachingResponseWrapper) response;
 
-        request.setAttribute("UUID", logUtil.generateUUIDForLogging()); // The UUID for an operation flow.
+        MyRequestContext myContext = (MyRequestContext) request.getAttribute("myContext");
+        myContext.setUUID(logUtil.generateUUIDForLogging()); //因為上面getAttribute得到的是參考，所以這裡set，會直接set進該物件
 
         filterChain.doFilter(reqWrapper, resWrapper);
     }
