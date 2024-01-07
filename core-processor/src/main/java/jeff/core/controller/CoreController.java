@@ -33,7 +33,7 @@ public class CoreController {
      */
     @PostMapping("/order/normal")
     public ResponseEntity<ResponseObject> createAnOrderFromNormalSalesEvent(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
-        myRequestContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
+        myRequestContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // TODO 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
         return ResponseEntity.ok(normalOrderService.createOrder(param, myRequestContext));
     }
 

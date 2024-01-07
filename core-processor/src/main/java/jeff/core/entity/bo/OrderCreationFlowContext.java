@@ -14,7 +14,7 @@ public class OrderCreationFlowContext {
 
     private Map<Integer, Integer> goodsIdToQuantityMap; //欲下訂商品ID-欲下購數量的Map
 
-    private int total; //本次交易的總金額
+    private int total = 0; //本次交易的總金額。會在訂單處理的流程中逐漸累加。
 
     private int newOrderId; //成立新訂單的Id，會在訂單處理的流程中才賦值，所以給一個setter，而非建構子賦值
 
@@ -23,9 +23,8 @@ public class OrderCreationFlowContext {
      *
      * @param idToQuantityMap
      */
-    public OrderCreationFlowContext(Map<Integer, Integer> idToQuantityMap, int total, int sellerMId, int customerMId) {
+    public OrderCreationFlowContext(Map<Integer, Integer> idToQuantityMap, int sellerMId, int customerMId) {
         this.goodsIdToQuantityMap = idToQuantityMap;
-        this.total = total;
         this.customerMId = customerMId;
         this.sellerMId = sellerMId;
     }
@@ -48,6 +47,10 @@ public class OrderCreationFlowContext {
 
     public int getNewOrderId() {
         return newOrderId;
+    }
+
+    public void calculateTotalAmount(int amount) {
+        this.total += amount;
     }
 
     public void setNewOrderId(int newOrderId) {

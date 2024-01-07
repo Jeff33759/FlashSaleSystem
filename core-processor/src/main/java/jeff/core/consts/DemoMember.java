@@ -3,7 +3,7 @@ package jeff.core.consts;
 import jeff.persistent.model.mysql.po.Members;
 
 /**
- * 系統目前沒有寫登入認證相關的邏輯，所以User部分先寫死。
+ * TODO 系統目前沒有寫登入認證相關的邏輯，所以User部分先寫死。
  */
 public final class DemoMember {
 

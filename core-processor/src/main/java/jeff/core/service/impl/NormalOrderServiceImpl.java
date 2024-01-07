@@ -37,7 +37,7 @@ public class NormalOrderServiceImpl implements OrderService {
     private LogUtil logUtil;
 
     /**
-     * 目前因為還沒做認證相關的邏輯，所以下單的買家與賣家的Id都先寫死，外部就先不用傳了。
+     * TODO 目前因為還沒做認證相關的邏輯，所以下單的買家與賣家的Id都先寫死，外部就先不用傳了。
      *
      * @param param 範例資料: {"goods_list":[{"g_id":1,"g_name":"螺絲套組","quantity":20},...]}
      */
@@ -58,19 +58,17 @@ public class NormalOrderServiceImpl implements OrderService {
 
     /**
      * 進入成立訂單的流程前，預先將參數處理成新增訂單流程所需的Context物件。
-     * 買家與賣家都先寫死。
+     * TODO 買家與賣家都先寫死。
      */
     private OrderCreationFlowContext generateContextForOrderCreationFlowByParam(JsonNode param, MyRequestContext context) {
         ArrayNode orderedGoodsList = param.withArray("goods_list");
         Map<Integer,Integer> idToQuantityMap = new HashMap<>(); //欲下訂商品ID-欲下購數量的Map
 
-        int total = 0; //訂單總金額
         for (JsonNode goods : orderedGoodsList) {
             idToQuantityMap.put(goods.get("g_id").asInt(), goods.get("quantity").asInt());
-            total += goods.get("quantity").asInt();
         }
 
-        return new OrderCreationFlowContext(idToQuantityMap, total, DemoMember.SELLER.getId(), context.getAuthenticatedMemberId()); //賣家先寫死。
+        return new OrderCreationFlowContext(idToQuantityMap, DemoMember.SELLER.getId(), context.getAuthenticatedMemberId()); // TODO 賣家先寫死。
     }
 
 }
