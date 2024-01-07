@@ -11,7 +11,8 @@ import org.springframework.context.annotation.PropertySources;
 @Configuration
 @Profile("dev")
 @PropertySources({
-        @PropertySource({"classpath:myDataSource-dev.properties"})})
+        @PropertySource({"classpath:myDataSource-dev.properties",
+                "classpath:myRedis-dev.properties"})})
 public class DevEnvConfig {
 
 }
