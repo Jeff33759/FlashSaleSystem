@@ -37,6 +37,7 @@ public class Orders implements Serializable {
 
     /**
      * 訂單狀態。1:進行中，2:已完成，3:已取消
+     * 已完成 = 雙方完成交易。
      * */
     private Integer status;
 

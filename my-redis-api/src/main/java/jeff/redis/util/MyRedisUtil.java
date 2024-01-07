@@ -15,8 +15,7 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * 自訂義的RedisService介面實作，
- * 使用SpringDataRedis作為訪問Redis的API，其底層實作預設為Lettuce。
+ * 自訂義的Redis工具包，使用SpringDataRedis作為訪問Redis的API，其底層實作預設為Lettuce。
  * <p>
  * redis本身雖是SingleProcess-MultiThread，可是實際上處理CRUD的只有一個Thread，所以即使併發量再高，也不用擔心執行緒競爭與上鎖的問題。
  * 利用這個特性，結合redis-list的lpush&rpop去做一個原子性又可以在各服務間共享的Queue，此Queue就拿來應付快閃搶購的業務。
