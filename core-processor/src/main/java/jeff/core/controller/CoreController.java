@@ -38,6 +38,16 @@ public class CoreController {
     }
 
     /**
+     * 當賣家出貨，買家確認收到後，由賣家將訂單的狀態設為已完成。
+     * 詳細的交易流程就不設計了，先做成這樣。
+     */
+    @PostMapping("/finish-order")
+    public ResponseEntity<ResponseObject> finishOrder(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+        myRequestContext.setAuthenticatedMemberId(DemoMember.SELLER.getId()); // TODO 此API的請求者就是賣家，目前先寫死，所以前端也不用傳這個參數
+        return ResponseEntity.ok(normalOrderService.finishOrder(param, myRequestContext));
+    }
+
+    /**
      * 初始化redis和MySql，方便DEMO。
      */
     @GetMapping("/system/init")

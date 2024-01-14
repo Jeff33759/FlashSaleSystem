@@ -1,5 +1,7 @@
 package jeff.core.manager;
 
+import jeff.common.entity.bo.MyRequestContext;
+import jeff.common.util.LogUtil;
 import jeff.core.entity.bo.OrderCreationFlowContext;
 import jeff.core.exception.OrderException;
 import jeff.persistent.model.mysql.dao.GoodsDAO;
@@ -50,6 +52,15 @@ public class OrderManager {
         this.insertOrdersDetailsIntoDB(context);
 
         return context.getNewOrderId();
+    }
+
+    /**
+     * 完成訂單的流程。
+     */
+    public void startOrderFinishFlow(int orderId, MyRequestContext context) {
+        //這裡省略對sellerMemberId的檢查，不想在update前又去select一次，取而代之的是過濾練會LOG，就算前端送錯封包也有得查
+
+        orderDAO.updateStatusById(orderId, 2);
     }
 
 

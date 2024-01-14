@@ -57,6 +57,19 @@ public class NormalOrderServiceImpl implements OrderService {
     }
 
     /**
+     * TODO 目前因為還沒做認證相關的邏輯，所以賣家的Id都先寫死，外部就先不用傳了。
+     *
+     * @param param 範例資料: {"o_id":1}
+     */
+    @Override
+    public ResponseObject finishOrder(JsonNode param, MyRequestContext context) {
+        int oId = param.get("o_id").asInt();
+        orderManager.startOrderFinishFlow(oId, context);
+
+        return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("o_id", oId), "Finish order successful.");
+    }
+
+    /**
      * 進入成立訂單的流程前，預先將參數處理成新增訂單流程所需的Context物件。
      * TODO 買家與賣家都先寫死。
      */

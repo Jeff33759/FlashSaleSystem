@@ -12,4 +12,8 @@ public interface OrderService {
      */
     ResponseObject createOrder(JsonNode param, MyRequestContext context) throws OrderException;
 
+    /**
+     * 完成一筆訂單。
+     */
+    ResponseObject finishOrder(JsonNode param, MyRequestContext context);
 }
