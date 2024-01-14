@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.3.1] - 2024-01-14
+
 ## Added
 - 新增子專案high-concurrency-processor
 - 新增子專案scheduler-processor
@@ -16,7 +18,7 @@
 - 統一Log格式(為了將來日誌中心化)、新增Log工具包
 - redis-api重構，並把噴錯統一成MyRedisException
 
-## [0.2.1-SNAPSHOT] - 2023-05-13
+## [0.2.1] - 2023-05-13
 
 ### Changed
 - DB的Schema更動，把快閃銷售案件跟一般銷售案件改成做在同張案件表裡，用type欄位區分案件類型
@@ -25,7 +27,7 @@
 - 一般銷售案件的下單API
 - core-processor的Logging以及例外的處理
 
-## [0.1.1-SNAPSHOT] - 2023-04-02
+## [0.1.1] - 2023-04-02
 
 ### Added
 - 父專案的建構，Spring相關版本統一管理，引入maven定版插件
