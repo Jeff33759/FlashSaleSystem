@@ -1,2 +1,6 @@
 server:
-  port: 8002
+  port: 8001
+
+app:
+  instance:
+    name: Core01

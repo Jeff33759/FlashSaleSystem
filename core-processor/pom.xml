@@ -45,12 +45,6 @@
             <artifactId>common-lib</artifactId>
             <version>0.2.1-SNAPSHOT</version>
         </dependency>
-        <!-- 常用配置 -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
 
     </dependencies>
 

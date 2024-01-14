@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>my-flashsale-system</artifactId>
+        <groupId>jeff.flash</groupId>
+        <version>0.2.1-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>high-concurrency-processor</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+
+        <!-- web相關 -->
+        <dependency> <!-- 非同步響應式Web應用框架 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency> <!-- 非同步響應式的spring data mongo函式庫 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-mongodb-reactive</artifactId>
+        </dependency>
+        <dependency> <!-- 非同步響應式的spring data redis函式庫 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+        </dependency>
+        <!-- 自己寫的函式庫 -->
+        <dependency> <!-- 共用包 -->
+            <groupId>jeff.flash</groupId>
+            <artifactId>common-lib</artifactId>
+            <version>0.2.1-SNAPSHOT</version>
+        </dependency>
+        <dependency> <!-- 測試工具包 -->
+            <groupId>jeff.flash</groupId>
+            <artifactId>my-test-lib</artifactId>
+            <version>0.2.1-SNAPSHOT</version>
+            <scope>test</scope> <!-- 設為test，此函式庫專門用於測試，不會打包 -->
+        </dependency>
+
+    </dependencies>
+
+</project>

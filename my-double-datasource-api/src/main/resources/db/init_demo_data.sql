@@ -1,5 +1,5 @@
 -- 建置DEMO用資料 --
-USE db_dev_flash_sale_module;
+USE db_dev_flash_sale_mysql;
 
 -- 以防萬一，先把所有表都Truncate了 --
 SET
@@ -9,6 +9,7 @@ TRUNCATE TABLE `members`;
 TRUNCATE TABLE `orders`;
 TRUNCATE TABLE `orders_detail`;
 TRUNCATE TABLE `sale_event`;
+TRUNCATE TABLE `flash_sale_event`;
 SET
 FOREIGN_KEY_CHECKS = 1;
 
@@ -20,9 +21,15 @@ VALUES (NULL, 'Jeff', 1, 1, '2022-09-19 20:57:43'),
 INSERT INTO goods
 VALUES (NULL, 2, '螺絲套組', 500, 200),
        (NULL, 2, '板手套組', 200, 1000),
-       (NULL, 2, '限量套組', 50, 2000);
+       (NULL, 2, '限量套組', 500, 2000),
+       (NULL, 2, '限量套組2', 10, 1500),
+       (NULL, 2, '限量套組3', 1000, 150);
 
 INSERT INTO `sale_event`
-VALUES (NULL, 1, FALSE, DEFAULT, '2023-01-12 19:00:00', CURRENT_TIMESTAMP() + INTERVAL 3 DAY),
-       (NULL, 2, FALSE, DEFAULT, '2023-02-12 19:00:00', CURRENT_TIMESTAMP() + INTERVAL 3 DAY),
-       (NULL, 3, TRUE, DEFAULT, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP() + INTERVAL 5 MINUTE);
+VALUES (NULL, 1, DEFAULT, '2023-01-12 19:00:00'),
+       (NULL, 2, DEFAULT, '2023-02-12 19:00:00');
+
+INSERT INTO `flash_sale_event`
+VALUES (NULL, 3, DEFAULT, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP() + INTERVAL 3 MINUTE, DEFAULT),
+       (NULL, 4, DEFAULT, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP() + INTERVAL 3 MINUTE, DEFAULT),
+       (NULL, 5, DEFAULT, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP() + INTERVAL 3 MINUTE, DEFAULT);

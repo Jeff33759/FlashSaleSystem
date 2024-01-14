@@ -44,7 +44,7 @@ public class OrderManager {
      */
     @Transactional(rollbackFor = Exception.class) //rollbackFor若不寫，預設只會針對RuntimeException去回滾
     public int startOrderCreationFlow(OrderCreationFlowContext context) throws OrderException {
-        this.checkThatAllGoodsAreInStockInDB(context);
+        this.checkThatAllGoodsAreInStockInDBAndCalculateTotalAmount(context);
         this.destock(context);
         this.insertANewOrderIntoDB(context);
         this.insertOrdersDetailsIntoDB(context);
@@ -56,8 +56,10 @@ public class OrderManager {
     /**
      * 檢查所有欲下訂的商品是否還有現貨。
      * 先檢查，有現貨才往下去做insert的流程，以免動不動就Rollback損耗效能。
+     *
+     * 途中順便去計算訂單的總金額，就不用之後還要再遍歷一次。
      */
-    private void checkThatAllGoodsAreInStockInDB(OrderCreationFlowContext context) throws OrderException {
+    private void checkThatAllGoodsAreInStockInDBAndCalculateTotalAmount(OrderCreationFlowContext context) throws OrderException {
         Map<Integer, Integer> goodsIdToQuantityMap = context.getGoodsIdToQuantityMap();
 
         List<Goods> goodsListFromDB = goodsDAO.findAllById(goodsIdToQuantityMap.keySet());
@@ -67,6 +69,8 @@ public class OrderManager {
             if (quantityToBeOrdered > goods.getStock()) {
                 throw new OrderException(String.format("The stock of goods-id:%d is not enough.", goods.getId()));
             }
+
+            context.calculateTotalAmount(goods.getPrice() * quantityToBeOrdered);
         });
     }
 

@@ -37,6 +37,7 @@ public class Orders implements Serializable {
 
     /**
      * 訂單狀態。1:進行中，2:已完成，3:已取消
+     * 已完成 = 雙方完成交易。
      * */
     private Integer status;
 
@@ -44,10 +45,10 @@ public class Orders implements Serializable {
     private Timestamp createTime;
 
     /**
-     * flash_sale_temp_record搶購臨時表的對應id(如果有的話)，來自MongoDB
+     * flash_sale_event_log搶購Log表的對應id(如果有的話)，來自MongoDB
      * */
-    @Column(name = "fstr_id")
-    private String fstrId;
+    @Column(name = "fsel_id")
+    private String fselId;
 
     /**
      * 為了讓查詢訂單時能夠順便抓出關聯的Detail。

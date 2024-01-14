@@ -1,7 +1,7 @@
 package jeff.persistent.config;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
-import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -24,19 +24,36 @@ import java.sql.SQLException;
 @EnableJpaRepositories(basePackages = {"jeff.persistent.model.mysql.dao"}) //告訴JPA屬於他的DAO去哪找
 public class MySQLSourceConfig {
 
+    @Value("${mydb.datasource.url.prefix}")
+    private String dataSourceUrlPrefix;
+
+    @Value("${mydb.datasource.url.suffix}")
+    private String dataSourceUrlSuffix;
+
+    @Value("${mydb.datasource.username}")
+    private String userName;
+
+    @Value("${mydb.datasource.password}")
+    private String passWord;
+
     /**
-     * 程式啟動時，自動執行SQL腳本，建置DB
+     * 自動執行SQL腳本，建置DB。
+     *
+     * PostConstruct的執行順序為:
+     * Constructor(建構子) -> @Autowired(依賴注入) -> @PostConstruct
+     *
+     * 把建構DB的邏輯寫在此方法與寫在建構子的區別，就是這種做法可以認得@Value所注入的值，因為已經是Spring元件。
      */
-    public MySQLSourceConfig() throws SQLException {
+    @PostConstruct //當DI完成後所要執行的初始化方法，此時呼叫的已經是Spring代理物件，所以成員變數會有值(從prop撈)
+    private void createDatabaseAfterThisComponentHasBeenInjectedIntoSpringContainer() throws SQLException {
         Resource resource = new ClassPathResource("db/schema-dev.sql");
 
-        MysqlDataSource a = new MysqlDataSource();
-        a.setUrl("jdbc:mysql://localhost:3306");
-        a.setUser("root");
-        a.setPassword("sasa");
-        ScriptUtils.executeSqlScript(a.getConnection(), resource);
+        MysqlDataSource mysqlDataSource = new MysqlDataSource();
+        mysqlDataSource.setUrl(dataSourceUrlPrefix);
+        mysqlDataSource.setUser(userName);
+        mysqlDataSource.setPassword(passWord);
+        ScriptUtils.executeSqlScript(mysqlDataSource.getConnection(), resource);
     }
-
 
     /**
      * 上面把建置DB的邏輯寫在建構子裡了，所以跑到這個方法時，DB一定存在，因此setUrl才不會跳錯。
@@ -47,9 +64,9 @@ public class MySQLSourceConfig {
     public DataSource customDataSource() {
         DataSourceBuilder dsBuilder = DataSourceBuilder.create();
         dsBuilder.driverClassName("com.mysql.cj.jdbc.Driver");
-        dsBuilder.url("jdbc:mysql://localhost:3306/db_dev_flash_sale_module?useUnicode=true&characterEncoding=utf-8&allowPublicKeyRetrieval=true&useSSL=false");
-        dsBuilder.username("root");
-        dsBuilder.password("sasa");
+        dsBuilder.url(dataSourceUrlPrefix + dataSourceUrlSuffix);
+        dsBuilder.username(userName);
+        dsBuilder.password(passWord);
         return dsBuilder.build();
     }
 
