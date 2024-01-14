@@ -8,7 +8,8 @@
 - 新增排程:掃描快閃銷售案件進mongo
 - 系統啟動時清除mongo、redis所有資料
 - 新增子專案my-test-lib，這一包裡面放些專門用於測試的東西，如POJO、自寫工具、第三方函式庫等等。
-- core新增init的接口，方便DEMO
+- core-processor新增init的接口，方便DEMO
+- high-concurrency-processor的reactive相關元件框架完成
 
 ### Changed
 - DB的Schema更動，把快閃銷售案件跟一般銷售案件又拆回兩張表了。
