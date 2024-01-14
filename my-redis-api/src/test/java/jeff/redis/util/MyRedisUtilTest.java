@@ -15,9 +15,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @SpringBootTest(classes = MyRedisUtilTest.class)
 class MyRedisUtilTest {
@@ -43,7 +41,7 @@ class MyRedisUtilTest {
     }
 
     @Test
-    void GivenTheKeyExistInRedis_WhenGetDataStrByKey_ThenReturnOptionalWhichContainsString() {
+    void GivenKeyExistInRedis_WhenGetDataStrByKey_ThenReturnOptionalWhichContainsString() {
         String stubKey = "keyForTesting.";
         String stubValue = "valueForTesting.";
         Mockito.when(mockStringRedisTemplate.opsForValue().get(stubKey)).thenReturn(stubValue);
@@ -54,7 +52,7 @@ class MyRedisUtilTest {
     }
 
     @Test
-    void GivenTheKeyExistInRedis_WhenGetDataStrByKey_ThenReturnEmptyOptional() {
+    void GivenKeyDoesNotExistInRedis_WhenGetDataStrByKey_ThenReturnEmptyOptional() {
         String stubKey = "keyForTesting.";
         Mockito.when(mockStringRedisTemplate.opsForValue().get(stubKey)).thenReturn(null);
 
@@ -181,9 +179,7 @@ class MyRedisUtilTest {
     void GivenKeyDoesNotExistInRedis_WhenLeftPopListByKeyAndGetDataObj_ThenReturnEmptyOptional() throws JsonProcessingException {
         String stubKey = "keyForTesting.";
         String stubJsonValue = "{\"id\":1,\"name\":\"stubName.\"}";
-        MyTestPOJO stubPOJO = new MyTestPOJO(1, "stubName.");
         Mockito.doReturn(Optional.empty()).when(spyMyRedisUtil).leftPopListByKeyAndGetDataStr(stubKey);
-        Mockito.when(mockObjectMapper.readValue(stubJsonValue, MyTestPOJO.class)).thenReturn(stubPOJO);
 
         Optional<Object> actual = spyMyRedisUtil.leftPopListByKeyAndGetDataObj(stubKey, MyTestPOJO.class);
 
@@ -228,5 +224,16 @@ class MyRedisUtilTest {
         Mockito.verify(spyMyRedisUtil, Mockito.times(1)).rightPushStrListByKey(stubKey, stubJsonStrList, stubInstant);
     }
 
+    @Test
+    void Given_WhenRemoveAllKeys_ThenInvokeExpectedMethodOfStringRedisTemplate() {
+        String expectedKeysPattern = "*";
+        Set<String> stubKeySet = new HashSet<>();
+        Mockito.when(mockStringRedisTemplate.keys(expectedKeysPattern)).thenReturn(stubKeySet);
+
+        spyMyRedisUtil.removeAllKeys();
+
+        Mockito.verify(mockStringRedisTemplate, Mockito.times(1)).keys(expectedKeysPattern);
+        Mockito.verify(mockStringRedisTemplate, Mockito.times(1)).delete(stubKeySet);
+    }
 
 }
