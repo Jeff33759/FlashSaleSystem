@@ -1,4 +1,4 @@
-package jeff.core.service.impl;
+package jeff.core.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -6,12 +6,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
+import jeff.common.business.order.IOrderService;
 import jeff.common.util.LogUtil;
 import jeff.core.entity.bo.OrderCreationFlowContext;
 import jeff.common.consts.DemoMember;
 import jeff.core.exception.OrderException;
 import jeff.core.manager.OrderManager;
-import jeff.core.service.OrderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -25,7 +25,7 @@ import java.util.Map;
  */
 @Slf4j
 @Component("normalOrderService")
-public class NormalOrderServiceImpl implements OrderService {
+public class NormalOrderService implements IOrderService {
 
     @Autowired
     private OrderManager orderManager;
@@ -42,7 +42,7 @@ public class NormalOrderServiceImpl implements OrderService {
      * @param param 範例資料: {"goods_list":[{"g_id":1,"g_name":"螺絲套組","quantity":20},...]}
      */
     @Override
-    public ResponseObject createOrder(JsonNode param, MyRequestContext context) throws OrderException{
+    public ResponseObject createOrder(JsonNode param, MyRequestContext context) throws OrderException {
         OrderCreationFlowContext orderCreationFlowContext = generateContextForOrderCreationFlowByParam(param, context); // 這個context是for訂單流程的，作用域跟MyRequestContext不同
 
         try{

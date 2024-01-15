@@ -1,7 +1,6 @@
 package jeff.core.manager;
 
 import jeff.common.entity.bo.MyRequestContext;
-import jeff.common.util.LogUtil;
 import jeff.core.entity.bo.OrderCreationFlowContext;
 import jeff.core.exception.OrderException;
 import jeff.persistent.model.mysql.dao.GoodsDAO;
@@ -57,10 +56,17 @@ public class OrderManager {
     /**
      * 完成訂單的流程。
      */
-    public void startOrderFinishFlow(int orderId, MyRequestContext context) {
-        //這裡省略對sellerMemberId的檢查，不想在update前又去select一次，取而代之的是過濾練會LOG，就算前端送錯封包也有得查
+    public void startOrderFinishFlow(int orderId, MyRequestContext context) throws OrderException{
+        Orders oldOrder = orderDAO.findById(orderId).orElseThrow(
+                () -> new OrderException("Failed to finish the order because it does not exist in DB.")
+        );
 
-        orderDAO.updateStatusById(orderId, 2);
+        if(oldOrder.getSellerMember().getId() != context.getAuthenticatedMemberId()) {
+            throw new OrderException("Failed to finish the order because req param is wrong");
+        }
+
+        oldOrder.setStatus(2);
+        orderDAO.save(oldOrder);
     }
 
 

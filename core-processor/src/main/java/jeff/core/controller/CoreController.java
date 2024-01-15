@@ -1,11 +1,11 @@
 package jeff.core.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jeff.common.business.order.IOrderService;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.consts.DemoMember;
 import jeff.core.exception.OrderException;
-import jeff.core.service.OrderService;
 import jeff.core.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 public class CoreController {
 
     @Resource(name = "normalOrderService")
-    private OrderService normalOrderService;
+    private IOrderService normalOrderService;
 
     @Autowired
     private SystemService systemService;
