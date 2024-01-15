@@ -8,7 +8,7 @@ import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.util.LogUtil;
 import jeff.core.entity.bo.OrderCreationFlowContext;
-import jeff.core.consts.DemoMember;
+import jeff.common.consts.DemoMember;
 import jeff.core.exception.OrderException;
 import jeff.core.manager.OrderManager;
 import jeff.core.service.OrderService;

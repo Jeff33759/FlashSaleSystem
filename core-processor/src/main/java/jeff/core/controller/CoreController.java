@@ -3,7 +3,7 @@ package jeff.core.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
-import jeff.core.consts.DemoMember;
+import jeff.common.consts.DemoMember;
 import jeff.core.exception.OrderException;
 import jeff.core.service.OrderService;
 import jeff.core.service.SystemService;
