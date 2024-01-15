@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
-import jeff.common.business.order.IOrderService;
+import jeff.common.interfaces.IOrderService;
 import jeff.common.util.LogUtil;
 import jeff.core.entity.bo.OrderCreationFlowContext;
 import jeff.common.consts.DemoMember;
