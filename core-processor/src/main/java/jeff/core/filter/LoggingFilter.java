@@ -30,7 +30,7 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Component
 @WebFilter
-@Order(10)
+@Order(FilterOrderNumber.LOGGING_FILTER)
 public class LoggingFilter extends OncePerRequestFilter {
 
     @Autowired

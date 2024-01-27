@@ -20,7 +20,7 @@ import java.io.IOException;
  */
 @Component
 @WebFilter
-@Order(1)
+@Order(FilterOrderNumber.REQ_CONTEXT_GENERATION_FILTER)
 public class ReqContextGenerationFilter extends OncePerRequestFilter {
 
     @Override
