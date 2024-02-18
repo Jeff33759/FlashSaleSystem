@@ -47,6 +47,11 @@
             <version>0.4.1-SNAPSHOT</version>
             <scope>test</scope> <!-- 設為test，此函式庫專門用於測試，不會打包 -->
         </dependency>
+        <dependency> <!-- MQ相關 -->
+            <groupId>jeff.flash</groupId>
+            <artifactId>my-mq-lib</artifactId>
+            <version>0.4.1-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
 
