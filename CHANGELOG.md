@@ -6,6 +6,7 @@
 - core-processor新增完成訂單的接口
 - high-concurrency-processor完成過濾鏈撰寫
 - my-mq-lib新增，並建置關於MQ的發布/消費架構
+- high-concurrency-processor完成aop例外捕捉
 
 ## [0.3.1] - 2024-01-14
 
