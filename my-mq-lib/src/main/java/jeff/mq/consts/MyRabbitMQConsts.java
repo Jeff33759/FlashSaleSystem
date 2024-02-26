@@ -13,9 +13,17 @@ public class MyRabbitMQConsts {
     private MyRabbitMQConsts() {
     }
 
+    // ----快閃銷售案件相關----
+
     /**
      * 快閃銷售案件中關於訂單相關的事件的routingKey。
      */
     public static final String ROUTING_KEY_NAME_FOR_FLASH_SALE_EVENT_ORDER_CASE = "fse.order";
+
+
+    /**
+     * 快閃銷售案件中關於訂單相關的事件，其中的訂單成立事件。
+     */
+    public static final String TITLE_NAME_FOR_ORDER_GENERATION_OF_FLASH_SALE_EVENT_ORDER_CASE = "generation";
 
 }

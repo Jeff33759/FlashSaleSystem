@@ -80,7 +80,7 @@ public class FlashSaleEventService {
                                         .flatMap(updatedFseInfo -> {
                                             // 處理第三個結果
                                             try {
-                                                myReactiveMQProducer.produceMessageToBusinessExchange(MyRabbitMQConsts.ROUTING_KEY_NAME_FOR_FLASH_SALE_EVENT_ORDER_CASE, new MyMessagePayloadTemplate("consume", objectMapper.writeValueAsString(updatedFseInfo)));
+                                                myReactiveMQProducer.produceMessageToBusinessExchange(MyRabbitMQConsts.ROUTING_KEY_NAME_FOR_FLASH_SALE_EVENT_ORDER_CASE, new MyMessagePayloadTemplate(MyRabbitMQConsts.TITLE_NAME_FOR_ORDER_GENERATION_OF_FLASH_SALE_EVENT_ORDER_CASE, objectMapper.writeValueAsString(updatedFseInfo)));
 
                                                 // 第四個操作
                                                 return Mono.just(new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("transNum", updatedFseInfo.getTransNum()), "Consume flashSaleEvent successfully."));
