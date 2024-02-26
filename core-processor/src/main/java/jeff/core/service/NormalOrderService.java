@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import jeff.common.consts.ResponseCode;
+import jeff.common.entity.bo.MyContext;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.interfaces.IOrderService;
@@ -42,15 +43,17 @@ public class NormalOrderService implements IOrderService {
      * @param param 範例資料: {"goods_list":[{"g_id":1,"g_name":"螺絲套組","quantity":20},...]}
      */
     @Override
-    public ResponseObject createOrder(JsonNode param, MyRequestContext context) throws OrderException {
-        OrderCreationFlowContext orderCreationFlowContext = generateContextForOrderCreationFlowByParam(param, context); // 這個context是for訂單流程的，作用域跟MyRequestContext不同
+    public ResponseObject createOrder(JsonNode param, MyContext context) throws OrderException {
+        MyRequestContext reqContext = (MyRequestContext) context;
+
+        OrderCreationFlowContext orderCreationFlowContext = generateContextForOrderCreationFlowByParam(param, reqContext); // 這個context是for訂單流程的，作用域跟MyRequestContext不同
 
         try{
             int newOrderId = orderManager.startOrderCreationFlow(orderCreationFlowContext);
 
             return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("oId",newOrderId), "Create order successful.");
         } catch (DataAccessException dae) { //Spring JDBC當操作DB遇到問題時會拋出的例外的基類，先印log後，統一包裝成OrderException
-            logUtil.logWarn(log, logUtil.composeLogPrefixForBusiness(context.getAuthenticatedMemberId(), context.getUUID()), String.format("Some errors occurred when creating order, message:%s", dae.getMessage()));
+            logUtil.logWarn(log, logUtil.composeLogPrefixForBusiness(reqContext.getAuthenticatedMemberId(), context.getUUID()), String.format("Some errors occurred when creating order, message:%s", dae.getMessage()));
             throw new OrderException("Some errors occurred when creating order."); //會在此捕捉的，都是一些沒有預期到的DB相關的例外，前面有預期的例外，就會先包成OrderException了
         }
 
@@ -62,9 +65,11 @@ public class NormalOrderService implements IOrderService {
      * @param param 範例資料: {"o_id":1}
      */
     @Override
-    public ResponseObject finishOrder(JsonNode param, MyRequestContext context) {
+    public ResponseObject finishOrder(JsonNode param, MyContext context) {
+        MyRequestContext reqContext = (MyRequestContext) context;
+
         int oId = param.get("o_id").asInt();
-        orderManager.startOrderFinishFlow(oId, context);
+        orderManager.startOrderFinishFlow(oId, reqContext);
 
         return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("o_id", oId), "Finish order successful.");
     }
