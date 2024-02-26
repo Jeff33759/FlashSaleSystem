@@ -2,32 +2,17 @@ package jeff.highconcurrency.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import jeff.common.consts.DemoMember;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.exception.MyException;
-import jeff.common.util.LogUtil;
 import jeff.highconcurrency.entity.bo.MyServerWebExchangeDecoratorWrapper;
-import jeff.highconcurrency.mq.producer.MyReactiveMQProducer;
-import jeff.highconcurrency.persistent.model.mongo.dao.ReactiveFlashSaleEventLogRepo;
 import jeff.highconcurrency.service.FlashSaleEventService;
-import jeff.highconcurrency.util.redis.util.MyReactiveRedisUtil;
-import jeff.mq.consts.MyRabbitMQConsts;
-import jeff.mq.entity.dto.MyMessagePayloadTemplate;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.ResponseEntity;
-import org.springframework.messaging.Message;
-import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.EmitterProcessor;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.Sinks;
-
-import javax.annotation.Resource;
-import java.util.function.Supplier;
 
 /**
  * 高併發業務接口。
@@ -44,73 +29,18 @@ public class HighConcurrencyController {
     @Autowired
     FlashSaleEventService flashSaleEventService;
 
-    @Autowired
-    ReactiveFlashSaleEventLogRepo reactiveFlashSaleEventLogRepo;
-
-    @Autowired
-    MyReactiveRedisUtil myReactiveRedisUtil;
-
-    @Autowired
-    LogUtil logUtil;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-    @Autowired
-    MyReactiveMQProducer myReactiveMQProducer;
-
-    @GetMapping("/hello")
-    public Mono hello() {
-        return Mono.just("Hello Spring WebFlux RestController");
-    }
-
-    @GetMapping("/test")
-    public boolean test() {
-        System.out.println(1);
-        return reactiveFlashSaleEventLogRepo.selectByFseIdAndTransNumAndHasNotBeenConsumed(1, 1)
-                .subscribe(
-                        b -> {
-                            System.out.println(b);
-                        }, err -> {
-                            System.out.println(err);
-                        }
-                ).isDisposed();
-    }
-
-    @GetMapping("/test2")
-    public Mono<ResponseObject> test2() {
-        return flashSaleEventService.consumeFlashSaleEvent();
-    }
-
-//    @GetMapping("/test3")
-//    public Mono<String> test3() {
-//        return myReactiveRedisUtil.putDataStrByKey("test", "test")
-//                .then(myReactiveRedisUtil.getDataStrByKey("test").map(output -> output.get()));
-//    }
-
-    @GetMapping("/test4")
-    public Mono<Boolean> test4() {
-        return myReactiveRedisUtil.getDataStrByKey("test").map(va -> va.isPresent());
-    }
-
-    @GetMapping("/test5")
-    public Mono<Void> test5() {
-        return myReactiveRedisUtil.removeAllKeys();
-    }
-
     /**
      * 客戶端快閃銷售案件的商品下單時的接口。
      * 通常是搶門票的頁面，進入快閃銷售案件特有的結帳頁面後，按下送出所打的API。
      */
     @PostMapping("/order/flash")
     public Mono<ResponseEntity<ResponseObject>> createAnOrderFromFlashSalesEvent(MyServerWebExchangeDecoratorWrapper serverWebExchange, @RequestBody JsonNode param) throws MyException, JsonProcessingException {
-        MyRequestContext myContext = serverWebExchange.getAttribute("myContext");
-        System.out.println(myContext.getUUID());
-        System.out.println("222" + param.toString());
+        MyRequestContext myReqContext = serverWebExchange.getAttribute("myContext");
+        myReqContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // TODO 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
 
-        myReactiveMQProducer.produceMessageToBusinessExchange(MyRabbitMQConsts.ROUTING_KEY_NAME_FOR_FLASH_SALE_EVENT_ORDER_CASE, new MyMessagePayloadTemplate("", ""));
 
-        return Mono.empty();
+        return flashSaleEventService.consumeFlashSaleEvent(param, myReqContext)
+                .map(resObj -> ResponseEntity.ok(resObj));
     }
 
 }
