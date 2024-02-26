@@ -15,7 +15,7 @@ public class MyMessagePayloadTemplate {
      *
      * 沒用到就傳空字串。
      */
-    private final String title;
+    private String title;
 
     /**
      * 消息的本體。
@@ -23,12 +23,12 @@ public class MyMessagePayloadTemplate {
      *
      * 沒用到就傳空字串。
      */
-    private final String content;
+    private String content;
 
     /**
      * 發布的時間點。
      */
-    private final long publishTimestamp;
+    private long publishTimestamp;
 
     /**
      * @param title     沒用到就傳空字串。
@@ -38,6 +38,12 @@ public class MyMessagePayloadTemplate {
         this.title = title;
         this.content = content;
         this.publishTimestamp = System.currentTimeMillis();
+    }
+
+    /**
+     * MyMQConsumer那邊要用，否則沒法轉換成Pojo。
+     */
+    public MyMessagePayloadTemplate() {
     }
 
 }
