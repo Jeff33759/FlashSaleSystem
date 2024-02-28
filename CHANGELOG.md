@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.4.1] - 2024-02-28
+
 ### Added
 - core-processor新增完成訂單的接口
 - high-concurrency-processor完成過濾鏈撰寫
