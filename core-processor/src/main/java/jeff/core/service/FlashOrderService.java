@@ -30,7 +30,7 @@ public class FlashOrderService implements IOrderService {
     private OrderManager orderManager;
 
     @Autowired
-    LogUtil logUtil;
+    private LogUtil logUtil;
 
     /**
      * 快閃銷售案件，限制玩家一個請求只能買一件商品，所以param沒有下定數量。

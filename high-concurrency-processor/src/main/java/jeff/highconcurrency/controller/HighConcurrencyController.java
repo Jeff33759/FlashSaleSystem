@@ -27,7 +27,7 @@ import reactor.core.publisher.Mono;
 public class HighConcurrencyController {
 
     @Autowired
-    FlashSaleEventService flashSaleEventService;
+    private FlashSaleEventService flashSaleEventService;
 
     /**
      * 客戶端快閃銷售案件的商品下單時的接口。

@@ -27,13 +27,13 @@ import java.util.function.Consumer;
 public class MyMQConsumer {
 
     @Resource(name = "flashOrderService")
-    IOrderService flashOrderService;
+    private IOrderService flashOrderService;
 
     @Autowired
-    LogUtil logUtil;
+    private LogUtil logUtil;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     /**
      * 快閃銷售案件的訂單相關事件。

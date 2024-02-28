@@ -27,19 +27,19 @@ import reactor.core.publisher.Mono;
 public class FlashSaleEventService {
 
     @Autowired
-    MyReactiveRedisUtil myReactiveRedisUtil;
+    private MyReactiveRedisUtil myReactiveRedisUtil;
 
     @Autowired
-    ReactiveFlashSaleEventLogRepo reactiveFlashSaleEventLogRepo;
+    private ReactiveFlashSaleEventLogRepo reactiveFlashSaleEventLogRepo;
 
     @Autowired
-    MyReactiveMQProducer myReactiveMQProducer;
+    private MyReactiveMQProducer myReactiveMQProducer;
 
     @Autowired
-    LogUtil logUtil;
+    private LogUtil logUtil;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     /**
      * 消費一個快閃銷售案件。
