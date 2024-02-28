@@ -1,13 +1,17 @@
 package jeff.highconcurrency.controller;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import jeff.common.consts.DemoMember;
+import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
-import jeff.highconcurrency.persistent.model.mongo.dao.ReactiveFlashSaleEventLogRepo;
+import jeff.common.exception.MyException;
+import jeff.highconcurrency.entity.bo.MyServerWebExchangeDecoratorWrapper;
 import jeff.highconcurrency.service.FlashSaleEventService;
-import jeff.highconcurrency.util.redis.util.MyReactiveRedisUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
 /**
@@ -18,54 +22,25 @@ import reactor.core.publisher.Mono;
  *
  * 當使用Mono和Flux來處理請求時，WebFlux不會為每個請求分配獨立的執行緒(不同於以往的同步模型)，而是通過非同步處理，更高效地利用執行緒和資源。
  */
+@Slf4j
 @RestController
 public class HighConcurrencyController {
 
     @Autowired
-    FlashSaleEventService flashSaleEventService;
+    private FlashSaleEventService flashSaleEventService;
 
-    @Autowired
-    ReactiveFlashSaleEventLogRepo reactiveFlashSaleEventLogRepo;
+    /**
+     * 客戶端快閃銷售案件的商品下單時的接口。
+     * 通常是搶門票的頁面，進入快閃銷售案件特有的結帳頁面後，按下送出所打的API。
+     */
+    @PostMapping("/order/flash")
+    public Mono<ResponseEntity<ResponseObject>> createAnOrderFromFlashSalesEvent(MyServerWebExchangeDecoratorWrapper serverWebExchange, @RequestBody JsonNode param) throws MyException, JsonProcessingException {
+        MyRequestContext myReqContext = serverWebExchange.getAttribute("myContext");
+        myReqContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // TODO 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
 
-    @Autowired
-    MyReactiveRedisUtil myReactiveRedisUtil;
 
-    @GetMapping("/hello")
-    public Mono hello() {
-        return Mono.just("Hello Spring WebFlux RestController");
+        return flashSaleEventService.consumeFlashSaleEvent(param, myReqContext)
+                .map(resObj -> ResponseEntity.ok(resObj));
     }
 
-    @GetMapping("/test")
-    public boolean test() {
-        System.out.println(1);
-        return reactiveFlashSaleEventLogRepo.selectByFseIdAndTransNumAndHasNotBeenConsumed(1, 1)
-                .subscribe(
-                        b -> {
-                            System.out.println(b);
-                        }, err -> {
-                            System.out.println(err);
-                        }
-                ).isDisposed();
-    }
-
-    @GetMapping("/test2")
-    public Mono<ResponseObject> test2() {
-        return flashSaleEventService.consumeFlashSaleEvent();
-    }
-
-//    @GetMapping("/test3")
-//    public Mono<String> test3() {
-//        return myReactiveRedisUtil.putDataStrByKey("test", "test")
-//                .then(myReactiveRedisUtil.getDataStrByKey("test").map(output -> output.get()));
-//    }
-
-    @GetMapping("/test4")
-    public Mono<Boolean> test4() {
-        return myReactiveRedisUtil.getDataStrByKey("test").map(va -> va.isPresent());
-    }
-
-    @GetMapping("/test5")
-    public Mono<Void> test5() {
-        return myReactiveRedisUtil.removeAllKeys();
-    }
 }

@@ -1,11 +1,11 @@
 package jeff.core.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jeff.common.interfaces.IOrderService;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
-import jeff.core.consts.DemoMember;
+import jeff.common.consts.DemoMember;
 import jeff.core.exception.OrderException;
-import jeff.core.service.OrderService;
 import jeff.core.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 public class CoreController {
 
     @Resource(name = "normalOrderService")
-    private OrderService normalOrderService;
+    private IOrderService normalOrderService;
 
     @Autowired
     private SystemService systemService;
@@ -35,6 +35,16 @@ public class CoreController {
     public ResponseEntity<ResponseObject> createAnOrderFromNormalSalesEvent(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
         myRequestContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // TODO 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
         return ResponseEntity.ok(normalOrderService.createOrder(param, myRequestContext));
+    }
+
+    /**
+     * 當賣家出貨，買家確認收到後，由賣家將訂單的狀態設為已完成。
+     * 詳細的交易流程就不設計了，先做成這樣。
+     */
+    @PostMapping("/finish-order")
+    public ResponseEntity<ResponseObject> finishOrder(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+        myRequestContext.setAuthenticatedMemberId(DemoMember.SELLER.getId()); // TODO 此API的請求者就是賣家，目前先寫死，所以前端也不用傳這個參數
+        return ResponseEntity.ok(normalOrderService.finishOrder(param, myRequestContext));
     }
 
     /**

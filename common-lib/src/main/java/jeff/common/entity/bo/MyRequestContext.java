@@ -3,16 +3,11 @@ package jeff.common.entity.bo;
 import lombok.Data;
 
 /**
- * 自己做的上下文物件，用來將一個請求的常用數值帶到往後的業務邏輯做使用，例如代表一個請求生命週期的UUID，或者是請求者的memberId等等......
+ * 自己做的WebApi用的上下文物件，用來將一個請求的常用數值帶到往後的業務邏輯做使用，例如代表一個請求生命週期的UUID，或者是請求者的memberId等等......
  * 看是要拿去記Log還是啥的。
  */
 @Data
-public class MyRequestContext {
-
-    /**
-     * 代表一個請求生命週期的UUID，方便日誌中心化時的搜尋(可以用UUID去找到某個請求在業務邏輯中跑了啥方法)。
-     */
-    private String UUID;
+public class MyRequestContext extends MyContext {
 
     /**
      * 被認證後的會員ID。

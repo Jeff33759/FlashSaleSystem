@@ -1,5 +1,6 @@
 package jeff.core.manager;
 
+import jeff.common.entity.bo.MyRequestContext;
 import jeff.core.entity.bo.OrderCreationFlowContext;
 import jeff.core.exception.OrderException;
 import jeff.persistent.model.mysql.dao.GoodsDAO;
@@ -50,6 +51,22 @@ public class OrderManager {
         this.insertOrdersDetailsIntoDB(context);
 
         return context.getNewOrderId();
+    }
+
+    /**
+     * 完成訂單的流程。
+     */
+    public void startOrderFinishFlow(int orderId, MyRequestContext context) throws OrderException{
+        Orders oldOrder = orderDAO.findById(orderId).orElseThrow(
+                () -> new OrderException("Failed to finish the order because it does not exist in DB.")
+        );
+
+        if(oldOrder.getSellerMember().getId() != context.getAuthenticatedMemberId()) {
+            throw new OrderException("Failed to finish the order because req param is wrong");
+        }
+
+        oldOrder.setStatus(2);
+        orderDAO.save(oldOrder);
     }
 
 
@@ -110,11 +127,15 @@ public class OrderManager {
      */
     private void insertANewOrderIntoDB(OrderCreationFlowContext context) {
         Orders order = new Orders()
-                .setSellerMember(new Members().setId(context.getSellerMId())) //因為用了@Transient，所以要setMenbers物件
+                .setSellerMember(new Members().setId(context.getSellerMId())) //因為用了@Transient，所以要setMembers物件
                 .setCustomerMember(new Members().setId(context.getCustomerMId()))
                 .setTotal(context.getTotal())
                 .setStatus(1)
                 .setCreateTime(new Timestamp(System.currentTimeMillis()));
+
+        if(context.getFlashSaleEventLogId().isPresent()) { // 只有快閃銷售案件的成立訂單流程，會跑進這裡
+            order.setFselId(context.getFlashSaleEventLogId().get());
+        }
 
         Orders newOrder = orderDAO.save(order);
         context.setNewOrderId(newOrder.getId());

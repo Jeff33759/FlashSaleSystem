@@ -38,6 +38,26 @@ class LogUtilTest {
     }
 
     @Test
+    void GivenArgs_WhenComposeLogPrefixForMQConsumer_ThenReturnExpectedString() {
+        String stubRoutingKey = "stubRoutingKey";
+        String stubUUID = "stubUUID";
+
+        String actual = spyLogUtil.composeLogPrefixForMQConsumer(stubRoutingKey, stubUUID);
+
+        Assertions.assertEquals("[MQ][TestAPP][TestApp01][CON][stubRoutingKey][stubUUID]", actual);
+    }
+
+    @Test
+    void GivenArgs_WhenComposeLogPrefixForMQProducer_ThenReturnExpectedString() {
+        String stubRoutingKey = "stubRoutingKey";
+        String stubUUID = "stubUUID";
+
+        String actual = spyLogUtil.composeLogPrefixForMQProducer(stubRoutingKey, stubUUID);
+
+        Assertions.assertEquals("[MQ][TestAPP][TestApp01][PUB][stubRoutingKey][stubUUID]", actual);
+    }
+
+    @Test
     void GivenArgs_WhenGenerateUUIDForLogging_ThenReturnExpectedLengthString() {
         int expectedLength = 6;
 
@@ -80,7 +100,7 @@ class LogUtilTest {
 
         spyLogUtil.logError(mockLogger, "stubPrefix", stubException.getMessage(), stubException);
 
-        Mockito.verify(mockLogger, Mockito.times(1)).error("{} {} {}", "stubPrefix", stubException.getMessage(), stubException);
+        Mockito.verify(mockLogger, Mockito.times(1)).error("{} {}", "stubPrefix", stubException.getMessage(), stubException);
     }
 
 }

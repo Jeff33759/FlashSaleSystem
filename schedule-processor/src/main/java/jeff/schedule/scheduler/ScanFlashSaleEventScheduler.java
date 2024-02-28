@@ -28,16 +28,24 @@ public class ScanFlashSaleEventScheduler {
      */
     @Scheduled(initialDelay = 5000, fixedDelay = 5000)
     public void scanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis() {
-        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), "ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is started.");
+        logUtil.logInfo(
+                log,
+                logUtil.composeLogPrefixForSystem(),
+                "ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is started."
+        );
 
         Instant startTime = Instant.now();
         int executionAmount = scanFlashSaleEventService.executeTheProcessingFlow();
         Instant endTime = Instant.now();
 
-        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), String.format(
-                "ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is finished, executionTime: %ssec, beExecutedFlashSaleEventAmount: %s",
-                Duration.between(startTime, endTime).getSeconds(), executionAmount
-        ));
+        logUtil.logInfo(
+                log,
+                logUtil.composeLogPrefixForSystem(),
+                String.format(
+                        "ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is finished, executionTime: %ssec, beExecutedFlashSaleEventAmount: %s",
+                        Duration.between(startTime, endTime).getSeconds(), executionAmount
+                )
+        );
     }
 
 

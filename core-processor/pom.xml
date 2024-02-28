@@ -40,6 +40,11 @@
             <artifactId>my-redis-api</artifactId>
             <version>0.4.1-SNAPSHOT</version>
         </dependency>
+        <dependency> <!-- MQ相關 -->
+            <groupId>jeff.flash</groupId>
+            <artifactId>my-mq-lib</artifactId>
+            <version>0.4.1-SNAPSHOT</version>
+        </dependency>
         <dependency> <!-- 共用包 -->
             <groupId>jeff.flash</groupId>
             <artifactId>common-lib</artifactId>

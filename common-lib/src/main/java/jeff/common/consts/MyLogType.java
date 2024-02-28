@@ -7,7 +7,9 @@ public enum MyLogType {
 
     SYSTEM("SYS"), //系統通知
 
-    BUSINESS("BUS"); //業務邏輯
+    BUSINESS("BUS"), //業務邏輯
+
+    MQ("MQ"); // MQ相關
 
     private String typeName;
 

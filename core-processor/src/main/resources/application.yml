@@ -2,5 +2,28 @@ spring:
   profiles:
     active: dev
 
+#### MQ配置 ####
+  cloud:
+    stream:
+      bindings: # 配置消息通道的通用設置，不特定於任何消息中間件。
+        coreProcessor_BusinessExchangeConsumerChannelForOrderCase-in-0:
+          content-type: application/json
+          destination: businessExchange
+          group: fseOrderQueue # queueName。同group裡的消費者，對於消息是競爭關係，不會重複消費同一個消息。這個可以看成是設置通道的群組，當兩條通道設置進同群組，那實際上其實是吃到同一個Queue。
+        coreProcessor_BusinessExchangeProducerChannel-out-0:
+          content-type: application/json
+          destination: businessExchange
+
+      rabbit:
+        bindings: # 配置 RabbitMQ 特有的消息通道設置
+          coreProcessor_BusinessExchangeConsumerChannelForOrderCase-in-0:
+            consumer:
+              binding-routing-key: fse.order
+              orderly: true # 是否依序消費，預設為 false 並發消費。
+          coreProcessor_BusinessExchangeProducerChannel-out-0:
+            producer:
+              # 必須在這個層級設定routing-key，在spring.cloud.stream.bindings中設定沒用(因為不是每個中間件都有routingKey的概念)。routing-key-expression指定固定字串的話，前後需加三引號。
+              routing-key-expression: headers['routingKey']
+
 app:
   type: core-processor

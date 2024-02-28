@@ -42,10 +42,18 @@ public class LogUtil {
      */
     private String PART_OF_LOG_PREFIX_FOR_BUSINESS;
 
+    /**
+     * 用於MQ Logging前綴的一部份。
+     * 這一部分因為是永遠不會變動的，所以寫成常數，不用每次呼叫log方法時都要重新組成這一段。
+     */
+    private String PART_OF_LOG_PREFIX_FOR_MQ;
+
+
     @PostConstruct
     private void initVariableAfterTheSpringApplicationStartup() {
         this.LOG_PREFIX_FOR_SYSTEM = String.format("[%s][%s][%s]", MyLogType.SYSTEM.getTypeName(), this.appType, this.appInstanceName);
         this.PART_OF_LOG_PREFIX_FOR_BUSINESS = String.format("[%s][%s][%s]", MyLogType.BUSINESS.getTypeName(), this.appType, this.appInstanceName);
+        this.PART_OF_LOG_PREFIX_FOR_MQ = String.format("[%s][%s][%s]", MyLogType.MQ.getTypeName(), this.appType, this.appInstanceName);
     }
 
     public void logInfo(Logger logger, String logPrefix, String logMsg) {
@@ -61,7 +69,7 @@ public class LogUtil {
     }
 
     public void logError(Logger logger, String logPrefix, String logMsg, Exception e) {
-        logger.error("{} {} {}", logPrefix, logMsg, e); // error級別的要印stackTrace
+        logger.error("{} {}", logPrefix, logMsg, e); // error級別的要印stackTrace
     }
 
     /**
@@ -80,6 +88,30 @@ public class LogUtil {
         return String.format("%s[%s][%s]",
                 this.PART_OF_LOG_PREFIX_FOR_BUSINESS,
                 memberId == null ? "NULL" : memberId, //有些情況會取不到或者不需要特地取MemberId
+                uuid
+        );
+    }
+
+    /**
+     * 組織MQ消費者Log的前綴。
+     * 用String.format雖然效能較差，但可讀性較佳，考量到單個Log也不是什麼很大量的字串拼接，不用那麼看效能。
+     */
+    public String composeLogPrefixForMQConsumer(String routingKey, String uuid) {
+        return String.format("%s[CON][%s][%s]",
+                this.PART_OF_LOG_PREFIX_FOR_MQ,
+                routingKey == null ? "NULL" : routingKey,
+                uuid
+        );
+    }
+
+    /**
+     * 組織MQ發布者Log的前綴。
+     * 用String.format雖然效能較差，但可讀性較佳，考量到單個Log也不是什麼很大量的字串拼接，不用那麼看效能。
+     */
+    public String composeLogPrefixForMQProducer(String routingKey, String uuid) {
+        return String.format("%s[PUB][%s][%s]",
+                this.PART_OF_LOG_PREFIX_FOR_MQ,
+                routingKey == null ? "NULL" : routingKey,
                 uuid
         );
     }

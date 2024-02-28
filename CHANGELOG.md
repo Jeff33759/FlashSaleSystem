@@ -2,9 +2,16 @@
 
 ## [Unreleased]
 
+### Added
+- core-processor新增完成訂單的接口
+- high-concurrency-processor完成過濾鏈撰寫
+- my-mq-lib新增，並建置各系統關於MQ的發布/消費架構
+- high-concurrency-processor完成aop例外捕捉
+- 快閃銷售案件的接口與整個流程功能完成
+
 ## [0.3.1] - 2024-01-14
 
-## Added
+### Added
 - 新增子專案high-concurrency-processor
 - 新增子專案scheduler-processor
 - 新增排程:掃描快閃銷售案件進mongo
