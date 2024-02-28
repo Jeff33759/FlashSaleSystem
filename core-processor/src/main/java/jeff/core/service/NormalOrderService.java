@@ -72,7 +72,7 @@ public class NormalOrderService implements IOrderService {
         int oId = param.get("o_id").asInt();
         orderManager.startOrderFinishFlow(oId, reqContext);
 
-        return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("o_id", oId), "Finish order successful.");
+        return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("o_id", oId), "Order completed successfully.");
     }
 
     /**
