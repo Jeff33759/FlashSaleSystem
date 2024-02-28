@@ -133,6 +133,10 @@ public class OrderManager {
                 .setStatus(1)
                 .setCreateTime(new Timestamp(System.currentTimeMillis()));
 
+        if(context.getFlashSaleEventLogId().isPresent()) { // 只有快閃銷售案件的成立訂單流程，會跑進這裡
+            order.setFselId(context.getFlashSaleEventLogId().get());
+        }
+
         Orders newOrder = orderDAO.save(order);
         context.setNewOrderId(newOrder.getId());
     }
