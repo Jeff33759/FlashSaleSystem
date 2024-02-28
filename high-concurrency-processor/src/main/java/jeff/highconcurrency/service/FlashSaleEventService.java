@@ -14,6 +14,7 @@ import jeff.highconcurrency.persistent.model.mongo.po.ReactiveFlashSaleEventLog;
 import jeff.highconcurrency.util.redis.util.MyReactiveRedisUtil;
 import jeff.mq.consts.MyRabbitMQConsts;
 import jeff.mq.entity.dto.MyMessagePayloadTemplate;
+import jeff.mq.util.MQUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,9 @@ public class FlashSaleEventService {
 
     @Autowired
     private LogUtil logUtil;
+
+    @Autowired
+    private MQUtil mqUtil;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -80,7 +84,11 @@ public class FlashSaleEventService {
                                         .flatMap(updatedFseInfo -> {
                                             // 處理第三個結果
                                             try {
-                                                myReactiveMQProducer.produceMessageToBusinessExchange(MyRabbitMQConsts.ROUTING_KEY_NAME_FOR_FLASH_SALE_EVENT_ORDER_CASE, new MyMessagePayloadTemplate(MyRabbitMQConsts.TITLE_NAME_FOR_ORDER_GENERATION_OF_FLASH_SALE_EVENT_ORDER_CASE, objectMapper.writeValueAsString(updatedFseInfo)));
+                                                myReactiveMQProducer.produceMessageToBusinessExchange(
+                                                        MyRabbitMQConsts.ROUTING_KEY_NAME_FOR_FLASH_SALE_EVENT_ORDER_CASE,
+                                                        new MyMessagePayloadTemplate(MyRabbitMQConsts.TITLE_NAME_FOR_ORDER_GENERATION_OF_FLASH_SALE_EVENT_ORDER_CASE, objectMapper.writeValueAsString(updatedFseInfo), mqUtil.generateMsgId()),
+                                                        reqContext
+                                                );
 
                                                 // 第四個操作
                                                 return Mono.just(new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("transNum", updatedFseInfo.getTransNum()), "Consume flashSaleEvent successfully."));

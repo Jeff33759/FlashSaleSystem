@@ -1,8 +1,12 @@
 package jeff.highconcurrency.mq.producer;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jeff.common.entity.bo.MyContext;
+import jeff.common.util.LogUtil;
 import jeff.highconcurrency.mq.exception.MyReactiveMQException;
 import jeff.mq.entity.dto.MyMessagePayloadTemplate;
 import jeff.mq.exception.MyMQException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.support.MessageBuilder;
@@ -19,6 +23,7 @@ import reactor.core.publisher.Mono;
  * 官方針對響應式的說明:
  * Native support for reactive programming - since v3.0.0 we no longer distribute spring-cloud-stream-reactive modules and instead relying on native reactive support provided by spring cloud function. For backward compatibility you can still bring spring-cloud-stream-reactive from previous versions.
  */
+@Slf4j
 @Component
 public class MyReactiveMQProducer {
 
@@ -33,13 +38,19 @@ public class MyReactiveMQProducer {
     @Autowired
     private StreamBridge streamBridge;
 
+    @Autowired
+    private LogUtil logUtil;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
 
     /**
      * 發布消息到BusinessExchange。
      *
      * @throws MyReactiveMQException 當發布消息失敗時拋錯
      */
-    public Mono<Void> produceMessageToBusinessExchange(String routingKey, MyMessagePayloadTemplate myMessagePayloadTemplate) throws MyMQException {
+    public Mono<Void> produceMessageToBusinessExchange(String routingKey, MyMessagePayloadTemplate myMessagePayloadTemplate, MyContext myContext) throws MyMQException {
         try {
             boolean executedFlag = streamBridge.send( //如果執行不成功，則executedFlag=false或者直接拋錯
                     MyReactiveMQProducer.BUSINESS_EXCHANGE_BINDING_NAME,
@@ -52,6 +63,12 @@ public class MyReactiveMQProducer {
             if(!executedFlag) {
                 throw new MyReactiveMQException("Failed to send data to businessExchange.");
             }
+
+            logUtil.logInfo(
+                    log,
+                    logUtil.composeLogPrefixForMQProducer(routingKey, myContext.getUUID()),
+                    String.format("Msg published successfully, routingKey: %s, payload: %s", routingKey, objectMapper.writeValueAsString(myMessagePayloadTemplate))
+            );
 
             return Mono.empty();
         } catch (Exception e) {

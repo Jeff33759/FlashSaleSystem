@@ -31,13 +31,19 @@ public class MyMessagePayloadTemplate {
     private long publishTimestamp;
 
     /**
+     * Message的唯一識別符。
+     */
+    private String msgId;
+
+    /**
      * @param title     沒用到就傳空字串。
      * @param content   沒用到就傳空字串。
      */
-    public MyMessagePayloadTemplate(String title, String content) {
+    public MyMessagePayloadTemplate(String title, String content, String msgId) {
         this.title = title;
         this.content = content;
         this.publishTimestamp = System.currentTimeMillis();
+        this.msgId = msgId;
     }
 
     /**

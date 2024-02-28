@@ -1,7 +1,6 @@
 package jeff.core.mq.consumer;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.entity.bo.MyMQConsumptionContext;
 import jeff.common.interfaces.IOrderService;
@@ -44,7 +43,7 @@ public class MyMQConsumer {
     @Bean(name = "coreProcessor_BusinessExchangeConsumerChannelForOrderCase")
     public Consumer<Message<String>> coreProcessor_BusinessExchangeConsumerChannelForOrderCase() {
         return message -> {
-            MyMQConsumptionContext myMQConsumptionContext = new MyMQConsumptionContext().chainSetUUID(logUtil.generateUUIDForLogging()); //不可以寫在lambda之外，不然UUID會是單例
+            MyMQConsumptionContext myMQConsumptionContext = new MyMQConsumptionContext().chainSetUUID(logUtil.generateUUIDForLogging()); //不可以寫在lambda之外，不然MyMQConsumptionContext會變成單例
 
             String payload = message.getPayload();
             String routingKey = (String) message.getHeaders().get(AmqpHeaders.RECEIVED_ROUTING_KEY);
