@@ -1,5 +1,6 @@
 package jeff.core.entity.bo;
 
+import org.springframework.http.HttpMethod;
 import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import javax.servlet.ReadListener;
@@ -23,7 +24,8 @@ public class MyContentCachingReqWrapper extends ContentCachingRequestWrapper {
      */
     public MyContentCachingReqWrapper(HttpServletRequest request) throws IOException {
         super(request);
-        this.reqBody = new byte[request.getContentLength()]; //別用ServletInputStream.available，當容器是Tomcat時，此方法沒辦法得到content，若是jetty就沒差
+        this.reqBody = request.getMethod().equals(HttpMethod.GET.name()) ?
+                new byte[0] : new byte[request.getContentLength()]; //別用ServletInputStream.available，當容器是Tomcat時，此方法沒辦法得到content，若是jetty就沒差
 
         try(
                 ServletInputStream is = request.getInputStream();
