@@ -52,7 +52,7 @@ public class CoreController {
     }
 
     /**
-     * 下架某個一般銷售案件。
+     * 更改某個一般銷售案件的狀態(上架中/已下架)
      * 被下架的銷售案件，將不會顯示在案件列表的頁面上，會員也就不會點選。
      */
     @PostMapping("/sale-event/update-state")
