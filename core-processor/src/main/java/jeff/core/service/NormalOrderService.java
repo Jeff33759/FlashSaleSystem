@@ -41,6 +41,7 @@ public class NormalOrderService implements IOrderService {
      * TODO 目前因為還沒做認證相關的邏輯，所以下單的買家與賣家的Id都先寫死，外部就先不用傳了。
      *
      * @param param 範例資料: {"goods_list":[{"g_id":1,"g_name":"螺絲套組","quantity":20},...]}
+     * @param context 實際上應是MyRequestContext的實例
      */
     @Override
     public ResponseObject createOrder(JsonNode param, MyContext context) throws OrderException {
