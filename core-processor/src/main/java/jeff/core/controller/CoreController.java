@@ -6,6 +6,7 @@ import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.consts.DemoMember;
 import jeff.core.exception.OrderException;
+import jeff.core.service.AllSaleEventService;
 import jeff.core.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,9 @@ public class CoreController {
     @Autowired
     private SystemService systemService;
 
+    @Autowired
+    private AllSaleEventService allSaleEventService;
+
     /**
      * 客戶端一般銷售案件的商品下單時的接口。
      * 通常是購物車結帳後按下送出所打的API。
@@ -45,6 +49,16 @@ public class CoreController {
     public ResponseEntity<ResponseObject> finishOrder(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
         myRequestContext.setAuthenticatedMemberId(DemoMember.SELLER.getId()); // TODO 此API的請求者就是賣家，目前先寫死，所以前端也不用傳這個參數
         return ResponseEntity.ok(normalOrderService.finishOrder(param, myRequestContext));
+    }
+
+    /**
+     * 下架某個一般銷售案件。
+     * 被下架的銷售案件，將不會顯示在案件列表的頁面上，會員也就不會點選。
+     */
+    @PostMapping("/sale-event/update-state")
+    public ResponseEntity<ResponseObject> updateNormalSalesEventState(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+        myRequestContext.setAuthenticatedMemberId(DemoMember.SELLER.getId()); // TODO 此API的請求者是賣家，目前先寫死，所以前端也不用傳這個參數
+        return ResponseEntity.ok(allSaleEventService.updateStateOfNormalSaleEvent(param, myRequestContext));
     }
 
     /**
