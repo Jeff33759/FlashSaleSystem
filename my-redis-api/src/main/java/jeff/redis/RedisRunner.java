@@ -50,7 +50,12 @@ public class RedisRunner implements CommandLineRunner {
      */
     private void initRedisData() {
         myRedisUtil.removeAllKeys();
-        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), "All redis data has been cleaned.");
+
+        logUtil.logInfo(
+                log,
+                logUtil.composeLogPrefixForSystem(),
+                "All redis data has been cleaned."
+        );
     }
 
 }

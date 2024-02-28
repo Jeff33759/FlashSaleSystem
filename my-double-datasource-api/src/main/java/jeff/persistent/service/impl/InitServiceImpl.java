@@ -49,13 +49,22 @@ public class InitServiceImpl implements InitService {
                 throwables.printStackTrace();
             }
         });
-        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), "All MySQL data has been cleaned and insert demo data successful.");
+        logUtil.logInfo(
+                log,
+                logUtil.composeLogPrefixForSystem(),
+                "All MySQL data has been cleaned and insert demo data successful."
+        );
     }
 
     @Override
     public void initFlashSaleEventLogDocumentOfMongoDB() {
         flashSaleEventLogRepo.deleteAll(); // 相當於truncate操作
-        logUtil.logInfo(log, logUtil.composeLogPrefixForSystem(), "All mongo data has been cleaned.");
+
+        logUtil.logInfo(
+                log,
+                logUtil.composeLogPrefixForSystem(),
+                "All mongo data has been cleaned."
+        );
     }
 
     private void executeSqlScript(String scriptPath) throws SQLException {

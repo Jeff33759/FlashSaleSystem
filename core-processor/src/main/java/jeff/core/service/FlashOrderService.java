@@ -51,7 +51,8 @@ public class FlashOrderService implements IOrderService {
             logUtil.logInfo(
                     log,
                     logUtil.composeLogPrefixForBusiness(null, mqConsumptionContext.getUUID()),
-                    String.format("Order created successfully, orderId: %s", newOrderId));
+                    String.format("Order created successfully, orderId: %s", newOrderId)
+            );
 
             return null;
         } catch (DataAccessException dae) { //Spring JDBC當操作DB遇到問題時會拋出的例外的基類，先印log後，統一包裝成OrderException

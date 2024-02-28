@@ -54,7 +54,13 @@ public class ControllerExceptionResAspect {
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseObject handleException(Exception e) {
-        logUtil.logError(log, logUtil.composeLogPrefixForSystem(), "Some errors occurred while processing request.", e);
+        logUtil.logError(
+                log,
+                logUtil.composeLogPrefixForSystem(),
+                "Some errors occurred while processing request.",
+                e
+        );
+
         return new ResponseObject(ResponseCode.Failed.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
     }
 
