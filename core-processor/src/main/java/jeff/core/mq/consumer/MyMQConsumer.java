@@ -43,9 +43,9 @@ public class MyMQConsumer {
      */
     @Bean(name = "coreProcessor_BusinessExchangeConsumerChannelForOrderCase")
     public Consumer<Message<String>> coreProcessor_BusinessExchangeConsumerChannelForOrderCase() {
-        MyMQConsumptionContext myMQConsumptionContext = new MyMQConsumptionContext().chainSetUUID(logUtil.generateUUIDForLogging());
-
         return message -> {
+            MyMQConsumptionContext myMQConsumptionContext = new MyMQConsumptionContext().chainSetUUID(logUtil.generateUUIDForLogging()); //不可以寫在lambda之外，不然UUID會是單例
+
             String payload = message.getPayload();
             String routingKey = (String) message.getHeaders().get(AmqpHeaders.RECEIVED_ROUTING_KEY);
 
