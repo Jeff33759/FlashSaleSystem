@@ -52,13 +52,29 @@ public class CoreController {
     }
 
     /**
-     * 更改某個一般銷售案件的狀態(上架中/已下架)
+     * 更改某個一般銷售案件的狀態(上架中/已下架)。
      * 被下架的銷售案件，將不會顯示在案件列表的頁面上，會員也就不會點選。
+     *
+     * 一般銷售案件的下架，必須要人為設置，沒有定時下架的功能(快閃銷售案件才有。)。
+     * 一度下架的一般銷售案件，可以經由人為設置使其再度上架。
      */
     @PostMapping("/sale-event/update-state")
-    public ResponseEntity<ResponseObject> updateNormalSalesEventState(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+    public ResponseEntity<ResponseObject> updateNormalSaleEventState(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
         myRequestContext.setAuthenticatedMemberId(DemoMember.SELLER.getId()); // TODO 此API的請求者是賣家，目前先寫死，所以前端也不用傳這個參數
         return ResponseEntity.ok(allSaleEventService.updateStateOfNormalSaleEvent(param, myRequestContext));
+    }
+
+
+    /**
+     * 將某個快閃銷售案件的狀態更改為已下架。
+     * 被下架的銷售案件，將不會顯示在案件列表的頁面上，會員也就不會點選。
+     *
+     * 快閃銷售案件有時效問題(例如在上架時就要設定幾天後過期自動下架)，且還涉及redis與mongo等等中間件的資料暫存問題，所以統一設計成一旦下架，那就無法再重新上架，要嘛就廠商根據庫存再創一個新的快閃銷售活動。
+     */
+    @PostMapping("/flash-sale-event/remove")
+    public ResponseEntity<ResponseObject> removeFlashSaleEventState(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+        myRequestContext.setAuthenticatedMemberId(DemoMember.SELLER.getId()); // TODO 此API的請求者是賣家，目前先寫死，所以前端也不用傳這個參數
+        return ResponseEntity.ok(allSaleEventService.removeFlashSaleEvent(param, myRequestContext));
     }
 
     /**

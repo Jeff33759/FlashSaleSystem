@@ -144,6 +144,13 @@ public class MyRedisUtil {
     }
 
     /**
+     * 刪除某個Key。
+     */
+    public void removeKey(String key) {
+        sRedisTemplate.delete(key);
+    }
+
+    /**
      * 移除redis上所有的key。
      */
     @SuppressWarnings("unchecked") //此方法執行maven install的時候會跳型別檢查的警告，不知為何，總之目前先用這個叫他別該
