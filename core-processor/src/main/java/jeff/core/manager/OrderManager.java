@@ -127,7 +127,7 @@ public class OrderManager {
      */
     private void insertANewOrderIntoDB(OrderCreationFlowContext context) {
         Orders order = new Orders()
-                .setSellerMember(new Members().setId(context.getSellerMId())) //因為用了@Transient，所以要setMenbers物件
+                .setSellerMember(new Members().setId(context.getSellerMId())) //因為用了@Transient，所以要setMembers物件
                 .setCustomerMember(new Members().setId(context.getCustomerMId()))
                 .setTotal(context.getTotal())
                 .setStatus(1)
