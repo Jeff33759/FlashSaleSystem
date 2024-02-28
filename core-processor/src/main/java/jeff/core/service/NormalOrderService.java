@@ -52,7 +52,7 @@ public class NormalOrderService implements IOrderService {
         try{
             int newOrderId = orderManager.startOrderCreationFlow(orderCreationFlowContext);
 
-            return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("oId",newOrderId), "Create order successful.");
+            return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("oId",newOrderId), "Order created successfully.");
         } catch (DataAccessException dae) { //Spring JDBC當操作DB遇到問題時會拋出的例外的基類，先印log後，統一包裝成OrderException
             logUtil.logWarn(log, logUtil.composeLogPrefixForBusiness(reqContext.getAuthenticatedMemberId(), context.getUUID()), String.format("Some errors occurred when creating order, message:%s", dae.getMessage()));
             throw new OrderException("Some errors occurred when creating order."); //會在此捕捉的，都是一些沒有預期到的DB相關的例外，前面有預期的例外，就會先包成OrderException了
