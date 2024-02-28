@@ -16,7 +16,7 @@ import jeff.core.manager.OrderManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -25,7 +25,7 @@ import java.util.Map;
  * 一般下單的情境非高併發情境，所以處理訂單的相關流程會直接訪問DB。
  */
 @Slf4j
-@Component("normalOrderService")
+@Service("normalOrderService")
 public class NormalOrderService implements IOrderService {
 
     @Autowired

@@ -13,7 +13,7 @@ import jeff.core.manager.OrderManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Map;
@@ -23,7 +23,7 @@ import java.util.Map;
  * 因為有導入MQ，所以訂單的處理本身不會是高併發場景，只有消費快閃銷售案件(搶購門票)是高併發，但搶完門票後成立訂單的一系列流程都不是高併發，因為利用MQ削峰了。
  */
 @Slf4j
-@Component("flashOrderService")
+@Service("flashOrderService")
 public class FlashOrderService implements IOrderService {
 
     @Autowired
