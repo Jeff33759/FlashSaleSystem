@@ -63,7 +63,7 @@ public class FlashOrderService implements IOrderService {
 
     @Override
     public ResponseObject finishOrder(JsonNode param, MyContext context) throws MyException {
-        return null;
+        throw new MyException("Unexpected invoke of FlashOrderService.finishOrder.");
     }
 
     /**
