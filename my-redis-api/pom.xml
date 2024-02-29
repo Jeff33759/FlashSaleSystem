@@ -5,7 +5,7 @@
     <parent>
         <artifactId>my-flashsale-system</artifactId>
         <groupId>jeff.flash</groupId>
-        <version>0.5.1-SNAPSHOT</version>
+        <version>0.5.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +28,12 @@
         <dependency> <!-- 共用包 -->
             <groupId>jeff.flash</groupId>
             <artifactId>common-lib</artifactId>
-            <version>0.5.1-SNAPSHOT</version>
+            <version>0.5.1</version>
         </dependency>
         <dependency> <!-- 測試工具包 -->
             <groupId>jeff.flash</groupId>
             <artifactId>my-test-lib</artifactId>
-            <version>0.5.1-SNAPSHOT</version>
+            <version>0.5.1</version>
             <scope>test</scope> <!-- 設為test，此函式庫專門用於測試，不會打包 -->
         </dependency>
 
