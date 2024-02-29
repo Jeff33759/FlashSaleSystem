@@ -152,6 +152,14 @@ public class MyReactiveRedisUtil {
     }
 
     /**
+     * 刪除某個Key。
+     */
+    public Mono<Void> removeKey(String key) {
+        return reactiveSRedisTemplate.opsForValue().delete(key)
+                .then();
+    }
+
+    /**
      * 移除redis上所有的key。
      */
     @SuppressWarnings("unchecked") //此方法執行maven install的時候會跳型別檢查的警告，不知為何，總之目前先用這個叫他別該

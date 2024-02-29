@@ -6,12 +6,12 @@ import jeff.common.entity.dto.send.ResponseObject;
 import jeff.persistent.service.InitService;
 import jeff.redis.util.MyRedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 /**
  * 一些跟系統設置有關的業務邏輯。
  */
-@Component
+@Service
 public class SystemService {
 
     @Autowired

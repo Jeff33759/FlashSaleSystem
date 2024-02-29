@@ -2,6 +2,13 @@
 
 ## [Unreleased]
 
+## Added
+- 更改一般銷售案件狀態(上架中/已下架)的接口完成
+- 更改銷售案件狀態為已下架的接口完成
+
+## Fixed
+- 修正core-processor當接口為Get類型時，因為沒有body而在WrapperFilter噴錯
+
 ## [0.4.1] - 2024-02-28
 
 ### Added

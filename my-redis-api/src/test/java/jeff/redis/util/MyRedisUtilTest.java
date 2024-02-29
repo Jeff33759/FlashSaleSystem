@@ -225,6 +225,16 @@ class MyRedisUtilTest {
     }
 
     @Test
+    void GivenKey_WhenRemoveKey_ThenInvokeExpectedMethodOfStringRedisTemplate() {
+        String stubKey = "stubKey";
+        Mockito.when(mockStringRedisTemplate.delete(stubKey)).thenReturn(true);
+
+        spyMyRedisUtil.removeKey(stubKey);
+
+        Mockito.verify(mockStringRedisTemplate, Mockito.times(1)).delete(stubKey);
+    }
+
+    @Test
     void Given_WhenRemoveAllKeys_ThenInvokeExpectedMethodOfStringRedisTemplate() {
         String expectedKeysPattern = "*";
         Set<String> stubKeySet = new HashSet<>();

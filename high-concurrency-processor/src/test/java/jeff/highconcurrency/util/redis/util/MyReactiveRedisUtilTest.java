@@ -282,12 +282,26 @@ class MyReactiveRedisUtilTest {
     }
 
     @Test
+    void GivenKey_WhenRemoveKey_ThenInvokeExpectedMethodOfReactiveStringRedisTemplateAndReturnEmptyMono() {
+        String stubKey = "keyForTesting.";
+        Mono<Boolean> deleteResultMono = Mono.just(true);
+        Mockito.when(mockReactiveValueOperations.delete(stubKey)).thenReturn(deleteResultMono);
+
+        Mono<Void> actualMono = spyMyReactiveRedisUtil.removeKey(stubKey);
+
+        StepVerifier.create(actualMono)
+                .expectNextCount(0)
+                .verifyComplete();
+        Mockito.verify(this.mockReactiveValueOperations, Mockito.times(1)).delete(stubKey);
+    }
+
+    @Test
     void Given_WhenRemoveAllKeys_ThenInvokeExpectedMethodOfStringRedisTemplateAndReturnEmptyMono() {
         String expectedKeysPattern = "*";
         Flux<String> stubFlux = Flux.just("key1", "key2", "key3");
         Mockito.when(mockReactiveStringRedisTemplate.keys(expectedKeysPattern)).thenReturn(stubFlux);
         Mono<Long> deleteResultMono = Mono.just(3L);
-        Mockito.doReturn(deleteResultMono).when(mockReactiveStringRedisTemplate).delete(stubFlux);
+        Mockito.when(mockReactiveStringRedisTemplate.delete(stubFlux)).thenReturn(deleteResultMono);
 
         Mono<Void> actualMono = spyMyReactiveRedisUtil.removeAllKeys();
 
