@@ -30,12 +30,12 @@ public class ScanFlashSaleEventService {
     private MyRedisUtil myRedisUtil;
 
     /**
-     * 搜尋未被掃描過的FlashSaleEvent，並且新增資料進Mongo Log表同時也put進Redis。
+     * 搜尋已到開賣時間的未被掃描過的FlashSaleEvent，並且新增資料進Mongo Log表同時也put進Redis。
      *
      * @return 總共幾筆銷售案件被執行
      */
-    public int executeTheProcessingFlow() {
-        List<FlashSaleEvent> flashSaleEventList = flashSaleEventDAO.selectFlashSaleEventWhichIsPublicAndHasNotBeenScanned();
+    public int scanFlashSaleEventWhichShouldBeOpenFromMySQLAndInsertIntoMongoAndPutToRedis() {
+        List<FlashSaleEvent> flashSaleEventList = flashSaleEventDAO.selectFlashSaleEventWhichIsPublicAndHasNotBeenScannedAndArrivalStartTime();
 
         Map<Integer, List<FlashSaleEventLog>> groupedFlashSaleEventLogMap = this.generateMultiFlashSaleEventLogListsGroupByFlashSaleEventId(flashSaleEventList); //分群
         Map<Integer, Instant> expirationMap = this.generateExpiredInstantMapByFlashEventId(flashSaleEventList);

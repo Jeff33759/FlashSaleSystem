@@ -24,18 +24,21 @@ public class ScanFlashSaleEventScheduler {
     private LogUtil logUtil;
 
     /**
-     * 每5秒就去掃一次MySQL，看有沒有新發布的快閃銷售活動。
+     * 每5秒就去掃一次MySQL，看有沒有新發布還沒被掃描過並且已經到了該開賣時間的快閃銷售活動。
+     *
+     * 新發布但還沒開賣的快閃銷售案件，is_public=true，has_been_scanned=false。
+     * 只要當下時間 > start_time，代表這個快閃銷售案件應該開賣了。
      */
     @Scheduled(initialDelay = 5000, fixedDelay = 5000)
-    public void scanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis() {
+    public void scanFlashSaleEventWhichShouldBeOpenFromMySQLAndInsertIntoMongoAndPutToRedis() {
         logUtil.logInfo(
                 log,
                 logUtil.composeLogPrefixForSystem(),
-                "ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is started."
+                "scanFlashSaleEventWhichShouldBeOpenFromMySQLAndInsertIntoMongoAndPutToRedis schedule is started."
         );
 
         Instant startTime = Instant.now();
-        int executionAmount = scanFlashSaleEventService.executeTheProcessingFlow();
+        int executionAmount = scanFlashSaleEventService.scanFlashSaleEventWhichShouldBeOpenFromMySQLAndInsertIntoMongoAndPutToRedis();
         Instant endTime = Instant.now();
 
         logUtil.logInfo(

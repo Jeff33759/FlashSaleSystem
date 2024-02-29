@@ -11,10 +11,10 @@ import java.util.List;
 public interface FlashSaleEventDAO extends JpaRepository<FlashSaleEvent, Integer> {
 
     /**
-     * 得到上架中並且還沒被排程掃描過的快閃銷售活動
+     * 得到上架中，已經到了該開賣的時間，卻還沒被排程掃描過的快閃銷售活動
      */
-    @Query(value = "SELECT * FROM `flash_sale_event` WHERE is_public = true AND has_been_scanned = false ", nativeQuery = true)
-    List<FlashSaleEvent> selectFlashSaleEventWhichIsPublicAndHasNotBeenScanned();
+    @Query(value = "SELECT * FROM `flash_sale_event` WHERE is_public = true AND has_been_scanned = false AND NOW() > start_time ", nativeQuery = true)
+    List<FlashSaleEvent> selectFlashSaleEventWhichIsPublicAndHasNotBeenScannedAndArrivalStartTime();
 
     /**
      * 更改銷售案件的狀態。

@@ -6,6 +6,9 @@
 - 更改一般銷售案件狀態(上架中/已下架)的接口完成
 - 更改銷售案件狀態為已下架的接口完成
 
+## Changed
+- 快閃銷售案件依照start_time決定開賣時間，還沒到點的不會開賣
+
 ## Fixed
 - 修正core-processor當接口為Get類型時，因為沒有body而在WrapperFilter噴錯
 
