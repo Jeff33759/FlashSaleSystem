@@ -30,12 +30,12 @@ public class ScanFlashSaleEventService {
     private MyRedisUtil myRedisUtil;
 
     /**
-     * 搜尋未被掃描過的FlashSaleEvent，並且新增資料進Mongo Log表同時也put進Redis。
+     * 搜尋已到開賣時間的未被掃描過的FlashSaleEvent，並且新增資料進Mongo Log表同時也put進Redis。
      *
      * @return 總共幾筆銷售案件被執行
      */
-    public int executeTheProcessingFlow() {
-        List<FlashSaleEvent> flashSaleEventList = flashSaleEventDAO.selectFlashSaleEventWhichIsPublicAndHasNotBeenScanned();
+    public int scanFlashSaleEventWhichShouldBeOpenFromMySQLAndInsertIntoMongoAndPutToRedis() {
+        List<FlashSaleEvent> flashSaleEventList = flashSaleEventDAO.selectFlashSaleEventWhichIsPublicAndHasNotBeenScannedAndArrivalStartTime();
 
         Map<Integer, List<FlashSaleEventLog>> groupedFlashSaleEventLogMap = this.generateMultiFlashSaleEventLogListsGroupByFlashSaleEventId(flashSaleEventList); //分群
         Map<Integer, Instant> expirationMap = this.generateExpiredInstantMapByFlashEventId(flashSaleEventList);
@@ -50,6 +50,21 @@ public class ScanFlashSaleEventService {
         });
 
         flashSaleEventDAO.saveAll(flashSaleEventList);
+        return flashSaleEventList.size();
+    }
+
+    /**
+     * 搜尋已到結束時間的開賣中的FlashSaleEvent，並且把Mongo的資料刪除，把redis queue刪除。
+     *
+     * @return 總共幾筆銷售案件被執行
+     */
+    public int scanFlashSaleEventWhichShouldBeClosedFromMySQLAndDeleteMongoAndRemoveRedis() {
+        List<FlashSaleEvent> flashSaleEventList = flashSaleEventDAO.selectFlashSaleEventWhichIsPublicAndHasBeenScannedAndArrivalEndTime();
+
+        flashSaleEventList.forEach(fse -> {
+            this.closeFlashSaleEventByFseId(fse.getId());
+        });
+
         return flashSaleEventList.size();
     }
 
@@ -102,6 +117,17 @@ public class ScanFlashSaleEventService {
         });
 
         return expiredInstantMap;
+    }
+
+    private void closeFlashSaleEventByFseId(int fseId) {
+//      1、更改MySQL的狀態為已下架
+        flashSaleEventDAO.updateStateById(fseId, false);
+
+//      2、清掉利用排程快取進redis queue的資料
+        myRedisUtil.removeKey("fse_" + fseId);
+
+//      3、清掉mongo裡面is_consumed=false的資料
+        flashSaleEventLogRepo.deleteByFseIdAndIsConsumed(fseId, false);
     }
 
 }
