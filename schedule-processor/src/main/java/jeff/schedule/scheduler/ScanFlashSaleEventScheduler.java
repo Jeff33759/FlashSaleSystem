@@ -45,7 +45,36 @@ public class ScanFlashSaleEventScheduler {
                 log,
                 logUtil.composeLogPrefixForSystem(),
                 String.format(
-                        "ScanFlashSaleEventFromMySQLAndInsertIntoMongoAndPutToRedis schedule is finished, executionTime: %ssec, beExecutedFlashSaleEventAmount: %s",
+                        "scanFlashSaleEventWhichShouldBeOpenFromMySQLAndInsertIntoMongoAndPutToRedis schedule is finished, executionTime: %ssec, beOpenFlashSaleEventAmount: %s",
+                        Duration.between(startTime, endTime).getSeconds(), executionAmount
+                )
+        );
+    }
+
+
+    /**
+     * 每30秒就去掃一次MySQL，看有沒有超過販售時間的快閃銷售案件，將其下架。
+     *
+     * 開賣中的快閃銷售案件，is_public=true，has_been_scanned=true。
+     * 只要當下時間 > end_time，就代表這個快閃銷售案件要被下架了，redis因為有設超時，所以應該也會已經不存在(但以防萬一，還是砍一下)，所以超過銷售時間的快閃銷售案件，不可能被會員消費到(redis left pop就會失敗了)。
+     */
+    @Scheduled(initialDelay = 30000, fixedDelay = 30000)
+    public void scanFlashSaleEventWhichShouldBeClosedFromMySQLAndDeleteMongoAndRemoveRedis() {
+        logUtil.logInfo(
+                log,
+                logUtil.composeLogPrefixForSystem(),
+                "scanFlashSaleEventWhichShouldBeClosedFromMySQLAndDeleteMongoAndRemoveRedis schedule is started."
+        );
+
+        Instant startTime = Instant.now();
+        int executionAmount = scanFlashSaleEventService.scanFlashSaleEventWhichShouldBeClosedFromMySQLAndDeleteMongoAndRemoveRedis();
+        Instant endTime = Instant.now();
+
+        logUtil.logInfo(
+                log,
+                logUtil.composeLogPrefixForSystem(),
+                String.format(
+                        "scanFlashSaleEventWhichShouldBeClosedFromMySQLAndDeleteMongoAndRemoveRedis schedule is finished, executionTime: %ssec, beClosedFlashSaleEventAmount: %s",
                         Duration.between(startTime, endTime).getSeconds(), executionAmount
                 )
         );

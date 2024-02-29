@@ -54,6 +54,21 @@ public class ScanFlashSaleEventService {
     }
 
     /**
+     * 搜尋已到結束時間的開賣中的FlashSaleEvent，並且把Mongo的資料刪除，把redis queue刪除。
+     *
+     * @return 總共幾筆銷售案件被執行
+     */
+    public int scanFlashSaleEventWhichShouldBeClosedFromMySQLAndDeleteMongoAndRemoveRedis() {
+        List<FlashSaleEvent> flashSaleEventList = flashSaleEventDAO.selectFlashSaleEventWhichIsPublicAndHasBeenScannedAndArrivalEndTime();
+
+        flashSaleEventList.forEach(fse -> {
+            this.closeFlashSaleEventByFseId(fse.getId());
+        });
+
+        return flashSaleEventList.size();
+    }
+
+    /**
      * 創建數個FlashSaleEventLogList，根據flashSaleEventId去分群，同個fseId的FlashSaleEventLogList放在同一群，並且每一群的FlashSaleEventLogList都會從頭去計數交易順序編號。
      * 這個設計的前提是，一個商品只能對應一個正在上架中的快閃銷售案件，不能夠同一個商品被發布在兩個上架中的快閃銷售案件，否則這裡分群邏輯就要再設計。
      * 之所以要分群，是為了快閃銷售案件的"消費順序編號"，每一群的消費順序編號都是獨立計算的。
@@ -102,6 +117,17 @@ public class ScanFlashSaleEventService {
         });
 
         return expiredInstantMap;
+    }
+
+    private void closeFlashSaleEventByFseId(int fseId) {
+//      1、更改MySQL的狀態為已下架
+        flashSaleEventDAO.updateStateById(fseId, false);
+
+//      2、清掉利用排程快取進redis queue的資料
+        myRedisUtil.removeKey("fse_" + fseId);
+
+//      3、清掉mongo裡面is_consumed=false的資料
+        flashSaleEventLogRepo.deleteByFseIdAndIsConsumed(fseId, false);
     }
 
 }

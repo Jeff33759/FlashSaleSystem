@@ -17,6 +17,12 @@ public interface FlashSaleEventDAO extends JpaRepository<FlashSaleEvent, Integer
     List<FlashSaleEvent> selectFlashSaleEventWhichIsPublicAndHasNotBeenScannedAndArrivalStartTime();
 
     /**
+     * 得到開賣中但已經過了銷售時間而該被下架的快閃銷售案件
+     */
+    @Query(value = "SELECT * FROM `flash_sale_event` WHERE is_public = true AND has_been_scanned = true AND NOW() > end_time ", nativeQuery = true)
+    List<FlashSaleEvent> selectFlashSaleEventWhichIsPublicAndHasBeenScannedAndArrivalEndTime();
+
+    /**
      * 更改銷售案件的狀態。
      * 上架中:is_public=true，已下架:is_public=false
      */
