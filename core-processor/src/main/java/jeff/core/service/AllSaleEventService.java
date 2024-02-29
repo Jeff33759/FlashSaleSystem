@@ -60,7 +60,7 @@ public class AllSaleEventService {
      *
      * @param {"fse_id":1}
      */
-    public ResponseObject removeFlashSaleEvent(JsonNode param, MyRequestContext context) {
+    public ResponseObject closeFlashSaleEvent(JsonNode param, MyRequestContext context) {
         int fseId = param.get("fse_id").asInt();
 
 //      1、更改MySQL的狀態為已下架
