@@ -1,8 +1,5 @@
 package jeff.persistent.model.mysql.po;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Timestamp;
@@ -11,8 +8,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "members")
-@Data
-@Accessors(chain = true) //lombok支援建構子鏈式賦值
+//@Data //lombok的這東西跟@OneToMany衝突
 public class Members implements Serializable {
 
     @Id
@@ -41,4 +37,53 @@ public class Members implements Serializable {
     @OneToMany(fetch = FetchType.LAZY ,mappedBy = "sellerMember", cascade = CascadeType.ALL)
     private Set<Goods> goodsSet = new HashSet<>();
 
+
+    public Integer getId() {
+        return id;
+    }
+
+    public Members setId(Integer id) {
+        this.id = id;
+        return this;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getRole() {
+        return role;
+    }
+
+    public void setRole(Integer role) {
+        this.role = role;
+    }
+
+    public Integer getStatus() {
+        return status;
+    }
+
+    public void setStatus(Integer status) {
+        this.status = status;
+    }
+
+    public Timestamp getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Timestamp createTime) {
+        this.createTime = createTime;
+    }
+
+    public Set<Goods> getGoodsSet() {
+        return goodsSet;
+    }
+
+    public void setGoodsSet(Set<Goods> goodsSet) {
+        this.goodsSet = goodsSet;
+    }
 }

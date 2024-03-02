@@ -1,8 +1,5 @@
 package jeff.persistent.model.mysql.po;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
-
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
@@ -10,8 +7,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "goods")
-@Data
-@Accessors(chain = true) //lombok支援建構子鏈式賦值
+//@Data //lombok的這東西跟@OneToMany衝突
 public class Goods implements Serializable {
 
     @Id
@@ -40,4 +36,53 @@ public class Goods implements Serializable {
     @OneToMany(mappedBy = "fseGoods", cascade = CascadeType.ALL) // 預設延遲載入
     private Set<FlashSaleEvent> flashSaleEventSet = new HashSet<>();
 
+    
+    public Integer getId() {
+        return id;
+    }
+
+    public Goods setId(Integer id) {
+        this.id = id;
+        return this;
+    }
+
+    public Members getSellerMember() {
+        return sellerMember;
+    }
+
+    public void setSellerMember(Members sellerMember) {
+        this.sellerMember = sellerMember;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getStock() {
+        return stock;
+    }
+
+    public void setStock(Integer stock) {
+        this.stock = stock;
+    }
+
+    public Integer getPrice() {
+        return price;
+    }
+
+    public void setPrice(Integer price) {
+        this.price = price;
+    }
+
+    public Set<FlashSaleEvent> getFlashSaleEventSet() {
+        return flashSaleEventSet;
+    }
+
+    public void setFlashSaleEventSet(Set<FlashSaleEvent> flashSaleEventSet) {
+        this.flashSaleEventSet = flashSaleEventSet;
+    }
 }
