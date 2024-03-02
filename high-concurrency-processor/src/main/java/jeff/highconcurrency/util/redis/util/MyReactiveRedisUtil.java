@@ -21,7 +21,7 @@ import java.util.Optional;
  * 不用在這裡去.subscribe()，回傳Mono讓外面的呼叫者去決定何時subscribe。
  * <p>
  * redis本身雖是SingleProcess-MultiThread，可是實際上處理CRUD的只有一個Thread，所以即使併發量再高，也不用擔心執行緒競爭與上鎖的問題。
- * 利用這個特性，結合redis-list的lpush&rpop去做一個原子性又可以在各服務間共享的Queue，此Queue就拿來應付快閃搶購的業務。
+ * 利用這個特性，結合redis-list的lpop&rpush去做一個原子性又可以在各服務間共享的Queue，此Queue就拿來應付快閃搶購的業務。
  */
 @Component
 public class MyReactiveRedisUtil {
