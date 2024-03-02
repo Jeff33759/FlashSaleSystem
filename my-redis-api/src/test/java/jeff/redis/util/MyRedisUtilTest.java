@@ -3,7 +3,6 @@ package jeff.redis.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import jeff.common.util.DateUtil;
 import jeff.redis.exception.MyRedisException;
 import jeff.test.pojo.MyTestPOJO;
 import org.junit.jupiter.api.Assertions;
@@ -123,6 +122,7 @@ class MyRedisUtilTest {
         });
 
         Assertions.assertEquals("The value in redis is not json format cause JsonProcessingException, value: not json.", actual.getMessage());
+        Assertions.assertInstanceOf(JsonProcessingException.class, actual.getCause());
         Mockito.verify(mockObjectMapper, Mockito.times(1)).readValue(stubJsonValue, MyTestPOJO.class);
     }
 
@@ -150,6 +150,7 @@ class MyRedisUtilTest {
         });
 
         Assertions.assertEquals("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", actual.getMessage());
+        Assertions.assertInstanceOf(JsonProcessingException.class, actual.getCause());
         Mockito.verify(mockObjectMapper, Mockito.times(1)).writeValueAsString(stubPOJO);
         Mockito.verify(spyMyRedisUtil, Mockito.times(0)).putDataStrByKey(Mockito.anyString(), Mockito.anyString());
     }
@@ -228,6 +229,7 @@ class MyRedisUtilTest {
         });
 
         Assertions.assertEquals("The value in redis is not json format cause JsonProcessingException, value: Not json.", actual.getMessage());
+        Assertions.assertInstanceOf(JsonProcessingException.class, actual.getCause());
         Mockito.verify(mockObjectMapper, Mockito.times(1)).readValue(stubValue, MyTestPOJO.class);
     }
 

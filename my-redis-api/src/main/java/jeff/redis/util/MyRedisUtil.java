@@ -72,7 +72,7 @@ public class MyRedisUtil {
         try {
             return Optional.of(mapper.readValue(jsonStr, clazz));
         } catch (JsonProcessingException e) {
-            throw new MyRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr));
+            throw new MyRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr), e);
         }
 
     }
@@ -87,8 +87,8 @@ public class MyRedisUtil {
         try {
             String jsonStr = mapper.writeValueAsString(cacheObj);
             this.putDataStrByKey(key, jsonStr);
-        }catch (JsonProcessingException e){
-            throw new MyRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.");
+        } catch (JsonProcessingException e){
+            throw new MyRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", e);
         }
     }
 
@@ -99,8 +99,8 @@ public class MyRedisUtil {
         try {
             String jsonStr = mapper.writeValueAsString(cacheObj);
             this.putDataStrByKeyAndSetExpiration(key, jsonStr, expiration);
-        }catch (JsonProcessingException e){
-            throw new MyRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.");
+        } catch (JsonProcessingException e){
+            throw new MyRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", e);
         }
     }
 
@@ -141,8 +141,8 @@ public class MyRedisUtil {
         String jsonStr = optionalJsonStr.get();
         try {
             return Optional.of(mapper.readValue(jsonStr, clazz));
-        }catch (JsonProcessingException e){
-            throw new MyRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr));
+        } catch (JsonProcessingException e){
+            throw new MyRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr), e);
         }
     }
 

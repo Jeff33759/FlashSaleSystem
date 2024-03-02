@@ -190,6 +190,7 @@ class MyReactiveRedisUtilTest {
         });
 
         Assertions.assertEquals("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", actual.getMessage());
+        Assertions.assertInstanceOf(JsonProcessingException.class, actual.getCause());
         Mockito.verify(mockObjectMapper, Mockito.times(1)).writeValueAsString(stubPOJO);
         Mockito.verify(spyMyReactiveRedisUtil, Mockito.times(0)).putDataStrByKey(Mockito.anyString(), Mockito.anyString());
     }
