@@ -3,6 +3,7 @@ package jeff.redis.util;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import jeff.common.util.DateUtil;
 import jeff.redis.exception.MyRedisException;
 import jeff.test.pojo.MyTestPOJO;
 import org.junit.jupiter.api.Assertions;
@@ -16,6 +17,7 @@ import org.springframework.data.redis.core.ValueOperations;
 
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @SpringBootTest(classes = MyRedisUtilTest.class)
 class MyRedisUtilTest {
@@ -70,6 +72,18 @@ class MyRedisUtilTest {
         spyMyRedisUtil.putDataStrByKey(stubKey, stubValue);
 
         Mockito.verify(this.mockValueOperations, Mockito.times(1)).set(stubKey, stubValue);
+    }
+
+    @Test
+    void GivenKeyAndStringValueAndExpiration_WhenPutDataStrByKeyAndSetExpiration_ThenInvokeExpectedMethodOfStringRedisTemplate() {
+        String stubKey = "keyForTesting.";
+        String stubValue = "valueForTesting.";
+        Instant stubExpiration = Instant.ofEpochMilli(1709369729900L); // 2024-03-02 16:55:29
+        Mockito.doNothing().when(this.mockValueOperations).set(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong(), Mockito.eq(TimeUnit.MILLISECONDS));
+
+        spyMyRedisUtil.putDataStrByKeyAndSetExpiration(stubKey, stubValue, stubExpiration);
+
+        Mockito.verify(this.mockValueOperations, Mockito.times(1)).set(stubKey, stubValue, stubExpiration.toEpochMilli(), TimeUnit.MILLISECONDS);
     }
 
     @Test
@@ -138,6 +152,21 @@ class MyRedisUtilTest {
         Assertions.assertEquals("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", actual.getMessage());
         Mockito.verify(mockObjectMapper, Mockito.times(1)).writeValueAsString(stubPOJO);
         Mockito.verify(spyMyRedisUtil, Mockito.times(0)).putDataStrByKey(Mockito.anyString(), Mockito.anyString());
+    }
+
+
+    @Test
+    void GivenPOJOAndExpiration_WhenPutDataObjByKeyAndSetExpiration_ThenInvokeWriteValueAsStringMethodOfObjectMapperAndPassExpectedJsonStrAndExpirationToPutDataStrByKeyAndSetExpirationMethod() throws JsonProcessingException {
+        String stubKey = "keyForTesting.";
+        MyTestPOJO stubPOJO = new MyTestPOJO(1, "stubName.");
+        String stubJsonValueFromConvertedStubPOJO = "{\"id\":1,\"stubName.\"}";
+        Instant stubExpiration = Instant.ofEpochMilli(1709369729900L); // 2024-03-02 16:55:29
+        Mockito.when(mockObjectMapper.writeValueAsString(stubPOJO)).thenReturn(stubJsonValueFromConvertedStubPOJO);
+
+        spyMyRedisUtil.putDataObjByKeyAndSetExpiration(stubKey, stubPOJO, stubExpiration);
+
+        Mockito.verify(mockObjectMapper, Mockito.times(1)).writeValueAsString(stubPOJO);
+        Mockito.verify(spyMyRedisUtil, Mockito.times(1)).putDataStrByKeyAndSetExpiration(stubKey, stubJsonValueFromConvertedStubPOJO, stubExpiration);
     }
 
     @Test

@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 自訂義的Redis工具包，使用SpringDataRedis作為訪問Redis的API，其底層實作預設為Lettuce。
@@ -48,6 +49,13 @@ public class MyRedisUtil {
     }
 
     /**
+     * 將某字串快取進Redis，該字串不一定要是json，並且設置超時。
+     */
+    public void putDataStrByKeyAndSetExpiration(String key, String cacheStr, Instant expiration) {
+        sRedisTemplate.opsForValue().set(key, cacheStr, expiration.toEpochMilli(), TimeUnit.MILLISECONDS);
+    }
+
+    /**
      * 用Key去redis拉資料(資料假定都是Json)，將Json轉成POJO後回傳。
      *
      * @param clazz 欲轉成的POJO
@@ -79,6 +87,18 @@ public class MyRedisUtil {
         try {
             String jsonStr = mapper.writeValueAsString(cacheObj);
             this.putDataStrByKey(key, jsonStr);
+        }catch (JsonProcessingException e){
+            throw new MyRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.");
+        }
+    }
+
+    /**
+     * 將一個POJO以Json型式存入redis，並且設置超時。
+     */
+    public void putDataObjByKeyAndSetExpiration(String key, Object cacheObj, Instant expiration) {
+        try {
+            String jsonStr = mapper.writeValueAsString(cacheObj);
+            this.putDataStrByKeyAndSetExpiration(key, jsonStr, expiration);
         }catch (JsonProcessingException e){
             throw new MyRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.");
         }

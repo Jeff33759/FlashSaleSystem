@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,14 @@ public class MyReactiveRedisUtil {
     }
 
     /**
+     * 將某字串快取進Redis，該字串不一定要是json，並且設置超時。
+     */
+    public Mono<Void> putDataStrByKeyAndSetExpiration(String key, String cacheStr, Instant expiration) {
+        return reactiveSRedisTemplate.opsForValue().set(key, cacheStr, Duration.ofMillis(expiration.toEpochMilli()))
+                .then();
+    }
+
+    /**
      * 用Key去redis拉資料(資料假定都是Json)，將Json轉成POJO後回傳。
      *
      * @param clazz 欲轉成的POJO
@@ -84,6 +93,18 @@ public class MyReactiveRedisUtil {
         try {
             String jsonStr = mapper.writeValueAsString(cacheObj);
             return this.putDataStrByKey(key, jsonStr);
+        }catch (JsonProcessingException e){
+            throw new MyReactiveRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.");
+        }
+    }
+
+    /**
+     * 將一個POJO以Json型式存入redis，並且設置超時。
+     */
+    public Mono<Void> putDataObjByKeyAndSetExpiration(String key, Object cacheObj, Instant expiration) {
+        try {
+            String jsonStr = mapper.writeValueAsString(cacheObj);
+            return this.putDataStrByKeyAndSetExpiration(key, jsonStr, expiration);
         }catch (JsonProcessingException e){
             throw new MyReactiveRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.");
         }
