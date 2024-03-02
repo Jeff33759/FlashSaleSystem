@@ -2,15 +2,20 @@
 
 ## [Unreleased]
 
-## Added
+### Added
+- core-processor新增查詢快閃銷售案件資料的接口(最終用於前端渲染)
+
+## [0.5.1] - 2024-03-01
+
+### Added
 - 更改一般銷售案件狀態(上架中/已下架)的接口完成
 - 更改銷售案件狀態為已下架的接口完成
 - 新增排程: 快閃銷售案件如果到達end_time，代表已經過了設定的販售時間，走下架流程
 
-## Changed
+### Changed
 - 修改排程: 快閃銷售案件依照start_time決定開賣時間，還沒到點的不會開賣
 
-## Fixed
+### Fixed
 - 修正core-processor當接口為Get類型時，因為沒有body而在WrapperFilter噴錯
 
 ## [0.4.1] - 2024-02-28

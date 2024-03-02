@@ -5,8 +5,20 @@ package jeff.common.consts;
  */
 public enum ResponseCode {
 
-    Success(1), //操作成功
-    Failure(0); //操作失敗
+    /**
+     * 操作成功
+     */
+    Success(1),
+
+    /**
+     * 操作失敗通用碼
+     */
+    Failure(0),
+
+    /**
+     * 查詢時找不到資料。
+     */
+    NotFound(404);
 
     int code;
 

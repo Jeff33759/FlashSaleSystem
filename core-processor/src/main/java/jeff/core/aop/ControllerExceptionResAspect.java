@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.util.LogUtil;
+import jeff.core.exception.MyNotFoundException;
 import jeff.core.exception.OrderException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,12 @@ public class ControllerExceptionResAspect {
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseObject handleOrderException(OrderException oe) {
         return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, oe.getMessage());
+    }
+
+    @ExceptionHandler(value = MyNotFoundException.class)
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseObject handleMyNotFoundException(MyNotFoundException mnfe) {
+        return new ResponseObject(ResponseCode.NotFound.getCode(), EMPTY_CONTENT, mnfe.getMessage());
     }
 
     /**
