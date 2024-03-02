@@ -2,7 +2,6 @@ package jeff.core.aop;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jeff.common.consts.MyLogType;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.util.LogUtil;
@@ -47,7 +46,7 @@ public class ControllerExceptionResAspect {
     @ExceptionHandler(value = OrderException.class)
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseObject handleOrderException(OrderException oe) {
-        return new ResponseObject(ResponseCode.Failed.getCode(), EMPTY_CONTENT, oe.getMessage());
+        return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, oe.getMessage());
     }
 
     /**
@@ -63,7 +62,7 @@ public class ControllerExceptionResAspect {
                 e
         );
 
-        return new ResponseObject(ResponseCode.Failed.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
+        return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
     }
 
 }

@@ -30,7 +30,7 @@ public class SystemService {
         dbInitService.initAllDemoDataOfMySQL(); //初始化在MySQL裡的Demo資料
         dbInitService.initFlashSaleEventLogDocumentOfMongoDB(); //初始化在Mongo裡的快閃銷售表
         myRedisUtil.removeAllKeys(); //清除redis上面所有的key
-        return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode(), "Initialize Mysql, Mongo and Redis successfully.");
+        return new ResponseObject(ResponseCode.Success.getCode(), objectMapper.createObjectNode(), "Initialize Mysql, Mongo and Redis successfully.");
     }
 
 }

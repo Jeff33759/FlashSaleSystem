@@ -91,7 +91,7 @@ public class FlashSaleEventService {
                                                 );
 
                                                 // 第四個操作
-                                                return Mono.just(new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("transNum", updatedFseInfo.getTransNum()), "Consume flashSaleEvent successfully."));
+                                                return Mono.just(new ResponseObject(ResponseCode.Success.getCode(), objectMapper.createObjectNode().put("transNum", updatedFseInfo.getTransNum()), "Consume flashSaleEvent successfully."));
                                             } catch (JsonProcessingException e) {
                                                 // 第四個操作
                                                 return Mono.error(new FlashSaleEventConsumeException("Failed to publish msg to mq because failing to convert to json."));

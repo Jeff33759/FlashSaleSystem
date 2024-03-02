@@ -5,8 +5,8 @@ package jeff.common.consts;
  */
 public enum ResponseCode {
 
-    Successful(1), //操作成功
-    Failed(0); //操作失敗
+    Success(1), //操作成功
+    Failure(0); //操作失敗
 
     int code;
 

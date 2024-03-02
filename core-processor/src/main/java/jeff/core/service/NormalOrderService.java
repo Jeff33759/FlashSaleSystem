@@ -52,7 +52,7 @@ public class NormalOrderService implements IOrderService {
         try{
             int newOrderId = orderManager.startOrderCreationFlow(orderCreationFlowContext);
 
-            return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("oId",newOrderId), "Order created successfully.");
+            return new ResponseObject(ResponseCode.Success.getCode(), objectMapper.createObjectNode().put("oId",newOrderId), "Order created successfully.");
         } catch (DataAccessException dae) { //Spring JDBC當操作DB遇到問題時會拋出的例外的基類，先印log後，統一包裝成OrderException
             logUtil.logWarn(
                     log,
@@ -77,7 +77,7 @@ public class NormalOrderService implements IOrderService {
         int oId = param.get("o_id").asInt();
         orderManager.startOrderFinishFlow(oId, reqContext);
 
-        return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode().put("o_id", oId), "Order completed successfully.");
+        return new ResponseObject(ResponseCode.Success.getCode(), objectMapper.createObjectNode().put("o_id", oId), "Order completed successfully.");
     }
 
     /**

@@ -8,13 +8,10 @@ import jeff.common.entity.dto.send.ResponseObject;
 import jeff.persistent.model.mongo.dao.FlashSaleEventLogRepo;
 import jeff.persistent.model.mysql.dao.FlashSaleEventDAO;
 import jeff.persistent.model.mysql.dao.SaleEventDAO;
-import jeff.persistent.model.mysql.po.SaleEvent;
 import jeff.redis.util.MyRedisUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 /**
  * 所有類型的銷售案件相關的服務器，包括一般銷售案件和快閃銷售案件。
@@ -48,7 +45,7 @@ public class AllSaleEventService {
     public ResponseObject updateStateOfNormalSaleEvent(JsonNode param, MyRequestContext context) {
         saleEventDAO.updateStateById(param.get("se_id").asInt(), param.get("is_public").asBoolean());
 
-        return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode(), "The state of sale-event updated successfully.");
+        return new ResponseObject(ResponseCode.Success.getCode(), objectMapper.createObjectNode(), "The state of sale-event updated successfully.");
     }
 
     /**
@@ -72,7 +69,7 @@ public class AllSaleEventService {
 //      3、清掉mongo裡面is_consumed=false的資料
         flashSaleEventLogRepo.deleteByFseIdAndIsConsumed(fseId, false);
 
-        return new ResponseObject(ResponseCode.Successful.getCode(), objectMapper.createObjectNode(), "The flash-sale-event removed successfully.");
+        return new ResponseObject(ResponseCode.Success.getCode(), objectMapper.createObjectNode(), "The flash-sale-event removed successfully.");
     }
 
 }
