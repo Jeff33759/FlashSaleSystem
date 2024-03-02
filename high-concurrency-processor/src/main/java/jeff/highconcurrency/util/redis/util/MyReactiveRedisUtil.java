@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,7 +21,7 @@ import java.util.Optional;
  * 不用在這裡去.subscribe()，回傳Mono讓外面的呼叫者去決定何時subscribe。
  * <p>
  * redis本身雖是SingleProcess-MultiThread，可是實際上處理CRUD的只有一個Thread，所以即使併發量再高，也不用擔心執行緒競爭與上鎖的問題。
- * 利用這個特性，結合redis-list的lpush&rpop去做一個原子性又可以在各服務間共享的Queue，此Queue就拿來應付快閃搶購的業務。
+ * 利用這個特性，結合redis-list的lpop&rpush去做一個原子性又可以在各服務間共享的Queue，此Queue就拿來應付快閃搶購的業務。
  */
 @Component
 public class MyReactiveRedisUtil {
@@ -52,6 +53,14 @@ public class MyReactiveRedisUtil {
     }
 
     /**
+     * 將某字串快取進Redis，該字串不一定要是json，並且設置超時。
+     */
+    public Mono<Void> putDataStrByKeyAndSetExpiration(String key, String cacheStr, Instant expiration) {
+        return reactiveSRedisTemplate.opsForValue().set(key, cacheStr, Duration.between(Instant.now(), expiration))
+                .then();
+    }
+
+    /**
      * 用Key去redis拉資料(資料假定都是Json)，將Json轉成POJO後回傳。
      *
      * @param clazz 欲轉成的POJO
@@ -69,7 +78,7 @@ public class MyReactiveRedisUtil {
             try {
                 return Optional.of(mapper.readValue(jsonStr, clazz));
             } catch (JsonProcessingException e) {
-                throw new MyReactiveRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr));
+                throw new MyReactiveRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr), e);
             }
         });
     }
@@ -84,8 +93,20 @@ public class MyReactiveRedisUtil {
         try {
             String jsonStr = mapper.writeValueAsString(cacheObj);
             return this.putDataStrByKey(key, jsonStr);
-        }catch (JsonProcessingException e){
-            throw new MyReactiveRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.");
+        } catch (JsonProcessingException e){
+            throw new MyReactiveRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", e);
+        }
+    }
+
+    /**
+     * 將一個POJO以Json型式存入redis，並且設置超時。
+     */
+    public Mono<Void> putDataObjByKeyAndSetExpiration(String key, Object cacheObj, Instant expiration) {
+        try {
+            String jsonStr = mapper.writeValueAsString(cacheObj);
+            return this.putDataStrByKeyAndSetExpiration(key, jsonStr, expiration);
+        } catch (JsonProcessingException e){
+            throw new MyReactiveRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", e);
         }
     }
 
@@ -101,12 +122,12 @@ public class MyReactiveRedisUtil {
     }
 
     /**
-     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後。
+     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後，並且設置超時。
      *
      * @param cacheStrList 一個String的List，可以不是Json字串
      * @param expiration   key的有效時間
      */
-    public Mono<Void> rightPushStrListByKey(String key, List<String> cacheStrList, Instant expiration) {
+    public Mono<Void> rightPushStrListByKeyAndSetExpiration(String key, List<String> cacheStrList, Instant expiration) {
         return reactiveSRedisTemplate.opsForList().rightPushAll(key, cacheStrList)
                 .then(Mono.fromRunnable(() -> reactiveSRedisTemplate.expireAt(key, expiration)));
     }
@@ -128,19 +149,19 @@ public class MyReactiveRedisUtil {
             String jsonStr = optionalJsonStr.get();
             try {
                 return Optional.of(mapper.readValue(jsonStr, clazz));
-            }catch (JsonProcessingException e){
-                throw new MyReactiveRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr));
+            } catch (JsonProcessingException e){
+                throw new MyReactiveRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr), e);
             }
         });
     }
 
     /**
-     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後。
+     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後，並且設置超時
      *
      * @param cacheList  一個POJO的List，可以轉成Json
      * @param expiration 有效時間
      */
-    public Mono<Void> rightPushObjListByKey(String key, List cacheList, Instant expiration) {
+    public Mono<Void> rightPushObjListByKeyAndSetExpiration(String key, List cacheList, Instant expiration) {
         ArrayNode jsonArr = mapper.valueToTree(cacheList);
         List<String> jsonStrList = new ArrayList<>();
 
@@ -148,7 +169,7 @@ public class MyReactiveRedisUtil {
             jsonStrList.add(json.toString());
         });
 
-        return this.rightPushStrListByKey(key, jsonStrList, expiration);
+        return this.rightPushStrListByKeyAndSetExpiration(key, jsonStrList, expiration);
     }
 
     /**

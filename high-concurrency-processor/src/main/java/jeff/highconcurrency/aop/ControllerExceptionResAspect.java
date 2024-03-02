@@ -45,7 +45,7 @@ public class ControllerExceptionResAspect {
     @ExceptionHandler(value = FlashSaleEventConsumeException.class)
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseObject handleOrderException(FlashSaleEventConsumeException fsece) {
-        return new ResponseObject(ResponseCode.Failed.getCode(), EMPTY_CONTENT, fsece.getMessage());
+        return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, fsece.getMessage());
     }
 
     /**
@@ -61,7 +61,7 @@ public class ControllerExceptionResAspect {
                 e
         );
 
-        return new ResponseObject(ResponseCode.Failed.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
+        return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
     }
 
 }

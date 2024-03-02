@@ -15,8 +15,8 @@ public class FlashSaleEvent {
     private Integer id;
 
     @JoinColumn(name ="g_id")
-    @ManyToOne //預設飢餓載入，因為查詢銷售案件的場景，幾乎都會需要member，所以設飢餓載入，避免N+1 Query
-    private Goods goods;
+    @ManyToOne //預設飢餓載入，因為查詢銷售案件的場景，幾乎都會需要賣家member，而賣家member在goods裡關聯，所以設飢餓載入goods，而goods裡面又飢餓載入賣家member，避免N+1+1 Query
+    private Goods fseGoods;
 
     /**
      * t: 上架中，f:下架中

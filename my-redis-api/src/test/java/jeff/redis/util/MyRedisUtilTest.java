@@ -14,6 +14,7 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -73,6 +74,21 @@ class MyRedisUtilTest {
     }
 
     @Test
+    void GivenKeyAndStringValueAndExpiration_WhenPutDataStrByKeyAndSetExpiration_ThenInvokeExpectedMethodOfStringRedisTemplate() {
+        try (MockedStatic<Duration> mockDuration = Mockito.mockStatic(Duration.class)) {
+            String stubKey = "keyForTesting.";
+            String stubValue = "valueForTesting.";
+            Instant stubExpiration = Instant.ofEpochMilli(1709369729900L); // 2024-03-02 16:55:29
+            Duration stubDuration = Duration.between(Instant.now(), stubExpiration);
+            mockDuration.when(() -> Duration.between(Mockito.any(), Mockito.eq(stubExpiration))).thenReturn(stubDuration);
+
+            spyMyRedisUtil.putDataStrByKeyAndSetExpiration(stubKey, stubValue, stubExpiration);
+
+            Mockito.verify(this.mockValueOperations, Mockito.times(1)).set(stubKey, stubValue, stubDuration);
+        }
+    }
+
+    @Test
     void GivenGetDataStrByKeyMethodReturnsOptionalWhichContainsJsonString_WhenGetDataObjByKey_ThenReturnOptionalWhichContainsExpectedPOJO() throws JsonProcessingException {
         String stubKey = "keyForTesting.";
         String stubJsonValue = "{\"id\":1,\"name\":\"stubName.\"}";
@@ -109,6 +125,7 @@ class MyRedisUtilTest {
         });
 
         Assertions.assertEquals("The value in redis is not json format cause JsonProcessingException, value: not json.", actual.getMessage());
+        Assertions.assertInstanceOf(JsonProcessingException.class, actual.getCause());
         Mockito.verify(mockObjectMapper, Mockito.times(1)).readValue(stubJsonValue, MyTestPOJO.class);
     }
 
@@ -136,8 +153,24 @@ class MyRedisUtilTest {
         });
 
         Assertions.assertEquals("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", actual.getMessage());
+        Assertions.assertInstanceOf(JsonProcessingException.class, actual.getCause());
         Mockito.verify(mockObjectMapper, Mockito.times(1)).writeValueAsString(stubPOJO);
         Mockito.verify(spyMyRedisUtil, Mockito.times(0)).putDataStrByKey(Mockito.anyString(), Mockito.anyString());
+    }
+
+
+    @Test
+    void GivenPOJOAndExpiration_WhenPutDataObjByKeyAndSetExpiration_ThenInvokeWriteValueAsStringMethodOfObjectMapperAndPassExpectedJsonStrAndExpirationToPutDataStrByKeyAndSetExpirationMethod() throws JsonProcessingException {
+        String stubKey = "keyForTesting.";
+        MyTestPOJO stubPOJO = new MyTestPOJO(1, "stubName.");
+        String stubJsonValueFromConvertedStubPOJO = "{\"id\":1,\"stubName.\"}";
+        Instant stubExpiration = Instant.ofEpochMilli(1709369729900L); // 2024-03-02 16:55:29
+        Mockito.when(mockObjectMapper.writeValueAsString(stubPOJO)).thenReturn(stubJsonValueFromConvertedStubPOJO);
+
+        spyMyRedisUtil.putDataObjByKeyAndSetExpiration(stubKey, stubPOJO, stubExpiration);
+
+        Mockito.verify(mockObjectMapper, Mockito.times(1)).writeValueAsString(stubPOJO);
+        Mockito.verify(spyMyRedisUtil, Mockito.times(1)).putDataStrByKeyAndSetExpiration(stubKey, stubJsonValueFromConvertedStubPOJO, stubExpiration);
     }
 
     @Test
@@ -199,11 +232,12 @@ class MyRedisUtilTest {
         });
 
         Assertions.assertEquals("The value in redis is not json format cause JsonProcessingException, value: Not json.", actual.getMessage());
+        Assertions.assertInstanceOf(JsonProcessingException.class, actual.getCause());
         Mockito.verify(mockObjectMapper, Mockito.times(1)).readValue(stubValue, MyTestPOJO.class);
     }
 
     @Test
-    void GivenPOJOList_WhenRightPushObjListByKey_ThenInvokeAndPassExpectedArgsToRightPushStrListByKeyMethod() throws JsonProcessingException {
+    void GivenPOJOList_WhenRightPushObjListByKeyAndSetExpiration_ThenInvokeAndPassExpectedArgsToRightPushStrListByKeyMethod() throws JsonProcessingException {
         String stubKey = "keyForTesting.";
         List<MyTestPOJO> stubPojoList = new ArrayList<>();
         MyTestPOJO stubPojo = new MyTestPOJO(1, "stubName1");
@@ -218,10 +252,10 @@ class MyRedisUtilTest {
         Instant stubInstant = Instant.now();
         Mockito.when(mockObjectMapper.valueToTree(stubPojoList)).thenReturn(stubArrayNode);
 
-        spyMyRedisUtil.rightPushObjListByKey(stubKey, stubPojoList, stubInstant);
+        spyMyRedisUtil.rightPushObjListByKeyAndSetExpiration(stubKey, stubPojoList, stubInstant);
 
         Mockito.verify(mockObjectMapper, Mockito.times(1)).valueToTree(stubPojoList);
-        Mockito.verify(spyMyRedisUtil, Mockito.times(1)).rightPushStrListByKey(stubKey, stubJsonStrList, stubInstant);
+        Mockito.verify(spyMyRedisUtil, Mockito.times(1)).rightPushStrListByKeyAndSetExpiration(stubKey, stubJsonStrList, stubInstant);
     }
 
     @Test

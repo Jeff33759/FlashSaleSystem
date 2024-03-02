@@ -8,10 +8,7 @@ import jeff.test.pojo.MyTestPOJO;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.Spy;
+import org.mockito.*;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.ReactiveListOperations;
 import org.springframework.data.redis.core.ReactiveStringRedisTemplate;
@@ -20,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -89,6 +87,27 @@ class MyReactiveRedisUtilTest {
                 .expectComplete()
                 .verify();
         Mockito.verify(this.mockReactiveValueOperations, Mockito.times(1)).set(stubKey, stubValue);
+    }
+
+    @Test
+    void GivenKeyAndStringValueAndExpiration_WhenPutDataStrByKeyAndSetExpiration_ThenInvokeExpectedMethodOfReactiveStringRedisTemplateAndReturnEmptyMono() {
+        try (MockedStatic<Duration> mockDuration = Mockito.mockStatic(Duration.class)) {
+            String stubKey = "keyForTesting.";
+            String stubValue = "valueForTesting.";
+            Instant stubExpiration = Instant.ofEpochMilli(1709369729900L); // 2024-03-02 16:55:29
+            Duration stubDuration = Duration.between(Instant.now(), stubExpiration);
+            mockDuration.when(() -> Duration.between(Mockito.any(), Mockito.eq(stubExpiration))).thenReturn(stubDuration);
+            Mono<Void> stubMono = Mono.empty();
+            Mockito.when(mockReactiveValueOperations.set(Mockito.anyString(), Mockito.anyString(), Mockito.eq(stubDuration))).thenReturn(stubMono);
+
+            Mono<Void> actualMono = spyMyReactiveRedisUtil.putDataStrByKeyAndSetExpiration(stubKey, stubValue, stubExpiration);
+
+            StepVerifier.create(actualMono)
+                    .expectNextCount(0)
+                    .expectComplete()
+                    .verify();
+            Mockito.verify(this.mockReactiveValueOperations, Mockito.times(1)).set(stubKey, stubValue, stubDuration);
+        }
     }
 
     @Test
@@ -171,12 +190,33 @@ class MyReactiveRedisUtilTest {
         });
 
         Assertions.assertEquals("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", actual.getMessage());
+        Assertions.assertInstanceOf(JsonProcessingException.class, actual.getCause());
         Mockito.verify(mockObjectMapper, Mockito.times(1)).writeValueAsString(stubPOJO);
         Mockito.verify(spyMyReactiveRedisUtil, Mockito.times(0)).putDataStrByKey(Mockito.anyString(), Mockito.anyString());
     }
 
     @Test
-    void GivenKeyExistInRedis_WhenLeftPopByKeyAndGetDataStr_ThenReturnMonoOptionalWhichContainsExpectedString() {
+    void GivenPOJOAndExpiration_WhenPutDataObjByKeyAndSetExpiration_ThenInvokeWriteValueAsStringMethodOfObjectMapperAndPassExpectedJsonStrToPutDataStrByKeyMethodAndReturnEmptyMono() throws JsonProcessingException {
+        String stubKey = "keyForTesting.";
+        MyTestPOJO stubPOJO = new MyTestPOJO(1, "stubName.");
+        String stubJsonValueFromConvertedStubPOJO = "{\"id\":1,\"stubName.\"}";
+        Instant stubExpiration = Instant.ofEpochMilli(1709369729900L); // 2024-03-02 16:55:29
+        Mockito.when(mockObjectMapper.writeValueAsString(stubPOJO)).thenReturn(stubJsonValueFromConvertedStubPOJO);
+        Mono<Object> stubMono = Mono.empty();
+        Mockito.doReturn(stubMono).when(spyMyReactiveRedisUtil).putDataStrByKeyAndSetExpiration(Mockito.anyString(), Mockito.anyString(), Mockito.eq(stubExpiration));
+
+        Mono<Void> actualMono = spyMyReactiveRedisUtil.putDataObjByKeyAndSetExpiration(stubKey, stubPOJO, stubExpiration);
+
+        StepVerifier.create(actualMono)
+                .expectNextCount(0)
+                .expectComplete()
+                .verify();
+        Mockito.verify(mockObjectMapper, Mockito.times(1)).writeValueAsString(stubPOJO);
+        Mockito.verify(spyMyReactiveRedisUtil, Mockito.times(1)).putDataStrByKeyAndSetExpiration(stubKey, stubJsonValueFromConvertedStubPOJO, stubExpiration);
+    }
+
+    @Test
+    void GivenKeyExistInRedis_WhenLeftPopListByKeyAndGetDataStr_ThenReturnMonoOptionalWhichContainsExpectedString() {
         String stubKey = "keyForTesting.";
         String stubJsonValue = "{\"id\":1,\"name\":\"stubName.\"}";
         Mono<String> stubMono = Mono.just(stubJsonValue);
@@ -192,7 +232,7 @@ class MyReactiveRedisUtilTest {
     }
 
     @Test
-    void GivenKeyDoesNotExistInRedis_WhenLeftPopByKeyAndGetDataStr_ThenReturnMonoEmptyOptional() {
+    void GivenKeyDoesNotExistInRedis_WhenLeftPopListByKeyAndGetDataStr_ThenReturnMonoEmptyOptional() {
         String stubKey = "keyForTesting.";
         Mono<String> stubMono = Mono.empty();
         Mockito.when(mockReactiveStringRedisTemplate.opsForList().leftPop(stubKey)).thenReturn(stubMono);
@@ -255,7 +295,7 @@ class MyReactiveRedisUtilTest {
     }
 
     @Test
-    void GivenPOJOList_WhenRightPushObjListByKey_ThenInvokeAndPassExpectedArgsToRightPushStrListByKeyMethodAndReturnEmptyMono() throws JsonProcessingException {
+    void GivenPOJOList_WhenRightPushObjListByKeyAndSetExpiration_ThenInvokeAndPassExpectedArgsToRightPushStrListByKeyAndSetExpirationMethodAndReturnEmptyMono() throws JsonProcessingException {
         String stubKey = "keyForTesting.";
         List<MyTestPOJO> stubPojoList = new ArrayList<>();
         MyTestPOJO stubPojo = new MyTestPOJO(1, "stubName1");
@@ -270,15 +310,15 @@ class MyReactiveRedisUtilTest {
         Instant stubInstant = Instant.now();
         Mockito.when(mockObjectMapper.valueToTree(stubPojoList)).thenReturn(stubArrayNode);
         Mono<Object> stubMono = Mono.empty();
-        Mockito.doReturn(stubMono).when(spyMyReactiveRedisUtil).rightPushStrListByKey(Mockito.anyString(), Mockito.anyList(), Mockito.any());
+        Mockito.doReturn(stubMono).when(spyMyReactiveRedisUtil).rightPushStrListByKeyAndSetExpiration(Mockito.anyString(), Mockito.anyList(), Mockito.any());
 
-        Mono<Void> actualMono = spyMyReactiveRedisUtil.rightPushObjListByKey(stubKey, stubPojoList, stubInstant);
+        Mono<Void> actualMono = spyMyReactiveRedisUtil.rightPushObjListByKeyAndSetExpiration(stubKey, stubPojoList, stubInstant);
 
         StepVerifier.create(actualMono)
                 .expectNextCount(0)
                 .verifyComplete();
         Mockito.verify(mockObjectMapper, Mockito.times(1)).valueToTree(stubPojoList);
-        Mockito.verify(spyMyReactiveRedisUtil, Mockito.times(1)).rightPushStrListByKey(stubKey, stubJsonStrList, stubInstant);
+        Mockito.verify(spyMyReactiveRedisUtil, Mockito.times(1)).rightPushStrListByKeyAndSetExpiration(stubKey, stubJsonStrList, stubInstant);
     }
 
     @Test

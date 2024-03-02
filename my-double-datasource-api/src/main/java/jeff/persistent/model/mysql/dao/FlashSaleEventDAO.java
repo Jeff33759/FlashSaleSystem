@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface FlashSaleEventDAO extends JpaRepository<FlashSaleEvent, Integer> {
 
@@ -21,6 +22,12 @@ public interface FlashSaleEventDAO extends JpaRepository<FlashSaleEvent, Integer
      */
     @Query(value = "SELECT * FROM `flash_sale_event` WHERE is_public = true AND has_been_scanned = true AND NOW() > end_time ", nativeQuery = true)
     List<FlashSaleEvent> selectFlashSaleEventWhichIsPublicAndHasBeenScannedAndArrivalEndTime();
+
+    /**
+     * 得到上架中的某快閃銷售活動
+     */
+    @Query(value = "SELECT * FROM `flash_sale_event` WHERE id = ?1 AND is_public = true ", nativeQuery = true)
+    Optional<FlashSaleEvent> selectFlashSaleEventWhichIsPublicById(int fseId);
 
     /**
      * 更改銷售案件的狀態。

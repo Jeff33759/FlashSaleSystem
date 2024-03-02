@@ -7,7 +7,6 @@ import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.consts.DemoMember;
 import jeff.core.exception.OrderException;
 import jeff.core.service.AllSaleEventService;
-import jeff.core.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,18 +14,15 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 
 /**
- * 本伺服端的入口控制器。
+ * 本伺服端的入口控制器，存放對外開放的接口。
  * 因為不多，所以沒有再根據業務邏輯細分。
  */
 @RestController
 @RequestMapping(produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
-public class CoreController {
+public class PublicApiController {
 
     @Resource(name = "normalOrderService")
     private IOrderService normalOrderService;
-
-    @Autowired
-    private SystemService systemService;
 
     @Autowired
     private AllSaleEventService allSaleEventService;
@@ -77,12 +73,5 @@ public class CoreController {
         return ResponseEntity.ok(allSaleEventService.closeFlashSaleEvent(param, myRequestContext));
     }
 
-    /**
-     * 初始化redis和MySql，方便DEMO。
-     */
-    @GetMapping("/system/init")
-    public ResponseEntity<ResponseObject> initRedisAndMySql() {
-        return ResponseEntity.ok(systemService.initAllDBAndRedis());
-    }
 
 }

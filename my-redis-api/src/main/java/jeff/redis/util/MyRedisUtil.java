@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ import java.util.Set;
  * 自訂義的Redis工具包，使用SpringDataRedis作為訪問Redis的API，其底層實作預設為Lettuce。
  * <p>
  * redis本身雖是SingleProcess-MultiThread，可是實際上處理CRUD的只有一個Thread，所以即使併發量再高，也不用擔心執行緒競爭與上鎖的問題。
- * 利用這個特性，結合redis-list的lpush&rpop去做一個原子性又可以在各服務間共享的Queue，此Queue就拿來應付快閃搶購的業務。
+ * 利用這個特性，結合redis-list的lpop&rpush去做一個原子性又可以在各服務間共享的Queue，此Queue就拿來應付快閃搶購的業務。
  */
 @Component
 public class MyRedisUtil {
@@ -48,6 +49,13 @@ public class MyRedisUtil {
     }
 
     /**
+     * 將某字串快取進Redis，該字串不一定要是json，並且設置超時。
+     */
+    public void putDataStrByKeyAndSetExpiration(String key, String cacheStr, Instant expiration) {
+        sRedisTemplate.opsForValue().set(key, cacheStr, Duration.between(Instant.now(), expiration));
+    }
+
+    /**
      * 用Key去redis拉資料(資料假定都是Json)，將Json轉成POJO後回傳。
      *
      * @param clazz 欲轉成的POJO
@@ -64,7 +72,7 @@ public class MyRedisUtil {
         try {
             return Optional.of(mapper.readValue(jsonStr, clazz));
         } catch (JsonProcessingException e) {
-            throw new MyRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr));
+            throw new MyRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr), e);
         }
 
     }
@@ -79,8 +87,20 @@ public class MyRedisUtil {
         try {
             String jsonStr = mapper.writeValueAsString(cacheObj);
             this.putDataStrByKey(key, jsonStr);
-        }catch (JsonProcessingException e){
-            throw new MyRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.");
+        } catch (JsonProcessingException e){
+            throw new MyRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", e);
+        }
+    }
+
+    /**
+     * 將一個POJO以Json型式存入redis，並且設置超時。
+     */
+    public void putDataObjByKeyAndSetExpiration(String key, Object cacheObj, Instant expiration) {
+        try {
+            String jsonStr = mapper.writeValueAsString(cacheObj);
+            this.putDataStrByKeyAndSetExpiration(key, jsonStr, expiration);
+        } catch (JsonProcessingException e){
+            throw new MyRedisException("Some error occurred when converting POJO into jsonStr cause JsonProcessingException.", e);
         }
     }
 
@@ -95,12 +115,12 @@ public class MyRedisUtil {
     }
 
     /**
-     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後。
+     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後，並設置超時時間。
      *
      * @param cacheStrList 一個String的List，可以不是Json字串
      * @param expiration   key的有效時間
      */
-    public void rightPushStrListByKey(String key, List<String> cacheStrList, Instant expiration) {
+    public void rightPushStrListByKeyAndSetExpiration(String key, List<String> cacheStrList, Instant expiration) {
         sRedisTemplate.opsForList().rightPushAll(key, cacheStrList);
         sRedisTemplate.expireAt(key, expiration);
     }
@@ -121,18 +141,18 @@ public class MyRedisUtil {
         String jsonStr = optionalJsonStr.get();
         try {
             return Optional.of(mapper.readValue(jsonStr, clazz));
-        }catch (JsonProcessingException e){
-            throw new MyRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr));
+        } catch (JsonProcessingException e){
+            throw new MyRedisException(String.format("The value in redis is not json format cause JsonProcessingException, value: %s", jsonStr), e);
         }
     }
 
     /**
-     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後。
+     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後，並且設置超時。
      *
      * @param cacheList  一個POJO的List，可以轉成Json
      * @param expiration 有效時間
      */
-    public void rightPushObjListByKey(String key, List cacheList, Instant expiration) {
+    public void rightPushObjListByKeyAndSetExpiration(String key, List cacheList, Instant expiration) {
         ArrayNode jsonArr = mapper.valueToTree(cacheList);
         List<String> jsonStrList = new ArrayList<>();
 
@@ -140,7 +160,7 @@ public class MyRedisUtil {
             jsonStrList.add(json.toString());
         });
 
-        this.rightPushStrListByKey(key, jsonStrList, expiration);
+        this.rightPushStrListByKeyAndSetExpiration(key, jsonStrList, expiration);
     }
 
     /**
