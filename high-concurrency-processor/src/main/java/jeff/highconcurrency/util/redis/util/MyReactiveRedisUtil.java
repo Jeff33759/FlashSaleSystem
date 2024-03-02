@@ -56,7 +56,7 @@ public class MyReactiveRedisUtil {
      * 將某字串快取進Redis，該字串不一定要是json，並且設置超時。
      */
     public Mono<Void> putDataStrByKeyAndSetExpiration(String key, String cacheStr, Instant expiration) {
-        return reactiveSRedisTemplate.opsForValue().set(key, cacheStr, Duration.ofMillis(expiration.toEpochMilli()))
+        return reactiveSRedisTemplate.opsForValue().set(key, cacheStr, Duration.between(Instant.now(), expiration))
                 .then();
     }
 
@@ -122,12 +122,12 @@ public class MyReactiveRedisUtil {
     }
 
     /**
-     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後。
+     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後，並且設置超時。
      *
      * @param cacheStrList 一個String的List，可以不是Json字串
      * @param expiration   key的有效時間
      */
-    public Mono<Void> rightPushStrListByKey(String key, List<String> cacheStrList, Instant expiration) {
+    public Mono<Void> rightPushStrListByKeyAndSetExpiration(String key, List<String> cacheStrList, Instant expiration) {
         return reactiveSRedisTemplate.opsForList().rightPushAll(key, cacheStrList)
                 .then(Mono.fromRunnable(() -> reactiveSRedisTemplate.expireAt(key, expiration)));
     }
@@ -156,12 +156,12 @@ public class MyReactiveRedisUtil {
     }
 
     /**
-     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後。
+     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後，並且設置超時
      *
      * @param cacheList  一個POJO的List，可以轉成Json
      * @param expiration 有效時間
      */
-    public Mono<Void> rightPushObjListByKey(String key, List cacheList, Instant expiration) {
+    public Mono<Void> rightPushObjListByKeyAndSetExpiration(String key, List cacheList, Instant expiration) {
         ArrayNode jsonArr = mapper.valueToTree(cacheList);
         List<String> jsonStrList = new ArrayList<>();
 
@@ -169,7 +169,7 @@ public class MyReactiveRedisUtil {
             jsonStrList.add(json.toString());
         });
 
-        return this.rightPushStrListByKey(key, jsonStrList, expiration);
+        return this.rightPushStrListByKeyAndSetExpiration(key, jsonStrList, expiration);
     }
 
     /**

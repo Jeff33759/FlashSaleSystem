@@ -22,6 +22,10 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
         </dependency>
+        <dependency> <!-- scope不設為test，讓my-test-lib被其他專案引用時，此函式庫可以跟著被引用進去，但my-test-lib本身需要設為test scope，以免佈署時連同一大包測試工具都打包進各專案 -->
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId> <!-- 讓Mockito.mockStatic可以用 -->
+        </dependency>
 
         <dependency> <!-- scope不設為test，讓my-test-lib被其他專案引用時，此函式庫可以跟著被引用進去，但my-test-lib本身需要設為test scope，以免佈署時連同一大包測試工具都打包進各專案 -->
             <groupId>io.projectreactor</groupId>

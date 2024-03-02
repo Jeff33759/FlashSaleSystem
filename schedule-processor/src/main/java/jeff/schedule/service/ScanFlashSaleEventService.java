@@ -42,7 +42,7 @@ public class ScanFlashSaleEventService {
 
         groupedFlashSaleEventLogMap.forEach((fseId, flashSaleEventLogList) -> {
             flashSaleEventLogRepo.saveAll(flashSaleEventLogList); //將資料寫入Mongo Log表
-            myRedisUtil.rightPushObjListByKey("fse_" + fseId, flashSaleEventLogList, expirationMap.get(fseId)); //將資料寫入redis-list，以fseId為Key分群
+            myRedisUtil.rightPushObjListByKeyAndSetExpiration("fse_" + fseId, flashSaleEventLogList, expirationMap.get(fseId)); //將資料寫入redis-list，以fseId為Key分群
         });
 
         flashSaleEventList.forEach(fse -> {

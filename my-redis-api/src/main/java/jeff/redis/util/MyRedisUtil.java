@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 
 /**
  * 自訂義的Redis工具包，使用SpringDataRedis作為訪問Redis的API，其底層實作預設為Lettuce。
@@ -52,7 +52,7 @@ public class MyRedisUtil {
      * 將某字串快取進Redis，該字串不一定要是json，並且設置超時。
      */
     public void putDataStrByKeyAndSetExpiration(String key, String cacheStr, Instant expiration) {
-        sRedisTemplate.opsForValue().set(key, cacheStr, expiration.toEpochMilli(), TimeUnit.MILLISECONDS);
+        sRedisTemplate.opsForValue().set(key, cacheStr, Duration.between(Instant.now(), expiration));
     }
 
     /**
@@ -115,12 +115,12 @@ public class MyRedisUtil {
     }
 
     /**
-     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後。
+     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後，並設置超時時間。
      *
      * @param cacheStrList 一個String的List，可以不是Json字串
      * @param expiration   key的有效時間
      */
-    public void rightPushStrListByKey(String key, List<String> cacheStrList, Instant expiration) {
+    public void rightPushStrListByKeyAndSetExpiration(String key, List<String> cacheStrList, Instant expiration) {
         sRedisTemplate.opsForList().rightPushAll(key, cacheStrList);
         sRedisTemplate.expireAt(key, expiration);
     }
@@ -147,12 +147,12 @@ public class MyRedisUtil {
     }
 
     /**
-     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後。
+     * 將List內的資料依序插入redis-list，每一筆資料都是插入在最後一筆之後，並且設置超時。
      *
      * @param cacheList  一個POJO的List，可以轉成Json
      * @param expiration 有效時間
      */
-    public void rightPushObjListByKey(String key, List cacheList, Instant expiration) {
+    public void rightPushObjListByKeyAndSetExpiration(String key, List cacheList, Instant expiration) {
         ArrayNode jsonArr = mapper.valueToTree(cacheList);
         List<String> jsonStrList = new ArrayList<>();
 
@@ -160,7 +160,7 @@ public class MyRedisUtil {
             jsonStrList.add(json.toString());
         });
 
-        this.rightPushStrListByKey(key, jsonStrList, expiration);
+        this.rightPushStrListByKeyAndSetExpiration(key, jsonStrList, expiration);
     }
 
     /**

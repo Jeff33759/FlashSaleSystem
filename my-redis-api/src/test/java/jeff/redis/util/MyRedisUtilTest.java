@@ -14,9 +14,9 @@ import org.springframework.data.redis.core.ListOperations;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 @SpringBootTest(classes = MyRedisUtilTest.class)
 class MyRedisUtilTest {
@@ -75,14 +75,17 @@ class MyRedisUtilTest {
 
     @Test
     void GivenKeyAndStringValueAndExpiration_WhenPutDataStrByKeyAndSetExpiration_ThenInvokeExpectedMethodOfStringRedisTemplate() {
-        String stubKey = "keyForTesting.";
-        String stubValue = "valueForTesting.";
-        Instant stubExpiration = Instant.ofEpochMilli(1709369729900L); // 2024-03-02 16:55:29
-        Mockito.doNothing().when(this.mockValueOperations).set(Mockito.anyString(), Mockito.anyString(), Mockito.anyLong(), Mockito.eq(TimeUnit.MILLISECONDS));
+        try (MockedStatic<Duration> mockDuration = Mockito.mockStatic(Duration.class)) {
+            String stubKey = "keyForTesting.";
+            String stubValue = "valueForTesting.";
+            Instant stubExpiration = Instant.ofEpochMilli(1709369729900L); // 2024-03-02 16:55:29
+            Duration stubDuration = Duration.between(Instant.now(), stubExpiration);
+            mockDuration.when(() -> Duration.between(Mockito.any(), Mockito.eq(stubExpiration))).thenReturn(stubDuration);
 
-        spyMyRedisUtil.putDataStrByKeyAndSetExpiration(stubKey, stubValue, stubExpiration);
+            spyMyRedisUtil.putDataStrByKeyAndSetExpiration(stubKey, stubValue, stubExpiration);
 
-        Mockito.verify(this.mockValueOperations, Mockito.times(1)).set(stubKey, stubValue, stubExpiration.toEpochMilli(), TimeUnit.MILLISECONDS);
+            Mockito.verify(this.mockValueOperations, Mockito.times(1)).set(stubKey, stubValue, stubDuration);
+        }
     }
 
     @Test
@@ -234,7 +237,7 @@ class MyRedisUtilTest {
     }
 
     @Test
-    void GivenPOJOList_WhenRightPushObjListByKey_ThenInvokeAndPassExpectedArgsToRightPushStrListByKeyMethod() throws JsonProcessingException {
+    void GivenPOJOList_WhenRightPushObjListByKeyAndSetExpiration_ThenInvokeAndPassExpectedArgsToRightPushStrListByKeyMethod() throws JsonProcessingException {
         String stubKey = "keyForTesting.";
         List<MyTestPOJO> stubPojoList = new ArrayList<>();
         MyTestPOJO stubPojo = new MyTestPOJO(1, "stubName1");
@@ -249,10 +252,10 @@ class MyRedisUtilTest {
         Instant stubInstant = Instant.now();
         Mockito.when(mockObjectMapper.valueToTree(stubPojoList)).thenReturn(stubArrayNode);
 
-        spyMyRedisUtil.rightPushObjListByKey(stubKey, stubPojoList, stubInstant);
+        spyMyRedisUtil.rightPushObjListByKeyAndSetExpiration(stubKey, stubPojoList, stubInstant);
 
         Mockito.verify(mockObjectMapper, Mockito.times(1)).valueToTree(stubPojoList);
-        Mockito.verify(spyMyRedisUtil, Mockito.times(1)).rightPushStrListByKey(stubKey, stubJsonStrList, stubInstant);
+        Mockito.verify(spyMyRedisUtil, Mockito.times(1)).rightPushStrListByKeyAndSetExpiration(stubKey, stubJsonStrList, stubInstant);
     }
 
     @Test
