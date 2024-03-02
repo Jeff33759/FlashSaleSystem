@@ -88,15 +88,15 @@ public class ScanFlashSaleEventService {
      * 例如現在某個限量商品庫存200個，針對該商品發布了一個快閃銷售活動，這時該快閃銷售活動就必須延伸出200筆Mongo Log表資料存進DB，並且每筆資料都要從1計數交易順序編號。
      */
     private List<FlashSaleEventLog> generateFlashSaleEventLogListAccordingToGoodsStock(FlashSaleEvent flashSaleEvent) {
-        Integer stockOfGoods = flashSaleEvent.getGoods().getStock();
+        Integer stockOfGoods = flashSaleEvent.getFseGoods().getStock();
         List<FlashSaleEventLog> flashSaleEventLogList = new ArrayList<>();
 
         for (int i = 1; i <= stockOfGoods; i++) {
             flashSaleEventLogList.add(
                     new FlashSaleEventLog() // 買家ID統一先不賦值，有人消費時才給。
                             .setFseId(flashSaleEvent.getId())
-                            .setGId(flashSaleEvent.getGoods().getId())
-                            .setSMId(flashSaleEvent.getGoods().getSellerMember().getId())
+                            .setGId(flashSaleEvent.getFseGoods().getId())
+                            .setSMId(flashSaleEvent.getFseGoods().getSellerMember().getId())
                             .setTransNum(i)
                             .setIsConsumed(false)
             );

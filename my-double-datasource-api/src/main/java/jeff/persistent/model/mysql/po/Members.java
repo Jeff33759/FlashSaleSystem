@@ -39,6 +39,6 @@ public class Members implements Serializable {
      * 每當我查詢某會員時，不一定每次都要查出該會員發佈那些商品，只有特定頁面才要，所以設置成LAZY
      */
     @OneToMany(fetch = FetchType.LAZY ,mappedBy = "sellerMember", cascade = CascadeType.ALL)
-    Set<Goods> goodsSet = new HashSet<>();
+    private Set<Goods> goodsSet = new HashSet<>();
 
 }
