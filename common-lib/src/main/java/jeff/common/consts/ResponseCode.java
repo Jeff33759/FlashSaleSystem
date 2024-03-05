@@ -18,7 +18,12 @@ public enum ResponseCode {
     /**
      * 查詢時找不到資料。
      */
-    NotFound(404);
+    NotFound(404),
+
+    /**
+     * 請求太頻繁。
+     */
+    TooManyReq(429);
 
     int code;
 

@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.util.LogUtil;
+import jeff.core.exception.BusyException;
 import jeff.core.exception.MyNotFoundException;
 import jeff.core.exception.OrderException;
 import lombok.extern.slf4j.Slf4j;
@@ -54,6 +55,12 @@ public class ControllerExceptionResAspect {
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseObject handleMyNotFoundException(MyNotFoundException mnfe) {
         return new ResponseObject(ResponseCode.NotFound.getCode(), EMPTY_CONTENT, mnfe.getMessage());
+    }
+
+    @ExceptionHandler(value = BusyException.class)
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseObject handleBusyException(BusyException be) {
+        return new ResponseObject(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
     }
 
     /**

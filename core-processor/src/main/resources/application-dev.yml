@@ -1,6 +1,19 @@
 server:
   port: 8001
 
+#### 服務降級、融斷、限流配置(不同環境可能要有不同的配置) ####
+## 官方文件: https://resilience4j.readme.io/v1.7.0/docs/getting-started，本應用使用版本為v1.7.0 ##
+resilience4j.ratelimiter: #現流器配置
+  configs:
+    fse-query-rl-config: #配置一個名為"fse-query-rl-config"的RateLimiterConfig
+      timeoutDuration: 0s #執行緒等待令牌的時間。預設5[s]
+      limitRefreshPeriod: 1s #令牌刷新的周期，每次刷新，剩餘令牌數都恢復到limitForPeriod個數量。預設500[ns]
+      limitForPeriod: 5 #每個周期的初始令牌數。預設50。
+# 【fse-query-rl-config的筆記: 每1秒為1個周期，每個周期都會把令牌數初始化為5個。每個請求進來，執行正式邏輯前會去嘗試取得令牌，若沒取到? 等待0秒後fallback。就結果而言，限制每秒請求數5個。】 #
+  instances: #配置限流器實例
+    fse-query-rl: #配置一個名為"fse-query-rl"的限流器實例，專門用於"查詢快閃銷售案件"的API
+      baseConfig: fse-query-rl-config #此實例所抓的限流器配置名
+
 app:
   instance:
     name: Core01
