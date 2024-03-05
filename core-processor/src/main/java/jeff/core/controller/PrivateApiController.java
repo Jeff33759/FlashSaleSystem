@@ -5,7 +5,7 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
-import jeff.core.exception.BusyException;
+import jeff.common.exception.BusyException;
 import jeff.core.service.AllSaleEventService;
 import jeff.core.service.SystemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  * 也許之後可以考慮加個認證機制。
  */
 @RestController
-@RequestMapping(path = "/inner",produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/inner", produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 public class PrivateApiController {
 
     @Autowired

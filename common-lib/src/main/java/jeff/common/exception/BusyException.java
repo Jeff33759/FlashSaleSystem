@@ -1,6 +1,4 @@
-package jeff.core.exception;
-
-import jeff.common.exception.MyException;
+package jeff.common.exception;
 
 /**
  * 伺服端太過忙碌所拋的例外。
