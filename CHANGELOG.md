@@ -7,6 +7,7 @@
 - 導入resilience4j(提升服務容錯率的方案)
 - core-processor查詢快閃銷售案件資料的接口-使用限流器限流
 - core-processor新增訂單的接口-使用斷路器保護
+- high-concurrency-processor的消費快閃銷售案件的接口-使用限流器限流
 
 ## [0.5.1] - 2024-03-01
 

@@ -5,14 +5,28 @@ app:
   instance:
     name: Concurrency01
 
-#### 【以下Mongo連線配置】 ####
 spring:
   data:
+#### 【Mongo連線配置】 ####
     mongodb:
       uri: mongodb://localhost:27017/db_dev_flash_sale_mongo
 
-####此為開發環境的Redis配置檔####
+#### 【Redis配置檔】 ####
   redis:
     host: 127.0.0.1
     port: 6379
     database: 1
+
+#### 【服務降級、融斷、限流配置(不同環境可能要有不同的配置)】 ####
+## 官方文件: https://resilience4j.readme.io/v1.7.0/docs/getting-started，本應用使用版本為v1.7.0 ##
+# 限流器配置 #
+resilience4j.ratelimiter:
+  configs:
+    fse-order-creation-rl-config: #配置一個名為"fse-order-creation-rl-config"的RateLimiterConfig
+      timeoutDuration: 0s #執行緒等待令牌的時間。預設5[s]
+      limitRefreshPeriod: 1s #令牌刷新的周期，每次刷新，剩餘令牌數都恢復到limitForPeriod個數量。預設500[ns]
+      limitForPeriod: 10 #每個周期的初始令牌數。預設50。
+  # 【fse-order-creation-rl-config的筆記: 每1秒為1個周期，每個周期都會把令牌數初始化為10個。每個請求進來，執行正式邏輯前會去嘗試取得令牌，若沒取到? 等待0秒後fallback。就結果而言，限制每秒請求數10個。】 #
+  instances: #配置限流器實例
+    fse-order-creation-rl: #配置一個名為"fse-order-creation-rl"的限流器實例，專門用於"搶購快閃銷售案件"的API
+      baseConfig: fse-order-creation-rl-config #此實例所抓的限流器配置名

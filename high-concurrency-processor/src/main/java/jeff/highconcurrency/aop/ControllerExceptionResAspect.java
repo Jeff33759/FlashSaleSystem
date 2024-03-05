@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.util.LogUtil;
+import jeff.common.exception.BusyException;
 import jeff.highconcurrency.exception.FlashSaleEventConsumeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,12 @@ public class ControllerExceptionResAspect {
     @ResponseStatus(code = HttpStatus.OK)
     public ResponseObject handleOrderException(FlashSaleEventConsumeException fsece) {
         return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, fsece.getMessage());
+    }
+
+    @ExceptionHandler(value = BusyException.class)
+    @ResponseStatus(code = HttpStatus.OK)
+    public ResponseObject handleBusyException(BusyException be) {
+        return new ResponseObject(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
     }
 
     /**
