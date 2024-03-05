@@ -3,7 +3,8 @@ server:
 
 #### 服務降級、融斷、限流配置(不同環境可能要有不同的配置) ####
 ## 官方文件: https://resilience4j.readme.io/v1.7.0/docs/getting-started，本應用使用版本為v1.7.0 ##
-resilience4j.ratelimiter: #現流器配置
+# 限流器配置 #
+resilience4j.ratelimiter:
   configs:
     fse-query-rl-config: #配置一個名為"fse-query-rl-config"的RateLimiterConfig
       timeoutDuration: 0s #執行緒等待令牌的時間。預設5[s]
@@ -13,6 +14,29 @@ resilience4j.ratelimiter: #現流器配置
   instances: #配置限流器實例
     fse-query-rl: #配置一個名為"fse-query-rl"的限流器實例，專門用於"查詢快閃銷售案件"的API
       baseConfig: fse-query-rl-config #此實例所抓的限流器配置名
+
+# 斷路器配置 #
+resilience4j.circuitbreaker:
+  configs:
+    se-order-creation-cb-config: #配置一個名為"se-order-creation-cb-config"的CircuitBreakerConfig
+      failureRateThreshold: 50 #故障率閥值，預設50(%)。當總請求數到達minimumNumberOfCalls，且錯誤請求占比>=此閥值，則打開斷路器
+      slowCallRateThreshold: 30 #慢調用閥值，預設100(%)。當調用執行時間大於slowCallDurationThreshold則視為慢調用。當慢調用的百分比>=此閥值，則打開斷路器
+      slowCallDurationThreshold: 3s #多長時間視為慢調用，設為3秒視為阻塞了，預設60000(ms)
+      minimumNumberOfCalls: 10 #觸發"計算錯誤率或者慢調用"所必須滿足的調用數，預設100。如果調用數<此設置，則即使錯誤或慢調用占比100%也不會打開斷路器(畢竟根本沒觸發計算)
+      slidingWindowSize: 10 #配置當斷路器關閉時，記錄呼叫結果時所使用的滑動視窗的大小。根據窗口類型，單位可能是秒或者調用次數，預設100。可以簡單理解為，當觸發計算時，要抓取幾筆資料來計算? 這裡就是在設置那個範圍。例如類型為COUNT_BASED，大小100，那就是每當被觸發計算，都會抓過去最近的100個請求來計算占比，決定斷路器是否開啟。
+      slidingWindowType: COUNT_BASED #滑動窗口類型，預設COUNT_BASED。
+      permittedNumberOfCallsInHalfOpenState: 5 #半開狀態允許的最大請求數，預設10。在半開狀態下，斷路器將允許最多XX個請求通過去執行業務邏輯，超過則直接fallback。如果XX個請求中，錯誤占比又超過閥值，則斷路器將重新進入開啟狀態。
+      waitDurationInOpenState: 20s #開啟斷路的保持時間。當斷路器開啟斷路，會等待此時間過去後，轉為半開狀態。預設60000(ms)
+      #      maxWaitDurationInHalfOpenState: 0 #半開狀態的保持時間，預設為0，就是不限時間。只有當接收到permittedNumberOfCallsInHalfOpenState個請求，再依照錯誤占比去切換斷路器狀態，不然會一直維持半開。
+      automaticTransitionFromOpenToHalfOpenEnabled: true #是否啟用"自動從開啟狀態過渡到半開狀態"，預設值為false。如果啟用，斷路器將在時間到後，自動從開啟狀態過渡到半開狀態，缺點是為了實現自動的這件事，會在程式啟動時多建立一個執行緒去監聽各斷路器實例；否則，需要手動呼叫斷路器的transitionToHalfOpen方法。
+      recordExceptions: #異常列表，只有指定的異常和其子類，才會認為調用失敗；其它異常會被認為是調用成功，除非指定了ignoreExceptions
+        - java.lang.Exception
+      ignoreExceptions: #忽略指定的異常，不計入成功和失敗數
+        - jeff.core.exception.MyNotFoundException #找不到資料算是正常業務邏輯會出現的情況，不計入失敗案例
+  ## 【se-order-creation的筆記: 每10次調用觸發一次計算，每一次計算都抓過去10次調用的結果來計算占比，拋例外>50%(ignoreExceptions的例外不計)或者慢調用>30%(API過3S還沒吐出結果就視為慢調用)，則斷路器開啟；斷路器開啟20秒後，"自動"切換至半開狀態；半開狀態允許5個調用執行正式邏輯，其餘fallback，並依照5個調用其中的錯誤占比來切換斷路器至開啟或關閉。 】##
+  instances: #配置斷路器實例
+    se-order-creation-cb: #配置一個名為"se-order-creation-cb"的斷路器實例，專門用於"一般銷售案件的新增訂單"的API
+      baseConfig: se-order-creation-cb-config #此實例所抓的斷路器配置名
 
 app:
   instance:

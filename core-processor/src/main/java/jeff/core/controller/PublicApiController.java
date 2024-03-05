@@ -1,10 +1,13 @@
 package jeff.core.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jeff.common.interfaces.IOrderService;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.consts.DemoMember;
+import jeff.core.exception.BusyException;
 import jeff.core.exception.OrderException;
 import jeff.core.service.AllSaleEventService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +33,11 @@ public class PublicApiController {
     /**
      * 客戶端一般銷售案件的商品下單時的接口。
      * 通常是購物車結帳後按下送出所打的API。
+     *
+     * 因為整個訂單新增流程比較耗時(經歷多個I/O與計算)，所以使用斷路器。如果一段時間內出錯太多次，代表可能一次太多人送購物車造成阻塞，就先熔斷此服務，讓伺服器可以慢慢消化之前的任務。
      */
     @PostMapping("/order/normal")
+    @CircuitBreaker(name = "se-order-creation-cb", fallbackMethod = "createAnOrderFromNormalSalesEventFallback")
     public ResponseEntity<ResponseObject> createAnOrderFromNormalSalesEvent(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
         myRequestContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // TODO 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
         return ResponseEntity.ok(normalOrderService.createOrder(param, myRequestContext));
@@ -73,5 +79,17 @@ public class PublicApiController {
         return ResponseEntity.ok(allSaleEventService.closeFlashSaleEvent(param, myRequestContext));
     }
 
+    /**
+     * createAnOrderFromNormalSalesEvent接口的fallback，回傳型別要跟原方法一樣。
+     *
+     * 這裡直接拋例外，讓AOP那裡去統一處理。
+     */
+    private ResponseEntity<ResponseObject> createAnOrderFromNormalSalesEventFallback(JsonNode param, MyRequestContext myRequestContext, Exception e) throws Exception {
+        if (e instanceof CallNotPermittedException) { // 如果是斷路器開啟時就會拋此例外，處理成自己的例外
+            throw new BusyException("Server is busy, please try again later");
+        }
+
+        throw e;
+    }
 
 }

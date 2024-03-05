@@ -57,7 +57,7 @@ public class PrivateApiController {
      *
      * 這裡直接拋例外，讓AOP那裡去統一處理。
      */
-    public ResponseEntity<ResponseObject> getFlashSaleEventInfoFallback(JsonNode param, MyRequestContext myRequestContext, Exception e) throws Exception {
+    private ResponseEntity<ResponseObject> getFlashSaleEventInfoFallback(JsonNode param, MyRequestContext myRequestContext, Exception e) throws Exception {
         if (e instanceof RequestNotPermitted) { // 如果是限流觸發時就會拋此例外，處理成自己的例外
             throw new BusyException("Server is busy, please try again later");
         }

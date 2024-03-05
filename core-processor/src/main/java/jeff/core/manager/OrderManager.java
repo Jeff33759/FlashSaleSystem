@@ -81,6 +81,10 @@ public class OrderManager {
 
         List<Goods> goodsListFromDB = goodsDAO.findAllById(goodsIdToQuantityMap.keySet());
 
+        if(goodsListFromDB.isEmpty()) {
+            throw new OrderException("Cannot find any goods data from DB by request param.");
+        }
+
         goodsListFromDB.forEach(goods -> {
             int quantityToBeOrdered = goodsIdToQuantityMap.get(goods.getId());
             if (quantityToBeOrdered > goods.getStock()) {
