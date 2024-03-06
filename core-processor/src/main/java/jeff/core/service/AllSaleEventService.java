@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.send.ResponseObject;
-import jeff.core.exception.MyNotFoundException;
+import jeff.common.exception.MyNotFoundException;
 import jeff.persistent.model.mongo.dao.FlashSaleEventLogRepo;
 import jeff.persistent.model.mysql.dao.FlashSaleEventDAO;
 import jeff.persistent.model.mysql.dao.SaleEventDAO;

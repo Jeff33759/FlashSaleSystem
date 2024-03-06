@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
  * 在這一層中還只是實例化上下文物件，之後的過濾鏈才會視情況對裡面的成員變數賦值。
  */
 @Component
-@Order(ReactiveFilterOrderNumber.REACTIVE_REQ_CONTEXT_GENERATION_FILTER)
+@Order(ReactiveFilterOrderNumberConst.REACTIVE_REQ_CONTEXT_GENERATION_FILTER)
 public class ReactiveReqContextGenerationFilter implements WebFilter {
 
     @Override

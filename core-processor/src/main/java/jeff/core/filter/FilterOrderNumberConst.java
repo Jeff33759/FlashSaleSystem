@@ -4,9 +4,9 @@ package jeff.core.filter;
  * 統一控管過濾器的順序。
  * 不用Enum是因為@Order(XX)只吃final宣告的常數。
  */
-public class FilterOrderNumber {
+public class FilterOrderNumberConst {
 
-    private FilterOrderNumber() {
+    private FilterOrderNumberConst() {
     }
 
     public static final int WRAPPER_FILTER = 1;

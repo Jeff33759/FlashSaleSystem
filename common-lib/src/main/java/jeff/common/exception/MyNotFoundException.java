@@ -1,6 +1,4 @@
-package jeff.core.exception;
-
-import jeff.common.exception.MyException;
+package jeff.common.exception;
 
 /**
  * 所有查不到資料的情況，都用這個例外。

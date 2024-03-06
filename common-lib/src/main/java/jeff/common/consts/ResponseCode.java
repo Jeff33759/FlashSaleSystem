@@ -8,17 +8,22 @@ public enum ResponseCode {
     /**
      * 操作成功
      */
-    Success(1),
+    Success(0),
 
     /**
      * 操作失敗通用碼
      */
-    Failure(0),
+    Failure(1),
 
     /**
      * 查詢時找不到資料。
      */
-    NotFound(404);
+    NotFound(404),
+
+    /**
+     * 請求太頻繁。
+     */
+    TooManyReq(429);
 
     int code;
 

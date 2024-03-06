@@ -4,9 +4,9 @@ package jeff.highconcurrency.filter;
  * 統一控管過濾器的順序。
  * 不用Enum是因為@Order(XX)只吃final宣告的常數。
  */
-public class ReactiveFilterOrderNumber {
+public class ReactiveFilterOrderNumberConst {
 
-    private ReactiveFilterOrderNumber() {
+    private ReactiveFilterOrderNumberConst() {
     }
 
     public static final int REACTIVE_WRAPPER_FILTER = 1;
