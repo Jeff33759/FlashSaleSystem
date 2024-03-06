@@ -48,6 +48,7 @@ resilience4j.circuitbreaker:
 spring.application.name: ${app.type} #如果某服務有多個實例，那麼每個實例的此參數都要同名，治理中心才會把兩個實例視為同個服務
 
 ### consul配置 ###
+## 官方文件: https://docs.spring.io/spring-cloud-consul/docs/current/reference/html/#spring-cloud-consul-discovery ##
 spring.cloud.consul:
   host: localhost #consul-server的對外位址
   port: 8500
