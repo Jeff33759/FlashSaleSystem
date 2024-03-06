@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
  * 生成UUID去代表一個請求的生命週期，方便日誌中心化時的搜尋(可以用UUID去找到某個請求在業務邏輯中跑了啥方法)。
  */
 @Component
-@Order(ReactiveFilterOrderNumber.REACTIVE_UUID_FILTER)
+@Order(ReactiveFilterOrderNumberConst.REACTIVE_UUID_FILTER)
 public class ReactiveUUIDFilter implements WebFilter {
 
     @Autowired

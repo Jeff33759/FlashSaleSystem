@@ -21,7 +21,7 @@ import java.io.IOException;
  */
 @Component
 @WebFilter
-@Order(FilterOrderNumber.UUID_FILTER)
+@Order(FilterOrderNumberConst.UUID_FILTER)
 public class UUIDFilter extends OncePerRequestFilter {
 
     @Autowired

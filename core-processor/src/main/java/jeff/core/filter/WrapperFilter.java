@@ -18,7 +18,7 @@ import java.io.IOException;
  */
 @Component
 @WebFilter
-@Order(FilterOrderNumber.WRAPPER_FILTER)
+@Order(FilterOrderNumberConst.WRAPPER_FILTER)
 public class WrapperFilter extends OncePerRequestFilter {
 
     @Override

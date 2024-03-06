@@ -13,7 +13,7 @@ import reactor.core.publisher.Mono;
  * 將請求與回應物件用包裝器包裝，讓資料流可以重複使用、或者包裝body的getter，不用在外面又做轉換。
  */
 @Component
-@Order(ReactiveFilterOrderNumber.REACTIVE_WRAPPER_FILTER)
+@Order(ReactiveFilterOrderNumberConst.REACTIVE_WRAPPER_FILTER)
 public class ReactiveWrapperFilter implements WebFilter {
 
     @Override

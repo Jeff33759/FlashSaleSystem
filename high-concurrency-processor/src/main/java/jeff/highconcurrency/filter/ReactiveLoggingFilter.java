@@ -27,7 +27,7 @@ import java.net.URLDecoder;
  */
 @Slf4j
 @Component
-@Order(ReactiveFilterOrderNumber.REACTIVE_LOGGING_FILTER)
+@Order(ReactiveFilterOrderNumberConst.REACTIVE_LOGGING_FILTER)
 public class ReactiveLoggingFilter implements WebFilter {
 
     @Autowired
