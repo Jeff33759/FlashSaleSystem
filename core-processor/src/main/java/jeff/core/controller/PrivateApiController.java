@@ -26,6 +26,11 @@ public class PrivateApiController {
     @Autowired
     private AllSaleEventService allSaleEventService;
 
+    /**
+     * 因為fallback的情況可能會一瞬間做很多次，而BusyException也沒要特別再針對場景包不同的cause，所以用同實例，就不用每次都new了。
+     */
+    private BusyException busyExceptionForFallback = new BusyException("Server is busy, please try again later");
+
 
     /**
      * 初始化redis和MySql，方便DEMO。
@@ -59,7 +64,7 @@ public class PrivateApiController {
      */
     private ResponseEntity<ResponseObject> getFlashSaleEventInfoFallback(JsonNode param, MyRequestContext myRequestContext, Exception e) throws Exception {
         if (e instanceof RequestNotPermitted) { // 如果是限流觸發時就會拋此例外，處理成自己的例外
-            throw new BusyException("Server is busy, please try again later");
+            throw this.busyExceptionForFallback;
         }
 
         throw e;

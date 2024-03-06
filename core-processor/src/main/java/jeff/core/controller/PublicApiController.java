@@ -31,6 +31,11 @@ public class PublicApiController {
     private AllSaleEventService allSaleEventService;
 
     /**
+     * 因為fallback的情況可能會一瞬間做很多次，而BusyException也沒要特別再針對場景包不同的cause，所以用同實例，就不用每次都new了。
+     */
+    private BusyException busyExceptionForFallback = new BusyException("Server is busy, please try again later");
+
+    /**
      * 客戶端一般銷售案件的商品下單時的接口。
      * 通常是購物車結帳後按下送出所打的API。
      *
@@ -86,7 +91,7 @@ public class PublicApiController {
      */
     private ResponseEntity<ResponseObject> createAnOrderFromNormalSalesEventFallback(JsonNode param, MyRequestContext myRequestContext, Exception e) throws Exception {
         if (e instanceof CallNotPermittedException) { // 如果是斷路器開啟時就會拋此例外，處理成自己的例外
-            throw new BusyException("Server is busy, please try again later");
+            throw this.busyExceptionForFallback;
         }
 
         throw e;
