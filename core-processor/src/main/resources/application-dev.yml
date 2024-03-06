@@ -42,3 +42,17 @@ resilience4j.circuitbreaker:
   instances: #配置斷路器實例
     se-order-creation-cb: #配置一個名為"se-order-creation-cb"的斷路器實例，專門用於"一般銷售案件的新增訂單"的API
       baseConfig: se-order-creation-cb-config #此實例所抓的斷路器配置名
+
+####【服務治理配置】####
+### 服務集群名 ###
+spring.application.name: ${app.type} #如果某服務有多個實例，那麼每個實例的此參數都要同名，治理中心才會把兩個實例視為同個服務
+
+### consul配置 ###
+spring.cloud.consul:
+  host: localhost #consul-server的對外位址
+  port: 8500
+  discovery: #服務發現的相關配置
+    service-name: ${app.type} #這個實例是隸屬於哪一個服務集群名稱底下
+    instance-id: ${app.instance.name} #此實例的唯一識別符，預設<service-name>-<server.port>
+    heartbeat:
+      enabled: false #是否啟用心跳機制來通知consul-server自己的狀態? 預設false。若不啟用，代表針對此實例的狀態檢測，是採用健康檢測方案而非心跳機制，那就要引入actuator套件，因為consul預設採用actuator提供的端點來實現健康檢測。

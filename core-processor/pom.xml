@@ -29,9 +29,13 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
         </dependency>
-        <dependency>
+        <dependency> <!-- 服務治理方案 -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+        <dependency> <!-- 服務健康檢測方案 -->
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <artifactId>spring-boot-starter-actuator</artifactId> <!--spring-cloud-consul-client預設用actuator作為服務健康檢查的端點，所以一定要引入，除非要用自訂義端點或者使用心跳機制(去yml設定) -->
         </dependency>
         <!-- 自己寫的函式庫 -->
         <dependency> <!-- DB相關 -->
