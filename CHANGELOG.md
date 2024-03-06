@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [0.6.1] - 2024-03-06
+
 ### Added
 - core-processor新增查詢快閃銷售案件資料的接口(最終用於前端渲染)
 - 導入resilience4j(提升服務容錯率的方案)
