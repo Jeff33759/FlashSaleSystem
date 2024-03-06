@@ -1,3 +1,6 @@
+app:
+  type: core-processor
+
 spring:
   profiles:
     active: dev
@@ -24,6 +27,3 @@ spring:
             producer:
               # 必須在這個層級設定routing-key，在spring.cloud.stream.bindings中設定沒用(因為不是每個中間件都有routingKey的概念)。routing-key-expression指定固定字串的話，前後需加三引號。
               routing-key-expression: headers['routingKey']
-
-app:
-  type: core-processor

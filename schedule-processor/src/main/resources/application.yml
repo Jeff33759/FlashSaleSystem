@@ -1,6 +1,6 @@
+app:
+  type: schedule-processor
+
 spring:
   profiles:
     active: dev
-
-app:
-  type: schedule-processor
