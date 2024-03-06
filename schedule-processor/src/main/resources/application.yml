@@ -1,6 +1,8 @@
+####【應用種類(服務集群名稱)】####
 app:
   type: schedule-processor
 
+####【區分環境】####
 spring:
   profiles:
     active: dev

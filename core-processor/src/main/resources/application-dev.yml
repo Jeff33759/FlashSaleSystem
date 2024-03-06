@@ -1,9 +1,14 @@
 server:
   port: 8001
 
-#### 服務降級、融斷、限流配置(不同環境可能要有不同的配置) ####
-## 官方文件: https://resilience4j.readme.io/v1.7.0/docs/getting-started，本應用使用版本為v1.7.0 ##
-# 限流器配置 #
+####【實例名稱】####
+app:
+  instance:
+    name: Core01
+
+####【服務降級、融斷、限流配置(不同環境可能要有不同的配置)】 ####
+### 官方文件: https://resilience4j.readme.io/v1.7.0/docs/getting-started，本應用使用版本為v1.7.0 ###
+## 限流器配置 ##
 resilience4j.ratelimiter:
   configs:
     fse-query-rl-config: #配置一個名為"fse-query-rl-config"的RateLimiterConfig
@@ -15,7 +20,7 @@ resilience4j.ratelimiter:
     fse-query-rl: #配置一個名為"fse-query-rl"的限流器實例，專門用於"查詢快閃銷售案件"的API
       baseConfig: fse-query-rl-config #此實例所抓的限流器配置名
 
-# 斷路器配置 #
+## 斷路器配置 ##
 resilience4j.circuitbreaker:
   configs:
     se-order-creation-cb-config: #配置一個名為"se-order-creation-cb-config"的CircuitBreakerConfig
@@ -33,11 +38,7 @@ resilience4j.circuitbreaker:
         - java.lang.Exception
       ignoreExceptions: #忽略指定的異常，不計入成功和失敗數
         - jeff.common.exception.MyNotFoundException #找不到資料算是正常業務邏輯會出現的情況，不計入失敗案例
-  ## 【se-order-creation的筆記: 每10次調用觸發一次計算，每一次計算都抓過去10次調用的結果來計算占比，拋例外>50%(ignoreExceptions的例外不計)或者慢調用>30%(API過3S還沒吐出結果就視為慢調用)，則斷路器開啟；斷路器開啟20秒後，"自動"切換至半開狀態；半開狀態允許5個調用執行正式邏輯，其餘fallback，並依照5個調用其中的錯誤占比來切換斷路器至開啟或關閉。 】##
+  # 【se-order-creation的筆記: 每10次調用觸發一次計算，每一次計算都抓過去10次調用的結果來計算占比，拋例外>50%(ignoreExceptions的例外不計)或者慢調用>30%(API過3S還沒吐出結果就視為慢調用)，則斷路器開啟；斷路器開啟20秒後，"自動"切換至半開狀態；半開狀態允許5個調用執行正式邏輯，其餘fallback，並依照5個調用其中的錯誤占比來切換斷路器至開啟或關閉。 】#
   instances: #配置斷路器實例
     se-order-creation-cb: #配置一個名為"se-order-creation-cb"的斷路器實例，專門用於"一般銷售案件的新增訂單"的API
       baseConfig: se-order-creation-cb-config #此實例所抓的斷路器配置名
-
-app:
-  instance:
-    name: Core01
