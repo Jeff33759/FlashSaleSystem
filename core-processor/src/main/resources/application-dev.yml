@@ -4,7 +4,7 @@ server:
 ####【實例名稱】####
 app:
   instance:
-    name: Core01
+    name: ${MY_INSTANCE_NAME:Core01} #讀取啟動命令的參數"-DMY_INSTANCE_NAME"，若沒有則預設是Core01
 
 ####【服務降級、融斷、限流配置(不同環境可能要有不同的配置)】 ####
 ### 官方文件: https://resilience4j.readme.io/v1.7.0/docs/getting-started，本應用使用版本為v1.7.0 ###
