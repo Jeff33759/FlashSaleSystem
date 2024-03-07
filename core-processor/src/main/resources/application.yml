@@ -2,11 +2,6 @@
 app:
   type: core-processor
 
-####【區分環境】####
-spring:
-  profiles:
-    active: dev
-
 ####【MQ配置】####
 spring.cloud:
   stream:
