@@ -71,7 +71,7 @@
                 <activeByDefault>true</activeByDefault> <!-- 如果mvn package沒帶-P參數，則預設是mvn package -P dev -->
             </activation>
             <properties>
-                <activeProfile>dev</activeProfile> <!-- 我這個profile-id是對應到哪一個配置檔 -->
+                <activeProfile>dev</activeProfile> <!-- 當有人在配置檔@activeProfile@時，要映射給他什麼值 -->
             </properties>
         </profile>
     </profiles>
