@@ -2,6 +2,11 @@
 
 ## [Unreleased]
 
+### Added
+- core-processor、high-concurrency-processor導入服務註冊/發現(使用Consul)
+- 所有伺服端，皆導入"根據mvn package -P 參數，打包出不同環境所需jar"的功能
+- core-processor、high-concurrency-processor在LoggingFilter新增忽略邏輯，某些Api不logging。
+
 ## [0.6.1] - 2024-03-06
 
 ### Added

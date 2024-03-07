@@ -1,0 +1,4 @@
+####【區分環境】####
+spring:
+  profiles:
+    active: dev

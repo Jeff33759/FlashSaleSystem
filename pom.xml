@@ -30,7 +30,6 @@
         <spring.cloud.ver>2021.0.5</spring.cloud.ver> <!-- 嚴格匹配Spring Boot版本 -->
     </properties>
 
-
     <!--  在此規範引入JAR包的規格，用於讓子項目繼承這裡的屬性，如版本號  -->
     <dependencyManagement>
         <dependencies>
@@ -72,6 +71,16 @@
                 <version>2.7</version>
             </plugin>
         </plugins>
+
+        <resources> <!-- 告訴Maven在構建項目的過程中如何處理資源文件 -->
+            <resource>
+                <directory>src/main/resources</directory> <!-- 指定了資源文件的所在目錄 -->
+                <filtering>true</filtering> <!-- 是否開啟過濾器功能，設置為true可去替換yml或properties的@@佔位符。預設false -->
+                <includes> <!-- resource指定的一些功能要奏效到directory所指定的目錄中的哪些檔案 -->
+                    <include>**/*.*</include> <!-- 所有檔案，不論檔名與副檔名 -->
+                </includes>
+            </resource>
+        </resources>
     </build>
 
 </project>

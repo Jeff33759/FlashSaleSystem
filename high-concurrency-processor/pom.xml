@@ -31,9 +31,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
-        <dependency>
+        <dependency> <!-- 服務治理方案 -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+        <dependency> <!-- 服務健康檢測方案 -->
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency> <!-- 資源文件的加載與解析，要讓bootstrap.yml認得@@佔位符，就要用這個。(如果之後要引入配置中心，那這個依賴可能要拿掉，也許會有版本衝突。) -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
         </dependency>
         <dependency> <!-- 非同步響應式的spring data mongo函式庫 -->
             <groupId>org.springframework.boot</groupId>
@@ -62,5 +70,35 @@
         </dependency>
 
     </dependencies>
+
+    <profiles> <!-- mvn打包的時候，下mvn clean package -P <profile-id>，決定要打包出來的東西是for哪個環境。 -->
+        <profile>
+            <id>dev</id> <!-- mvn clean package -P <profile-id> -->
+            <activation>
+                <activeByDefault>true</activeByDefault> <!-- 如果mvn package沒帶-P參數，則預設是mvn package -P dev -->
+            </activation>
+            <properties>
+                <activeProfile>dev</activeProfile> <!-- 當有人在配置檔@activeProfile@時，要映射給他什麼值 -->
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId> <!-- Spring-boot與maven整合的打包插件，spring-boot:repackage指令打包出來的東西，才能夠直接執行 -->
+                <version>2.7.2</version> <!-- 此插件若用太新版，會不支援JDK8 -->
+                <executions>
+                    <execution>
+                        <phase>package</phase> <!-- 指定哪個phase -->
+                        <goals>
+                            <goal>repackage</goal> <!-- 當跑到package-phase時，要做啥goal。當執行mvn package時，spring-boot:repackage將被自動執行。 -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

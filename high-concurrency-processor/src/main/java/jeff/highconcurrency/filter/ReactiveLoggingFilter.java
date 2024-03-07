@@ -19,6 +19,9 @@ import reactor.core.publisher.Mono;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 紀錄請求參數與回應的過濾器。
@@ -33,13 +36,23 @@ public class ReactiveLoggingFilter implements WebFilter {
     @Autowired
     private LogUtil logUtil;
 
+    /**
+     * 不走本過濾器邏輯的Api路徑。
+     *
+     * java有針對String覆寫hashCode方法，所以Set調用contains時，可以針對字串的值判斷是否重複。
+     */
+    private Set<String> ignorePathSet =
+            new HashSet<>(Arrays.asList(new String[]{
+                    "/actuator/health" //actuator套件的健康檢測接口，consul會一直發Get過來監測伺服器健康度
+            }));
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         MyServerWebExchangeDecoratorWrapper exchangeWrapper = (MyServerWebExchangeDecoratorWrapper) exchange;
 
         return chain.filter(exchangeWrapper).doFinally((se) -> { // 使用doFinally，無論流的操作是成功、失敗、取消，都會執行。
             try {
-                this.logReq(exchangeWrapper.getRequest(), exchangeWrapper.getResponse(), exchangeWrapper.getAttribute("myContext"));
+                this.logReqAndRes(exchangeWrapper.getRequest(), exchangeWrapper.getResponse(), exchangeWrapper.getAttribute("myContext"));
             } catch (IOException e) {
                 new MyException("Some error occur when logging api info", e);
             }
@@ -53,7 +66,12 @@ public class ReactiveLoggingFilter implements WebFilter {
      * 目前只能夠做到在controller處理完時，印出請求和回應。
      *
      */
-    private void logReq(MyServerHttpRequestDecoratorWrapper reqWrapper, MyServerHttpResponseDecoratorWrapper resWrapper, MyRequestContext myContext) throws IOException {
+    private void logReqAndRes(MyServerHttpRequestDecoratorWrapper reqWrapper, MyServerHttpResponseDecoratorWrapper resWrapper, MyRequestContext myContext) throws IOException {
+
+        if(ignorePathSet.contains(reqWrapper.getPath().value())) {
+            return;
+        }
+
         logUtil.logInfo(
                 log,
                 logUtil.composeLogPrefixForBusiness(myContext.getAuthenticatedMemberId(), myContext.getUUID()),

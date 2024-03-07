@@ -1,25 +1,24 @@
 server:
-  port: 8010
+  port: 8010 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dserver.port"，否則預設8010
 
+####【實例名稱】####
 app:
   instance:
-    name: Concurrency01
+    name: Concurrency01 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dapp.instance.name"，否則預設Concurrency01
 
-spring:
-  data:
-#### 【Mongo連線配置】 ####
-    mongodb:
-      uri: mongodb://localhost:27017/db_dev_flash_sale_mongo
+####【Mongo連線配置】####
+spring.data.mongodb:
+  uri: mongodb://localhost:27017/db_dev_flash_sale_mongo
 
-#### 【Redis配置檔】 ####
-  redis:
-    host: 127.0.0.1
-    port: 6379
-    database: 1
+####【Redis配置】####
+spring.redis:
+  host: 127.0.0.1
+  port: 6379
+  database: 1
 
 #### 【服務降級、融斷、限流配置(不同環境可能要有不同的配置)】 ####
-## 官方文件: https://resilience4j.readme.io/v1.7.0/docs/getting-started，本應用使用版本為v1.7.0 ##
-# 限流器配置 #
+### 官方文件: https://resilience4j.readme.io/v1.7.0/docs/getting-started，本應用使用版本為v1.7.0 ###
+## 限流器配置 ##
 resilience4j.ratelimiter:
   configs:
     fse-order-creation-rl-config: #配置一個名為"fse-order-creation-rl-config"的RateLimiterConfig
@@ -30,3 +29,18 @@ resilience4j.ratelimiter:
   instances: #配置限流器實例
     fse-order-creation-rl: #配置一個名為"fse-order-creation-rl"的限流器實例，專門用於"搶購快閃銷售案件"的API
       baseConfig: fse-order-creation-rl-config #此實例所抓的限流器配置名
+
+####【服務治理配置】####
+### 服務集群名 ###
+spring.application.name: ${app.type} #如果某服務有多個實例，那麼每個實例的此參數都要同名，治理中心才會把兩個實例視為同個服務
+
+### consul配置 ###
+## 官方文件: https://docs.spring.io/spring-cloud-consul/docs/current/reference/html/#spring-cloud-consul-discovery ##
+spring.cloud.consul:
+  host: localhost #consul-server的對外位址
+  port: 8500
+  discovery: #服務發現的相關配置
+    service-name: ${app.type} #這個實例是隸屬於哪一個服務集群名稱底下
+    instance-id: ${app.instance.name} #此實例的唯一識別符，預設<service-name>-<server.port>
+    heartbeat:
+      enabled: false #是否啟用心跳機制來通知consul-server自己的狀態? 預設false。若不啟用，代表針對此實例的狀態檢測，是採用健康檢測方案而非心跳機制，那就要引入actuator套件，因為consul預設採用actuator提供的端點來實現健康檢測。
