@@ -1,4 +1,7 @@
+server:
+  port: 8020 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dserver.port"，否則預設8020
+
 ####【實例名稱】####
 app:
   instance:
-    name: Scheduler01
+    name: Scheduler01 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dapp.instance.name"，否則預設Scheduler01

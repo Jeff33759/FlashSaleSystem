@@ -1,10 +1,10 @@
 server:
-  port: 8010
+  port: 8010 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dserver.port"，否則預設8010
 
 ####【實例名稱】####
 app:
   instance:
-    name: Concurrency01
+    name: Concurrency01 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dapp.instance.name"，否則預設Concurrency01
 
 ####【Mongo連線配置】####
 spring.data.mongodb:
