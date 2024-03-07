@@ -21,6 +21,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * 紀錄請求參數與回應的過濾器。
@@ -35,6 +38,16 @@ public class LoggingFilter extends OncePerRequestFilter {
 
     @Autowired
     private LogUtil logUtil;
+
+    /**
+     * 不走本過濾器邏輯的Api路徑。
+     *
+     * java有針對String覆寫hashCode方法，所以Set調用contains時，可以針對字串的值判斷是否重複。
+     */
+    private Set<String> ignorePathSet =
+            new HashSet<>(Arrays.asList(new String[]{
+                    "/actuator/health" //actuator套件的健康檢測接口，consul會一直發Get過來監測伺服器健康度
+            }));
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -97,4 +110,8 @@ public class LoggingFilter extends OncePerRequestFilter {
         return new String(contentBytes, Charset.forName("UTF-8"));
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        return ignorePathSet.contains(request.getServletPath());
+    }
 }
