@@ -52,6 +52,8 @@ spring.cloud.consul:
 ### 官方文件: https://github.com/PlaytikaOSS/feign-reactive/tree/develop ###
 ### 配置檔參數官方文件(要有feign-reactor-spring-configuration的依賴): https://github.com/PlaytikaOSS/feign-reactive/blob/develop/feign-reactor-spring-configuration/README.md ###
 ### Spring Cloud OpenFeign配置檔官方文件: https://docs.spring.io/spring-cloud-openfeign/reference/spring-cloud-openfeign.html ###
+### Netty官方文件: https://projectreactor.io/docs/netty/release/reference/index.html#http-client ###
+### FeignClient預設使用WebClient()，而WebFlux預設容器為Netty。所以最底層的HttpClient有哪些參數可以調控，可以參考Netty文件 ###
 
 reactive.feign: #reactive feign官方參數
   ##整合斷路器的配置##
