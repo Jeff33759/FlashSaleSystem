@@ -1,9 +1,10 @@
 server:
   port: 8001 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dserver.port"，否則預設8001
 
-####【實例名稱】####
+####【實例資訊】####
 app:
   instance:
+    hostname: localhost #實例所在主機的對外位址(或域名)。多個實例放於不同機器的話，要在啟動命令用-Dapp.instance.hostname指定。
     name: Core01 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dapp.instance.name"，否則預設Core01
 
 ####【服務降級、融斷、限流配置(不同環境可能要有不同的配置)】 ####
@@ -55,5 +56,7 @@ spring.cloud.consul:
   discovery: #服務發現的相關配置
     service-name: ${app.type} #這個實例是隸屬於哪一個服務集群名稱底下
     instance-id: ${app.instance.name} #此實例的唯一識別符，預設<service-name>-<server.port>
+    prefer-ip-address: true #指定consul客戶端(也就是本實例)註冊進服務中心時，是否優先使用IP位址而不是主機名稱。換句話說，別的實例要訪問我這個實例，要用什麼IP。
+    ip-address: ${app.instance.hostname}
     heartbeat:
       enabled: false #是否啟用心跳機制來通知consul-server自己的狀態? 預設false。若不啟用，代表針對此實例的狀態檢測，是採用健康檢測方案而非心跳機制，那就要引入actuator套件，因為consul預設採用actuator提供的端點來實現健康檢測。
