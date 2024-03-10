@@ -21,6 +21,10 @@ public class ReactiveFeignConfigForCoreProcessor {
     @Value("${my.reactive.feign.client.config.core-processor.writeTimeout}")
     private int writeTimeout;
 
+    /**
+     * 各種參數配置官方範例:
+     * https://github.com/PlaytikaOSS/feign-reactive/tree/develop/feign-reactor-webclient/src/test/java/reactivefeign/webclient
+     */
     @Bean
     public ReactiveOptions reactiveOptionsForCoreProcessor() {
         return new WebReactiveOptions.Builder()
