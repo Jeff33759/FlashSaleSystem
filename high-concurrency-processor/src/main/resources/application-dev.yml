@@ -47,3 +47,24 @@ spring.cloud.consul:
     ip-address: ${app.instance.hostname}
     heartbeat:
       enabled: false #是否啟用心跳機制來通知consul-server自己的狀態? 預設false。若不啟用，代表針對此實例的狀態檢測，是採用健康檢測方案而非心跳機制，那就要引入actuator套件，因為consul預設採用actuator提供的端點來實現健康檢測。
+
+####【reactive feign配置】####
+### 官方文件: https://github.com/PlaytikaOSS/feign-reactive/tree/develop ###
+### 配置檔參數官方文件(要有feign-reactor-spring-configuration的依賴): https://github.com/PlaytikaOSS/feign-reactive/blob/develop/feign-reactor-spring-configuration/README.md ###
+### Spring Cloud OpenFeign配置檔官方文件: https://docs.spring.io/spring-cloud-openfeign/reference/spring-cloud-openfeign.html ###
+
+reactive.feign: #reactive feign官方參數
+  ##整合斷路器的配置##
+  circuit:
+    breaker:
+      enabled: false #預設開啟。若為True，那會強制要求feign client要寫fallback。
+
+  ##整合負載均衡的配置##
+  loadbalancer:
+    enabled: true #預設開啟，這裡顯式地寫著。
+
+my.reactive.feign.client.config: #自己寫的reactive feign配置，因為feign client如果要設超時，目前還只能用java config的方式。
+  core-processor: #與core-processor通信的Feign實例的配置
+    connectTimeout: 3000
+    readTimeout: 3000
+    writeTimeout: 3000

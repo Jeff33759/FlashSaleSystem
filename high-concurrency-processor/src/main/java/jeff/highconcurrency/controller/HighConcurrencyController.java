@@ -5,6 +5,7 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jeff.common.consts.DemoMember;
 import jeff.common.entity.bo.MyRequestContext;
+import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.exception.MyException;
 import jeff.common.exception.BusyException;
@@ -49,6 +50,18 @@ public class HighConcurrencyController {
 
         return flashSaleEventService.consumeFlashSaleEvent(param, myReqContext)
                 .map(resObj -> ResponseEntity.ok(resObj));
+    }
+
+    /**
+     * 回傳快閃銷售案件的資訊，用於渲染搶購頁面的view。
+     *
+     * 會由high-concurrency-processor來承接請求，並做為上游Server打請求到core-processor要資料，core-processor做為下游Server提供資料。
+     */
+    @GetMapping("/flash-sale-event/query/{fse_id}")
+    public Mono<ResponseEntity<Mono<ResponseObjectFromInnerSystem>>> getFlashSaleEventInfo(MyServerWebExchangeDecoratorWrapper serverWebExchange, @PathVariable("fse_id") int fseId) throws MyException {
+        MyRequestContext myReqContext = serverWebExchange.getAttribute("myContext");
+
+        return flashSaleEventService.getFlashSaleEventInfo(fseId, myReqContext);
     }
 
     /**

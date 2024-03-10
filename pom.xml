@@ -28,6 +28,7 @@
         <mysql.version>8.0.30</mysql.version> <!-- 嚴格匹配安裝的MySQL版本 -->
         <spring.boot.ver>2.7.2</spring.boot.ver>
         <spring.cloud.ver>2021.0.5</spring.cloud.ver> <!-- 嚴格匹配Spring Boot版本 -->
+        <feignReactive.ver>3.2.10</feignReactive.ver> <!-- 要稍微對一下Spring Cloud的版本 -->
     </properties>
 
     <!--  在此規範引入JAR包的規格，用於讓子項目繼承這裡的屬性，如版本號  -->
@@ -59,6 +60,14 @@
                 <artifactId>lombok</artifactId>
                 <version>${lombok.version}</version>
                 <optional>true</optional>
+            </dependency>
+            <!-- 統一控管feign-reactive相關組件的版本 -->
+            <dependency>
+                <groupId>com.playtika.reactivefeign</groupId>
+                <artifactId>feign-reactor-bom</artifactId>
+                <version>${feignReactive.ver}</version>
+                <type>pom</type>
+                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+## Added
+- high-concurrency-processor導入reactive-feign(響應式Http客戶端封裝)，結合consul，實現調用其他微服務時的客戶端軟負載均衡。
+
 ### Fixed
 - 所有Consul客戶端註冊進服務中心時，實例的訪問位址原本是預設的主機名，現改成IP。
 

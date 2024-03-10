@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.bo.MyRequestContext;
+import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
 import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.util.LogUtil;
 import jeff.highconcurrency.exception.FlashSaleEventConsumeException;
+import jeff.highconcurrency.http.feign.client.CoreProcessorFeignClient;
 import jeff.highconcurrency.mq.producer.MyReactiveMQProducer;
 import jeff.highconcurrency.persistent.model.mongo.dao.ReactiveFlashSaleEventLogRepo;
 import jeff.highconcurrency.persistent.model.mongo.po.ReactiveFlashSaleEventLog;
@@ -17,6 +19,7 @@ import jeff.mq.entity.dto.MyMessagePayloadTemplate;
 import jeff.mq.util.MQUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
@@ -35,6 +38,9 @@ public class FlashSaleEventService {
 
     @Autowired
     private MyReactiveMQProducer myReactiveMQProducer;
+
+    @Autowired
+    private CoreProcessorFeignClient coreProcessorFeignClient;
 
     @Autowired
     private LogUtil logUtil;
@@ -102,6 +108,16 @@ public class FlashSaleEventService {
 
     }
 
+    /**
+     * 回傳快閃銷售案件的資訊，用於渲染搶購頁面的view。
+     *
+     * 會由high-concurrency-processor來承接請求，並做為上游Server打請求到core-processor要資料，core-processor做為下游Server提供資料。
+     */
+    public Mono<ResponseEntity<Mono<ResponseObjectFromInnerSystem>>> getFlashSaleEventInfo(int fseId, MyRequestContext reqContext) {
+        return coreProcessorFeignClient.getFlashSaleEventInfo(
+                objectMapper.createObjectNode().put("fse_id", fseId)
+        );
+    }
 
 
 }
