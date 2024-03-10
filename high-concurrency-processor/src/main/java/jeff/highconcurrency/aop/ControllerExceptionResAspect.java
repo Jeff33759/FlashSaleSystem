@@ -3,7 +3,7 @@ package jeff.highconcurrency.aop;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
-import jeff.common.entity.dto.send.ResponseObject;
+import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
 import jeff.common.util.LogUtil;
 import jeff.common.exception.BusyException;
 import jeff.highconcurrency.exception.FlashSaleEventConsumeException;
@@ -45,14 +45,14 @@ public class ControllerExceptionResAspect {
 
     @ExceptionHandler(value = FlashSaleEventConsumeException.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObject handleOrderException(FlashSaleEventConsumeException fsece) {
-        return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, fsece.getMessage());
+    public ResponseObjectFromInnerSystem handleOrderException(FlashSaleEventConsumeException fsece) {
+        return new ResponseObjectFromInnerSystem(ResponseCode.Failure.getCode(), EMPTY_CONTENT, fsece.getMessage());
     }
 
     @ExceptionHandler(value = BusyException.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObject handleBusyException(BusyException be) {
-        return new ResponseObject(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
+    public ResponseObjectFromInnerSystem handleBusyException(BusyException be) {
+        return new ResponseObjectFromInnerSystem(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
     }
 
     /**
@@ -60,7 +60,7 @@ public class ControllerExceptionResAspect {
      */
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObject handleException(Exception e) {
+    public ResponseObjectFromInnerSystem handleException(Exception e) {
         logUtil.logError(
                 log,
                 logUtil.composeLogPrefixForSystem(),
@@ -68,7 +68,7 @@ public class ControllerExceptionResAspect {
                 e
         );
 
-        return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
+        return new ResponseObjectFromInnerSystem(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
     }
 
 }

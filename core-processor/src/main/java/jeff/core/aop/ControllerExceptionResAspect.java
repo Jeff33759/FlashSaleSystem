@@ -3,7 +3,7 @@ package jeff.core.aop;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
-import jeff.common.entity.dto.send.ResponseObject;
+import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
 import jeff.common.util.LogUtil;
 import jeff.common.exception.BusyException;
 import jeff.common.exception.MyNotFoundException;
@@ -47,20 +47,20 @@ public class ControllerExceptionResAspect {
 
     @ExceptionHandler(value = OrderException.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObject handleOrderException(OrderException oe) {
-        return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, oe.getMessage());
+    public ResponseObjectFromInnerSystem handleOrderException(OrderException oe) {
+        return new ResponseObjectFromInnerSystem(ResponseCode.Failure.getCode(), EMPTY_CONTENT, oe.getMessage());
     }
 
     @ExceptionHandler(value = MyNotFoundException.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObject handleMyNotFoundException(MyNotFoundException mnfe) {
-        return new ResponseObject(ResponseCode.NotFound.getCode(), EMPTY_CONTENT, mnfe.getMessage());
+    public ResponseObjectFromInnerSystem handleMyNotFoundException(MyNotFoundException mnfe) {
+        return new ResponseObjectFromInnerSystem(ResponseCode.NotFound.getCode(), EMPTY_CONTENT, mnfe.getMessage());
     }
 
     @ExceptionHandler(value = BusyException.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObject handleBusyException(BusyException be) {
-        return new ResponseObject(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
+    public ResponseObjectFromInnerSystem handleBusyException(BusyException be) {
+        return new ResponseObjectFromInnerSystem(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
     }
 
     /**
@@ -68,7 +68,7 @@ public class ControllerExceptionResAspect {
      */
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObject handleException(Exception e) {
+    public ResponseObjectFromInnerSystem handleException(Exception e) {
         logUtil.logError(
                 log,
                 logUtil.composeLogPrefixForSystem(),
@@ -76,7 +76,7 @@ public class ControllerExceptionResAspect {
                 e
         );
 
-        return new ResponseObject(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
+        return new ResponseObjectFromInnerSystem(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
     }
 
 }

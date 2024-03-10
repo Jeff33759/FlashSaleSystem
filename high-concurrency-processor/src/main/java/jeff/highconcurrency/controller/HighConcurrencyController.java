@@ -6,7 +6,6 @@ import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jeff.common.consts.DemoMember;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
-import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.exception.MyException;
 import jeff.common.exception.BusyException;
 import jeff.highconcurrency.entity.bo.MyServerWebExchangeDecoratorWrapper;
@@ -44,7 +43,7 @@ public class HighConcurrencyController {
      */
     @PostMapping("/order/flash")
     @RateLimiter(name = "fse-order-creation-rl", fallbackMethod = "createAnOrderFromFlashSalesEventFallback")
-    public Mono<ResponseEntity<ResponseObject>> createAnOrderFromFlashSalesEvent(MyServerWebExchangeDecoratorWrapper serverWebExchange, @RequestBody JsonNode param) throws MyException {
+    public Mono<ResponseEntity<ResponseObjectFromInnerSystem>> createAnOrderFromFlashSalesEvent(MyServerWebExchangeDecoratorWrapper serverWebExchange, @RequestBody JsonNode param) throws MyException {
         MyRequestContext myReqContext = serverWebExchange.getAttribute("myContext");
         myReqContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // TODO 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
 
@@ -69,7 +68,7 @@ public class HighConcurrencyController {
      *
      * 這裡直接拋例外，讓AOP那裡去統一處理。
      */
-    private Mono<ResponseEntity<ResponseObject>> createAnOrderFromFlashSalesEventFallback(MyServerWebExchangeDecoratorWrapper serverWebExchange, JsonNode param, Exception e) throws Exception {
+    private Mono<ResponseEntity<ResponseObjectFromInnerSystem>> createAnOrderFromFlashSalesEventFallback(MyServerWebExchangeDecoratorWrapper serverWebExchange, JsonNode param, Exception e) throws Exception {
         if (e instanceof RequestNotPermitted) { // 如果是限流觸發時就會拋此例外，處理成自己的例外
             throw this.busyExceptionForFallback;
         }

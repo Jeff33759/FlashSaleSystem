@@ -3,9 +3,9 @@ package jeff.core.controller;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
 import jeff.common.interfaces.IOrderService;
 import jeff.common.entity.bo.MyRequestContext;
-import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.consts.DemoMember;
 import jeff.common.exception.BusyException;
 import jeff.core.exception.OrderException;
@@ -43,7 +43,7 @@ public class PublicApiController {
      */
     @PostMapping("/order/normal")
     @CircuitBreaker(name = "se-order-creation-cb", fallbackMethod = "createAnOrderFromNormalSalesEventFallback")
-    public ResponseEntity<ResponseObject> createAnOrderFromNormalSalesEvent(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+    public ResponseEntity<ResponseObjectFromInnerSystem> createAnOrderFromNormalSalesEvent(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
         myRequestContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // TODO 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
         return ResponseEntity.ok(normalOrderService.createOrder(param, myRequestContext));
     }
@@ -53,7 +53,7 @@ public class PublicApiController {
      * 詳細的交易流程就不設計了，先做成這樣。
      */
     @PostMapping("/finish-order")
-    public ResponseEntity<ResponseObject> finishOrder(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+    public ResponseEntity<ResponseObjectFromInnerSystem> finishOrder(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
         myRequestContext.setAuthenticatedMemberId(DemoMember.SELLER.getId()); // TODO 此API的請求者就是賣家，目前先寫死，所以前端也不用傳這個參數
         return ResponseEntity.ok(normalOrderService.finishOrder(param, myRequestContext));
     }
@@ -66,7 +66,7 @@ public class PublicApiController {
      * 一度下架的一般銷售案件，可以經由人為設置使其再度上架。
      */
     @PostMapping("/sale-event/update-state")
-    public ResponseEntity<ResponseObject> updateNormalSaleEventState(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+    public ResponseEntity<ResponseObjectFromInnerSystem> updateNormalSaleEventState(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
         myRequestContext.setAuthenticatedMemberId(DemoMember.SELLER.getId()); // TODO 此API的請求者是賣家，目前先寫死，所以前端也不用傳這個參數
         return ResponseEntity.ok(allSaleEventService.updateStateOfNormalSaleEvent(param, myRequestContext));
     }
@@ -79,7 +79,7 @@ public class PublicApiController {
      * 快閃銷售案件有時效問題(例如在上架時就要設定幾天後過期自動下架)，且還涉及redis與mongo等等中間件的資料暫存問題，所以統一設計成一旦下架，那就無法再重新上架，要嘛就廠商根據庫存再創一個新的快閃銷售活動。
      */
     @PostMapping("/flash-sale-event/close")
-    public ResponseEntity<ResponseObject> closeFlashSaleEvent(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
+    public ResponseEntity<ResponseObjectFromInnerSystem> closeFlashSaleEvent(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) throws OrderException {
         myRequestContext.setAuthenticatedMemberId(DemoMember.SELLER.getId()); // TODO 此API的請求者是賣家，目前先寫死，所以前端也不用傳這個參數
         return ResponseEntity.ok(allSaleEventService.closeFlashSaleEvent(param, myRequestContext));
     }
@@ -89,7 +89,7 @@ public class PublicApiController {
      *
      * 這裡直接拋例外，讓AOP那裡去統一處理。
      */
-    private ResponseEntity<ResponseObject> createAnOrderFromNormalSalesEventFallback(JsonNode param, MyRequestContext myRequestContext, Exception e) throws Exception {
+    private ResponseEntity<ResponseObjectFromInnerSystem> createAnOrderFromNormalSalesEventFallback(JsonNode param, MyRequestContext myRequestContext, Exception e) throws Exception {
         if (e instanceof CallNotPermittedException) { // 如果是斷路器開啟時就會拋此例外，處理成自己的例外
             throw this.busyExceptionForFallback;
         }

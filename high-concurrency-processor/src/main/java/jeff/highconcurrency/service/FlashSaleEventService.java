@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
-import jeff.common.entity.dto.send.ResponseObject;
 import jeff.common.util.LogUtil;
 import jeff.highconcurrency.exception.FlashSaleEventConsumeException;
 import jeff.highconcurrency.http.feign.client.CoreProcessorFeignClient;
@@ -58,7 +57,7 @@ public class FlashSaleEventService {
      * TODO 目前因為還沒做認證相關的邏輯，所以下單的買家與賣家的Id都先寫死，外部就先不用傳了。
      * @param param 範例資料: {"flash_event":{"fse_id":1}
      */
-    public Mono<ResponseObject> consumeFlashSaleEvent(JsonNode param, MyRequestContext reqContext) {
+    public Mono<ResponseObjectFromInnerSystem> consumeFlashSaleEvent(JsonNode param, MyRequestContext reqContext) {
         int fseId = param.get("flash_event").get("fse_id").asInt(-1);
 
         // 以下嵌套寫法，確保了前個操作完成才做下個操作。每個操作的結果都預期只會輸出一個流(例如mongo預計最多只會查出一筆資料)，所以回傳的都是Mono。
@@ -97,7 +96,7 @@ public class FlashSaleEventService {
                                                 );
 
                                                 // 第四個操作
-                                                return Mono.just(new ResponseObject(ResponseCode.Success.getCode(), objectMapper.createObjectNode().put("transNum", updatedFseInfo.getTransNum()), "Consume flashSaleEvent successfully."));
+                                                return Mono.just(new ResponseObjectFromInnerSystem(ResponseCode.Success.getCode(), objectMapper.createObjectNode().put("transNum", updatedFseInfo.getTransNum()), "Consume flashSaleEvent successfully."));
                                             } catch (JsonProcessingException e) {
                                                 // 第四個操作
                                                 return Mono.error(new FlashSaleEventConsumeException("Failed to publish msg to mq because failing to convert to json."));
@@ -119,6 +118,5 @@ public class FlashSaleEventService {
                 objectMapper.createObjectNode().put("fse_id", fseId)
         );
     }
-
 
 }
