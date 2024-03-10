@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import reactivefeign.spring.config.ReactiveFeignClient;
 import reactor.core.publisher.Mono;
 
@@ -22,6 +23,6 @@ import reactor.core.publisher.Mono;
 public interface CoreProcessorFeignClient {
 
     @PostMapping(value = "/flash-sale-event/query")
-    Mono<ResponseEntity<Mono<ResponseObjectFromInnerSystem>>> getFlashSaleEventInfo(@RequestBody JsonNode param);
+    Mono<ResponseEntity<Mono<ResponseObjectFromInnerSystem>>> getFlashSaleEventInfo(@RequestHeader(value = "myUUID") String myUUID, @RequestBody JsonNode param);
 
 }

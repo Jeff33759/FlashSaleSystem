@@ -115,6 +115,7 @@ public class FlashSaleEventService {
      */
     public Mono<ResponseEntity<Mono<ResponseObjectFromInnerSystem>>> getFlashSaleEventInfo(int fseId, MyRequestContext reqContext) {
         return coreProcessorFeignClient.getFlashSaleEventInfo(
+                reqContext.getUUID(),
                 objectMapper.createObjectNode().put("fse_id", fseId)
         );
     }
