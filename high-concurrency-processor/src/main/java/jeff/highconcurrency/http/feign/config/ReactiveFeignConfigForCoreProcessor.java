@@ -8,6 +8,10 @@ import reactivefeign.webclient.WebReactiveOptions;
 
 /**
  * 針對訪問core-processor的feign配置。
+ *
+ * 文件參考(搜尋"application.properties configuration"):
+ * https://github.com/PlaytikaOSS/feign-reactive/tree/develop/feign-reactor-spring-configuration
+ * 它範例沒有很完整，實際上有哪些東西可以配置，要直接去看官方SourceCode。
  */
 @Configuration
 public class ReactiveFeignConfigForCoreProcessor {
@@ -22,7 +26,7 @@ public class ReactiveFeignConfigForCoreProcessor {
     private int writeTimeout;
 
     /**
-     * 各種參數配置官方範例:
+     * http的一些策略配置，如超時等等。
      */
     @Bean
     public ReactiveOptions reactiveOptionsForCoreProcessor() {
