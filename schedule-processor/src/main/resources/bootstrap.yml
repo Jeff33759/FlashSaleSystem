@@ -1,4 +1,4 @@
 ####【區分環境】####
 spring:
   profiles:
-    active: dev
+    active: @activeProfile@ #根據mvn clean package -P <profile-id>，來決定這個參數的值。詳細可以看pom檔的profiles標籤的設置。要引入spring-cloud-starter-bootstrap才會奏效。
