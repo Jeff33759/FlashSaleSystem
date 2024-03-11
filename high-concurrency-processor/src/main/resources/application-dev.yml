@@ -42,6 +42,8 @@ spring.cloud.consul:
     instance-id: ${app.instance.name} #此實例的唯一識別符，預設<service-name>-<server.port>
     prefer-ip-address: true #指定consul客戶端(也就是本實例)註冊進服務中心時，是否優先使用IP位址而不是主機名稱。換句話說，別的實例要訪問我這個實例，要用什麼IP。
     ip-address: ${app.instance.hostname}
+    deregister: false #是否關閉自動註銷功能，預設為true。如果為true，那麼你實例shutdown後，註冊列表就不會自動把該實例給註銷掉，上游Server仍會LB到已關閉的位址。
+    health-check-critical-timeout: 20s #超過多久就註銷掉非健康狀態的實例。此處設定當某實例已經20秒都沒通過健康檢測後，便註銷。
     heartbeat:
       enabled: false #是否啟用心跳機制來通知consul-server自己的狀態? 預設false。若不啟用，代表針對此實例的狀態檢測，是採用健康檢測方案而非心跳機制，那就要引入actuator套件，因為consul預設採用actuator提供的端點來實現健康檢測。
 
