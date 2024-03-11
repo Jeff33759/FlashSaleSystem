@@ -45,16 +45,13 @@ resilience4j.circuitbreaker:
       baseConfig: se-order-creation-cb-config #此實例所抓的斷路器配置名
 
 ####【服務治理配置】####
-### 服務集群名 ###
-spring.application.name: ${app.type} #如果某服務有多個實例，那麼每個實例的此參數都要同名，治理中心才會把兩個實例視為同個服務
-
 ### consul配置 ###
 ## 官方文件: https://docs.spring.io/spring-cloud-consul/docs/current/reference/html/#spring-cloud-consul-discovery ##
 spring.cloud.consul:
   host: localhost #consul-server的對外位址
   port: 8500
   discovery: #服務發現的相關配置
-    service-name: ${app.type} #這個實例是隸屬於哪一個服務集群名稱底下
+    service-name: ${app.type} #這個實例是隸屬於哪一個服務集群名稱底下。如果某服務有多個實例，那麼每個實例的此參數都要同名，治理中心才會把兩個實例視為同個服務
     instance-id: ${app.instance.name} #此實例的唯一識別符，預設<service-name>-<server.port>
     prefer-ip-address: true #指定consul客戶端(也就是本實例)註冊進服務中心時，是否優先使用IP位址而不是主機名稱。換句話說，別的實例要訪問我這個實例，要用什麼IP。
     ip-address: ${app.instance.hostname}
