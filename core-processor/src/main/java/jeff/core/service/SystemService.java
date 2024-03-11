@@ -2,7 +2,7 @@ package jeff.core.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
-import jeff.common.entity.dto.send.ResponseObject;
+import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
 import jeff.persistent.service.InitService;
 import jeff.redis.util.MyRedisUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +26,11 @@ public class SystemService {
     /**
      * 初始化所有的DB(RDBMS和NoSQL)與Redis
      */
-    public ResponseObject initAllDBAndRedis() {
+    public ResponseObjectFromInnerSystem initAllDBAndRedis() {
         dbInitService.initAllDemoDataOfMySQL(); //初始化在MySQL裡的Demo資料
         dbInitService.initFlashSaleEventLogDocumentOfMongoDB(); //初始化在Mongo裡的快閃銷售表
         myRedisUtil.removeAllKeys(); //清除redis上面所有的key
-        return new ResponseObject(ResponseCode.Success.getCode(), objectMapper.createObjectNode(), "Initialize Mysql, Mongo and Redis successfully.");
+        return new ResponseObjectFromInnerSystem(ResponseCode.Success.getCode(), objectMapper.createObjectNode(), "Initialize Mysql, Mongo and Redis successfully.");
     }
 
 }

@@ -51,6 +51,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-redis-reactive</artifactId>
         </dependency>
+        <!-- 官網: https://github.com/PlaytikaOSS/feign-reactive/tree/develop -->
+        <dependency> <!-- 非同步響應式的第三方HttpClient封裝，Spring官方推薦在Open feign支援Reavtive之前的替代方案，也有跟一些Spring Cloud的元件整合過，如resilience等等 -->
+            <groupId>com.playtika.reactivefeign</groupId>
+            <artifactId>feign-reactor-spring-cloud-starter</artifactId>
+            <type>pom</type>
+        </dependency>
         <!-- 自己寫的函式庫 -->
         <dependency> <!-- 共用包 -->
             <groupId>jeff.flash</groupId>
@@ -75,7 +81,7 @@
         <profile>
             <id>dev</id> <!-- mvn clean package -P <profile-id> -->
             <activation>
-                <activeByDefault>true</activeByDefault> <!-- 如果mvn package沒帶-P參數，則預設是mvn package -P dev -->
+                <activeByDefault>true</activeByDefault> <!-- 如果mvn package沒帶-P參數，又或者帶的P參數沒有匹配到這裡的任一profile-id，則預設是mvn package -P dev -->
             </activation>
             <properties>
                 <activeProfile>dev</activeProfile> <!-- 當有人在配置檔@activeProfile@時，要映射給他什麼值 -->

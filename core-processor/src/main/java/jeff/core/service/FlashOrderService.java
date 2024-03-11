@@ -3,7 +3,7 @@ package jeff.core.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import jeff.common.entity.bo.MyContext;
 import jeff.common.entity.bo.MyMQConsumptionContext;
-import jeff.common.entity.dto.send.ResponseObject;
+import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
 import jeff.common.exception.MyException;
 import jeff.common.interfaces.IOrderService;
 import jeff.common.util.LogUtil;
@@ -40,7 +40,7 @@ public class FlashOrderService implements IOrderService {
      * @return 固定回傳null(因為消費MQ的場合不會用到)
      */
     @Override
-    public ResponseObject createOrder(JsonNode param, MyContext context) throws MyException {
+    public ResponseObjectFromInnerSystem createOrder(JsonNode param, MyContext context) throws MyException {
         MyMQConsumptionContext mqConsumptionContext = (MyMQConsumptionContext) context;
 
         OrderCreationFlowContext orderCreationFlowContext = this.generateContextForOrderCreationFlowByParam(param); // 這個context是for訂單流程的，作用域跟MyMQConsumptionContext不同
@@ -62,7 +62,7 @@ public class FlashOrderService implements IOrderService {
     }
 
     @Override
-    public ResponseObject finishOrder(JsonNode param, MyContext context) throws MyException {
+    public ResponseObjectFromInnerSystem finishOrder(JsonNode param, MyContext context) throws MyException {
         throw new MyException("Unexpected invoke of FlashOrderService.finishOrder.");
     }
 

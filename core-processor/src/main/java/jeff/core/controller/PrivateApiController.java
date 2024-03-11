@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jeff.common.entity.bo.MyRequestContext;
-import jeff.common.entity.dto.send.ResponseObject;
+import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
 import jeff.common.exception.BusyException;
 import jeff.core.service.AllSaleEventService;
 import jeff.core.service.SystemService;
@@ -36,7 +36,7 @@ public class PrivateApiController {
      * 初始化redis和MySql，方便DEMO。
      */
     @GetMapping("/system/init")
-    public ResponseEntity<ResponseObject> initRedisAndMySql() {
+    public ResponseEntity<ResponseObjectFromInnerSystem> initRedisAndMySql() {
         return ResponseEntity.ok(systemService.initAllDBAndRedis());
     }
 
@@ -53,7 +53,7 @@ public class PrivateApiController {
      */
     @PostMapping("/flash-sale-event/query")
     @RateLimiter(name = "fse-query-rl", fallbackMethod = "getFlashSaleEventInfoFallback")
-    public ResponseEntity<ResponseObject> getFlashSaleEventInfo(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) {
+    public ResponseEntity<ResponseObjectFromInnerSystem> getFlashSaleEventInfo(@RequestBody JsonNode param, @RequestAttribute(value = "myContext") MyRequestContext myRequestContext) {
         return ResponseEntity.ok(allSaleEventService.getCacheOfFlashSaleEventInfo(param, myRequestContext));
     }
 
@@ -62,7 +62,7 @@ public class PrivateApiController {
      *
      * 這裡直接拋例外，讓AOP那裡去統一處理。
      */
-    private ResponseEntity<ResponseObject> getFlashSaleEventInfoFallback(JsonNode param, MyRequestContext myRequestContext, Exception e) throws Exception {
+    private ResponseEntity<ResponseObjectFromInnerSystem> getFlashSaleEventInfoFallback(JsonNode param, MyRequestContext myRequestContext, Exception e) throws Exception {
         if (e instanceof RequestNotPermitted) { // 如果是限流觸發時就會拋此例外，處理成自己的例外
             throw this.busyExceptionForFallback;
         }

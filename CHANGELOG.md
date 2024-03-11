@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## Added
+- high-concurrency-processor導入reactive-feign(響應式Http客戶端封裝)，結合consul，實現調用其他微服務時的客戶端軟負載均衡。
+- 實作跨服務的UUID。只要是同個業務場景的鏈路，都使用同個UUID，方便之後日誌集中化，可以用同一組UUID抓出跨服務的整條業務鏈路日誌。(之後可以考慮改成Spring Cloud Sleuth)
+
+## Changed
+- 微服務之間溝通，改成不再固定狀態碼200，而是根據情況有不同的Http Status。此更動是為了方便之後跟resilience4j整合。
+
+### Fixed
+- 所有Consul客戶端註冊進服務中心時，實例的訪問位址原本是預設的主機名，現改成IP。
+- scheduler-processor加上"根據mvn package -P 參數，打包出不同環境所需jar"的功能，0.7.1漏掉了。
+- 修正當consul client關閉時，沒有自動向consul server註銷的問題
+
 ## [0.7.1] - 2024-03-08
 
 ### Added

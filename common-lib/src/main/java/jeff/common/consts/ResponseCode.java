@@ -2,6 +2,8 @@ package jeff.common.consts;
 
 /**
  * 回應的狀態碼。
+ *
+ * 操作失敗的錯誤碼避免使用2XX。
  */
 public enum ResponseCode {
 

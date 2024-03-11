@@ -68,7 +68,7 @@
         <profile>
             <id>dev</id> <!-- mvn clean package -P <profile-id> -->
             <activation>
-                <activeByDefault>true</activeByDefault> <!-- 如果mvn package沒帶-P參數，則預設是mvn package -P dev -->
+                <activeByDefault>true</activeByDefault> <!-- 如果mvn package沒帶-P參數，又或者帶的P參數沒有匹配到這裡的任一profile-id，則預設是mvn package -P dev -->
             </activation>
             <properties>
                 <activeProfile>dev</activeProfile> <!-- 當有人在配置檔@activeProfile@時，要映射給他什麼值 -->
