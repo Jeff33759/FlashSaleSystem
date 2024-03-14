@@ -15,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import reactivefeign.client.ReactiveFeignException;
+import reactivefeign.client.ReadTimeoutException;
 
 import javax.annotation.PostConstruct;
 
@@ -68,6 +70,29 @@ public class ControllerExceptionResAspect {
                 .body(micsfe.getResObjectFromInnerSystem());
     }
 
+    /**
+     * 承接一些ReactiveFeign所拋的例外。
+     * 應該是可以在某層Handler處理成自己的例外，再由這個aop捕捉，但懶得再看Source Code了。
+     */
+    @ExceptionHandler(value = ReactiveFeignException.class)
+    public ResponseEntity<ResponseObjectFromInnerSystem> handleReactiveFeignException(ReadTimeoutException rte) {
+        logUtil.logError(
+                log,
+                logUtil.composeLogPrefixForSystem(),
+                "Some errors occurred at httpClient.",
+                rte
+        );
+
+        if(rte instanceof ReadTimeoutException) {
+            return ResponseEntity
+                    .status(ResponseCode.RequestTimeout.getCode())
+                    .body(new ResponseObjectFromInnerSystem(ResponseCode.RequestTimeout.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner."));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ResponseObjectFromInnerSystem(ResponseCode.RequestTimeout.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner."));
+    }
 
 
     /**

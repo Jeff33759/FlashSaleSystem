@@ -25,7 +25,14 @@ public enum ResponseCode {
     /**
      * 請求太頻繁。
      */
-    TooManyReq(429);
+    TooManyReq(429),
+
+    /**
+     * 系統節點A欲訪問節點B時，遲遲沒有成功得到回應，可能是遭遇readTimeout，或者是其他各種timeout。
+     * 可能原因有兩節點之間網路抖動，節點B阻塞了等等...
+     * 回應這個，告訴自己的上游Server，說你發來的這個請求，我這裡處理超時了。
+     */
+    RequestTimeout(408);
 
     int code;
 
