@@ -120,7 +120,7 @@ public class MyGatewayGlobalExceptionHandler extends AbstractErrorWebExceptionHa
         if(causeEx instanceof TimeoutException) {
             logUtil.logWarn(
                     log,
-                    logUtil.composeLogPrefixForSystem(),
+                    logUtil.composeLogPrefixForBusiness(null, exchange.getRequest().getHeaders().getFirst("myUUID")),
                     String.format(
                             "Call other service timeout, accessUrl: %s, causeMessage: %s",
                             requestUrl.toASCIIString(),
