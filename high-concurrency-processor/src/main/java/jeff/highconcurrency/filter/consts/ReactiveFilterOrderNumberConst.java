@@ -9,12 +9,14 @@ public class ReactiveFilterOrderNumberConst {
     private ReactiveFilterOrderNumberConst() {
     }
 
-    public static final int REACTIVE_WRAPPER_FILTER = 1;
+    private static final int START_ORDER_NUMBER = 1;
 
-    public static final int REACTIVE_REQ_CONTEXT_GENERATION_FILTER = 2;
+    public static final int REACTIVE_WRAPPER_FILTER = START_ORDER_NUMBER;
 
-    public static final int REACTIVE_UUID_FILTER = 3;
+    public static final int REACTIVE_REQ_CONTEXT_GENERATION_FILTER = START_ORDER_NUMBER + 1;
 
-    public static final int REACTIVE_LOGGING_FILTER = 4;
+    public static final int REACTIVE_UUID_FILTER = START_ORDER_NUMBER + 2;
+
+    public static final int REACTIVE_LOGGING_FILTER = START_ORDER_NUMBER + 3;
 
 }
