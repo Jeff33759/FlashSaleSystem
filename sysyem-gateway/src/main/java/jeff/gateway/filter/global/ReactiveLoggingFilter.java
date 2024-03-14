@@ -95,6 +95,9 @@ public class ReactiveLoggingFilter implements GlobalFilter, Ordered {
     }
 
 
+    /**
+     * 這個順序要夠小，responseBody才會取的到東西，才印得到log。
+     */
     @Override
     public int getOrder() {
         return GatewayGlobalFilterOrderNumberConst.REACTIVE_LOGGING_FILTER;

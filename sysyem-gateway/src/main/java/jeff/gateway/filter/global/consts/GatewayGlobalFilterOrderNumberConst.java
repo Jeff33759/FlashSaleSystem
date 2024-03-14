@@ -17,14 +17,14 @@ public class GatewayGlobalFilterOrderNumberConst {
      */
     private static final int START_ORDER_NUMBER = -50;
 
-    public static final int REACTIVE_WRAPPER_FILTER = START_ORDER_NUMBER;
+    public static final int REACTIVE_WRAPPER_FILTER = START_ORDER_NUMBER; //-50
 
-    public static final int REACTIVE_REQ_CONTEXT_GENERATION_FILTER = START_ORDER_NUMBER + 1;
+    public static final int REACTIVE_REQ_CONTEXT_GENERATION_FILTER = START_ORDER_NUMBER + 1; //-49
 
-    public static final int REACTIVE_UUID_FILTER = START_ORDER_NUMBER + 2;
+    public static final int REACTIVE_UUID_FILTER = START_ORDER_NUMBER + 2; //-48
 
-    public static final int REACTIVE_LOGGING_FILTER = START_ORDER_NUMBER + 3;
+    public static final int REACTIVE_LOGGING_FILTER = START_ORDER_NUMBER + 3; //-47
 
-    public static final int ADD_REQUEST_HEADER_FILTER = START_ORDER_NUMBER + 4;
+    public static final int ADD_REQUEST_HEADER_FILTER = START_ORDER_NUMBER + 4; //-46
 
 }
