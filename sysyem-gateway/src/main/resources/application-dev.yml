@@ -1,0 +1,44 @@
+server:
+  port: 8030 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dserver.port"，否則預設8030
+
+####【實例資訊】####
+app:
+  instance:
+    hostname: localhost #實例所在主機的對外位址(或域名)。多個實例放於不同機器的話，要在啟動命令用-Dapp.instance.hostname指定。
+    name: Gateway01 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dapp.instance.name"，否則預設Gateway01
+
+####【服務治理配置】####
+### consul配置 ###
+## 官方文件: https://docs.spring.io/spring-cloud-consul/docs/current/reference/html/#spring-cloud-consul-discovery ##
+spring.cloud.consul:
+  host: localhost #consul-server的對外位址
+  port: 8500
+  discovery: #服務發現的相關配置
+    service-name: ${app.type} #這個實例是隸屬於哪一個服務集群名稱底下。如果某服務有多個實例，那麼每個實例的此參數都要同名，治理中心才會把兩個實例視為同個服務
+    instance-id: ${app.instance.name} #此實例的唯一識別符，預設<service-name>-<server.port>
+    prefer-ip-address: true #指定consul客戶端(也就是本實例)註冊進服務中心時，是否優先使用IP位址而不是主機名稱。換句話說，別的實例要訪問我這個實例，要用什麼IP。
+    ip-address: ${app.instance.hostname}
+    deregister: false #是否關閉自動註銷功能，預設為true。如果為true，那麼你實例shutdown後，註冊列表就不會自動把該實例給註銷掉，上游Server仍會LB到已關閉的位址。
+    health-check-critical-timeout: 20s #超過多久就註銷掉非健康狀態的實例。此處設定當某實例已經20秒都沒通過健康檢測後，便註銷。
+    heartbeat:
+      enabled: false #是否啟用心跳機制來通知consul-server自己的狀態? 預設false。若不啟用，代表針對此實例的狀態檢測，是採用健康檢測方案而非心跳機制，那就要引入actuator套件，因為consul預設採用actuator提供的端點來實現健康檢測。
+
+####【Gateway配置】####
+### 官方文件(本專題使用3.1.4版本): https://docs.spring.io/spring-cloud-gateway/docs/3.1.4/reference/html/ ###
+spring.cloud.gateway:
+  httpclient: #配置gateway的HttpClient參數(WebFlux預設容器為Netty，所以是使用Netty的HttpClient)。
+    ##這裡超時設定，要考量到下游Server鏈路的超時總和，視情況去設計整個系統。##
+    connect-timeout: 1000 #must be specified in milliseconds
+    response-timeout: 5s #可以當成是read-timeout。must be specified as a java.time.Duration
+
+  routes: #Api路由的設置
+    - id: core-prosessor-router #路由器的ID，須為唯一值。
+      predicates: #本路由器的斷言配置。當打進來的請求路徑匹配時，由本路由器來處理後續路由。
+        ##會寫在這裡的，都是對系統外部開放的Api。##
+        - Path=/order/normal, /finish-order, /sale-event/update-state, /flash-sale-event/close
+      uri: lb://core-processor #路由的位址。lb開頭打開負載均衡功能(ReactiveLoadBalancerClientFilter)，會根據從服務註冊中心拿到core-processor服務集群的實例列表，以某種策略去訪問實例位址，預設策略為輪詢。
+
+    - id: high-concurrency-processor-router
+      predicates:
+        - Path=/order/flash, /flash-sale-event/query/**
+      uri: lb://high-concurrency-processor

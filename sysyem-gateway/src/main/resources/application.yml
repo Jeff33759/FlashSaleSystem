@@ -1,0 +1,11 @@
+####【應用種類(服務集群名稱)】####
+app:
+  type: system-gateway
+
+####【Gateway配置】####
+### 官方文件(本專題使用3.1.4版本): https://docs.spring.io/spring-cloud-gateway/docs/3.1.4/reference/html/ ###
+spring:
+  cloud:
+    gateway:
+      default-filters: #To add a filter and apply it to all routes. 這裡的過濾器都是官方寫好的，在router裡面的過濾鏈，加個參數就可以開啟。
+        - SetStatus=OK #配置一個官方既有的過濾器，其名稱為SetStatus，功能為把回應的狀態碼統一改成OK(200)。
