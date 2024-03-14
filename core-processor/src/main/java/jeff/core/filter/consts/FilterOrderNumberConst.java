@@ -1,4 +1,4 @@
-package jeff.core.filter;
+package jeff.core.filter.consts;
 
 /**
  * 統一控管過濾器的順序。
