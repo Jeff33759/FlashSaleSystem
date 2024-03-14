@@ -7,6 +7,7 @@
 - 新增子專案system-gateway
 - 系統所有API，對外統一回應狀態碼200(做在gateway)
 - UUID統一由gateway生成
+- 各應用的dev模式，設定logging等級為debug
 
 ## [0.8.1] - 2024-03-12
 

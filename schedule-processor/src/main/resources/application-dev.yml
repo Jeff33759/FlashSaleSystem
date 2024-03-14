@@ -6,3 +6,8 @@ app:
   instance:
     hostname: localhost #實例所在主機的對外位址(或域名)。多個實例放於不同機器的話，要在啟動命令用-Dapp.instance.hostname指定。
     name: Scheduler01 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dapp.instance.name"，否則預設Scheduler01
+
+####【日誌等級】####
+logging:
+  level:
+    jeff: debug #設定jeff目錄底下的所有class的日誌等級
