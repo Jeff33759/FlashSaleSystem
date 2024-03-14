@@ -6,6 +6,7 @@
 - 當high-concurrency-processor調用下游Server時，遭遇readTimeout的處理
 - 新增子專案system-gateway
 - 系統所有API，對外統一回應狀態碼200(做在gateway)
+- UUID統一由gateway生成
 
 ## [0.8.1] - 2024-03-12
 

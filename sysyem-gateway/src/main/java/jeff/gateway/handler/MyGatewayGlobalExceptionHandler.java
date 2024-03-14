@@ -90,7 +90,7 @@ public class MyGatewayGlobalExceptionHandler extends AbstractErrorWebExceptionHa
      * 這裡接到的throwable，都是經過其他過濾器包裝過的，不會是最底層的cause。例如responseTimeout，是由{@link NettyRoutingFilter#filter}包裝後，拋出ResponseStatusException到這此層。
      * 如果想要對各式各樣的例外情況處理，可能要去參考官方文件看有哪些過濾器，然後進去看SourceCode，然後在這裡去捕捉。
      * 官方文件:
-     * https://cloud.spring.io/spring-cloud-static/spring-cloud-gateway/2.2.1.RELEASE/reference/html/#global-filters
+     * https://docs.spring.io/spring-cloud-gateway/docs/3.1.4/reference/html/#global-filters
      */
     @Override
     public Mono<Void> handle(ServerWebExchange exchange, Throwable throwable) {
