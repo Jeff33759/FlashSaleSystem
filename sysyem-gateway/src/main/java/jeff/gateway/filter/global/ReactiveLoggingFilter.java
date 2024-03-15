@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.cloud.gateway.filter.NettyWriteResponseFilter;
 import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -96,7 +97,7 @@ public class ReactiveLoggingFilter implements GlobalFilter, Ordered {
 
 
     /**
-     * 這個順序要夠小，responseBody才會取的到東西，才印得到log。
+     * 這個順序要小於{@link NettyWriteResponseFilter}，responseBody才會取的到東西，才印得到log。
      */
     @Override
     public int getOrder() {
