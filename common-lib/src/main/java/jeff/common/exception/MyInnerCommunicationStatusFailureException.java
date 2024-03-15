@@ -5,6 +5,7 @@ import lombok.Getter;
 
 /**
  * 微服務之間溝通，收到狀態碼非2XX時要拋的異常。
+ * 此例外不代表服務異常，有時候下游Server找不到資料也會傳404。
  */
 @Getter
 public class MyInnerCommunicationStatusFailureException extends MyException {

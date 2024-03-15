@@ -24,6 +24,7 @@ public enum ResponseCode {
 
     /**
      * 請求太頻繁。
+     * 開啟斷路器或限流器會回此狀態碼。
      */
     TooManyReq(429),
 
@@ -34,7 +35,7 @@ public enum ResponseCode {
      */
     RequestTimeout(408);
 
-    int code;
+    private final int code;
 
     ResponseCode(int code) {
         this.code = code;
