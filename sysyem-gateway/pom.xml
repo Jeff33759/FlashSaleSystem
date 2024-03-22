@@ -21,7 +21,7 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
-        <dependency> <!-- 非同步響應式服務降級方案 -->
+        <dependency> <!-- 非同步響應式系統容錯方案 -->
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
         </dependency>

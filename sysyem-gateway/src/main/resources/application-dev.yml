@@ -37,7 +37,7 @@ spring.cloud.gateway:
     response-timeout: 5s #可以當成是read-timeout。must be specified as a java.time.Duration
 
 
-####【服務降級、融斷、限流配置(不同環境可能要有不同的配置)】 ####
+####【系統容錯配置(不同環境可能要有不同的配置)】 ####
 ###以下配置要根據下游Server的熔斷配置，去決定參數。最上游Server設成比較不容易觸發熔斷###
 ## 斷路器配置 ##
 my.circuitbreaker.configs: #針對環境與不同router去寫不同的斷路器配置，再用java config去註冊實例。參考MyFaultToleranceComponentConfig
