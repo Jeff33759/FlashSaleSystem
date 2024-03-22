@@ -5,7 +5,7 @@
     <parent>
         <artifactId>my-flashsale-system</artifactId>
         <groupId>jeff.flash</groupId>
-        <version>0.9.1</version>
+        <version>0.10.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -31,7 +31,7 @@
         <dependency> <!-- 測試工具包 -->
             <groupId>jeff.flash</groupId>
             <artifactId>my-test-lib</artifactId>
-            <version>0.9.1</version>
+            <version>0.10.1-SNAPSHOT</version>
             <scope>test</scope> <!-- 設為test，此函式庫專門用於測試，不會打包 -->
         </dependency>
 
