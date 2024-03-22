@@ -1,15 +1,15 @@
 package jeff.highconcurrency.http.feign.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
+import jeff.common.entity.dto.inner.InnerCommunicationDto;
 import jeff.common.exception.MyException;
 import jeff.common.exception.MyInnerCommunicationStatusFailureException;
-import jeff.common.util.LogUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import reactivefeign.ReactiveOptions;
 import reactivefeign.client.ReactiveFeignException;
 import reactivefeign.client.ReactiveHttpResponse;
@@ -38,10 +38,8 @@ import java.time.Clock;
 public class ReactiveFeignConfigForDefault {
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
-    @Autowired
-    LogUtil logUtil;
 
     /**
      * http的一些策略配置，如超時等等。
@@ -85,8 +83,8 @@ public class ReactiveFeignConfigForDefault {
                 return response.bodyData()
                         .flatMap(body -> {
                             try {
-                                ResponseObjectFromInnerSystem bodyObj = objectMapper.readValue(body, ResponseObjectFromInnerSystem.class);
-                                return Mono.just(new MyInnerCommunicationStatusFailureException(response.status(), bodyObj));
+                                InnerCommunicationDto bodyObj = objectMapper.readValue(body, InnerCommunicationDto.class);
+                                return Mono.just(new MyInnerCommunicationStatusFailureException(HttpStatus.valueOf(response.status()), bodyObj));
                             } catch (IOException e) {
                                 return Mono.error(new MyException("Cannot convert body data into jsonObj but it should not occur."));
                             }

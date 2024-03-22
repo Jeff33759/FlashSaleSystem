@@ -3,7 +3,8 @@ package jeff.highconcurrency.aop;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
-import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
+import jeff.common.entity.dto.inner.InnerCommunicationDto;
+import jeff.common.exception.MyException;
 import jeff.common.exception.MyInnerCommunicationStatusFailureException;
 import jeff.common.util.LogUtil;
 import jeff.common.exception.BusyException;
@@ -52,24 +53,24 @@ public class ControllerExceptionResAspect {
 
     @ExceptionHandler(value = FlashSaleEventConsumeException.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObjectFromInnerSystem handleFlashSaleEventConsumeException(FlashSaleEventConsumeException fsece) {
-        return new ResponseObjectFromInnerSystem(ResponseCode.Failure.getCode(), EMPTY_CONTENT, fsece.getMessage());
+    public InnerCommunicationDto handleFlashSaleEventConsumeException(FlashSaleEventConsumeException fsece) {
+        return new InnerCommunicationDto(ResponseCode.Failure.getCode(), EMPTY_CONTENT, fsece.getMessage());
     }
 
     @ExceptionHandler(value = BusyException.class)
     @ResponseStatus(code = HttpStatus.TOO_MANY_REQUESTS)
-    public ResponseObjectFromInnerSystem handleBusyException(BusyException be) {
-        return new ResponseObjectFromInnerSystem(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
+    public InnerCommunicationDto handleBusyException(BusyException be) {
+        return new InnerCommunicationDto(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
     }
 
     /**
      * 當下游Server回應狀態碼非2XX，會在{@link ReactiveFeignConfigForDefault}處理成MyInnerCommunicationStatusFailureException，再由這邊處理。
      */
     @ExceptionHandler(value = MyInnerCommunicationStatusFailureException.class)
-    public ResponseEntity<ResponseObjectFromInnerSystem> handleMyInnerCommunicationStatusFailureException(MyInnerCommunicationStatusFailureException micsfe) {
+    public ResponseEntity<InnerCommunicationDto> handleMyInnerCommunicationStatusFailureException(MyInnerCommunicationStatusFailureException micsfe) {
         return ResponseEntity
-                .status(micsfe.getStatusCode())
-                .body(micsfe.getResObjectFromInnerSystem());
+                .status(micsfe.getHttpStatusFromInnerSystem())
+                .body(micsfe.getResObjectFromInnerSystem().orElseThrow(() -> new MyException("InnerCommunicationDto field of MyInnerCommunicationStatusFailureException is empty, but this shouldn't happen in this server.")));
     }
 
     /**
@@ -77,7 +78,7 @@ public class ControllerExceptionResAspect {
      * 應該是可以在某層Handler處理成自己的例外，再由這個aop捕捉，但懶得再看Source Code了。
      */
     @ExceptionHandler(value = ReactiveFeignException.class)
-    public ResponseEntity<ResponseObjectFromInnerSystem> handleReactiveFeignException(ReactiveFeignException rfe) {
+    public ResponseEntity<InnerCommunicationDto> handleReactiveFeignException(ReactiveFeignException rfe) {
         logUtil.logError(
                 log,
                 logUtil.composeLogPrefixForSystem(),
@@ -88,12 +89,12 @@ public class ControllerExceptionResAspect {
         if(rfe instanceof ReadTimeoutException) {
             return ResponseEntity
                     .status(HttpStatus.REQUEST_TIMEOUT)
-                    .body(new ResponseObjectFromInnerSystem(ResponseCode.RequestTimeout.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner."));
+                    .body(new InnerCommunicationDto(ResponseCode.RequestTimeout.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner."));
         }
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(new ResponseObjectFromInnerSystem(ResponseCode.RequestTimeout.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner."));
+                .body(new InnerCommunicationDto(ResponseCode.RequestTimeout.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner."));
     }
 
 
@@ -102,7 +103,7 @@ public class ControllerExceptionResAspect {
      */
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseObjectFromInnerSystem handleException(Exception e) {
+    public InnerCommunicationDto handleException(Exception e) {
         logUtil.logError(
                 log,
                 logUtil.composeLogPrefixForSystem(),
@@ -110,7 +111,7 @@ public class ControllerExceptionResAspect {
                 e
         );
 
-        return new ResponseObjectFromInnerSystem(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
+        return new InnerCommunicationDto(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
     }
 
 }

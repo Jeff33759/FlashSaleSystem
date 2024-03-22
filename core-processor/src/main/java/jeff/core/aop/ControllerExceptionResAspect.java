@@ -3,7 +3,7 @@ package jeff.core.aop;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jeff.common.consts.ResponseCode;
-import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
+import jeff.common.entity.dto.inner.InnerCommunicationDto;
 import jeff.common.util.LogUtil;
 import jeff.common.exception.BusyException;
 import jeff.common.exception.MyNotFoundException;
@@ -49,20 +49,20 @@ public class ControllerExceptionResAspect {
 
     @ExceptionHandler(value = OrderException.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObjectFromInnerSystem handleOrderException(OrderException oe) {
-        return new ResponseObjectFromInnerSystem(ResponseCode.Failure.getCode(), EMPTY_CONTENT, oe.getMessage());
+    public InnerCommunicationDto handleOrderException(OrderException oe) {
+        return new InnerCommunicationDto(ResponseCode.Failure.getCode(), EMPTY_CONTENT, oe.getMessage());
     }
 
     @ExceptionHandler(value = MyNotFoundException.class)
     @ResponseStatus(code = HttpStatus.OK)
-    public ResponseObjectFromInnerSystem handleMyNotFoundException(MyNotFoundException mnfe) {
-        return new ResponseObjectFromInnerSystem(ResponseCode.NotFound.getCode(), EMPTY_CONTENT, mnfe.getMessage());
+    public InnerCommunicationDto handleMyNotFoundException(MyNotFoundException mnfe) {
+        return new InnerCommunicationDto(ResponseCode.NotFound.getCode(), EMPTY_CONTENT, mnfe.getMessage());
     }
 
     @ExceptionHandler(value = BusyException.class)
     @ResponseStatus(code = HttpStatus.TOO_MANY_REQUESTS)
-    public ResponseObjectFromInnerSystem handleBusyException(BusyException be) {
-        return new ResponseObjectFromInnerSystem(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
+    public InnerCommunicationDto handleBusyException(BusyException be) {
+        return new InnerCommunicationDto(ResponseCode.TooManyReq.getCode(), EMPTY_CONTENT, be.getMessage());
     }
 
     /**
@@ -70,7 +70,7 @@ public class ControllerExceptionResAspect {
      */
     @ExceptionHandler(value = Exception.class)
     @ResponseStatus(code = HttpStatus.INTERNAL_SERVER_ERROR)
-    public ResponseObjectFromInnerSystem handleException(Exception e) {
+    public InnerCommunicationDto handleException(Exception e) {
         logUtil.logError(
                 log,
                 logUtil.composeLogPrefixForSystem(),
@@ -78,7 +78,7 @@ public class ControllerExceptionResAspect {
                 e
         );
 
-        return new ResponseObjectFromInnerSystem(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
+        return new InnerCommunicationDto(ResponseCode.Failure.getCode(), EMPTY_CONTENT, "Some errors occurred while processing request, please call the application owner.");
     }
 
 }

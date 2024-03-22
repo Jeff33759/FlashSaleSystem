@@ -1,7 +1,7 @@
 package jeff.highconcurrency.http.feign.client;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
+import jeff.common.entity.dto.inner.InnerCommunicationDto;
 import jeff.highconcurrency.http.feign.config.ReactiveFeignConfigForCoreProcessor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -23,6 +23,6 @@ import reactor.core.publisher.Mono;
 public interface CoreProcessorFeignClient {
 
     @PostMapping(value = "/flash-sale-event/query")
-    Mono<ResponseEntity<Mono<ResponseObjectFromInnerSystem>>> getFlashSaleEventInfo(@RequestHeader(value = "myUUID") String myUUID, @RequestBody JsonNode param);
+    Mono<ResponseEntity<Mono<InnerCommunicationDto>>> getFlashSaleEventInfo(@RequestHeader(value = "myUUID") String myUUID, @RequestBody JsonNode param);
 
 }
