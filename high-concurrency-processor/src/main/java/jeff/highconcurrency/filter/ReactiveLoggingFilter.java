@@ -49,9 +49,9 @@ public class ReactiveLoggingFilter implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        MyServerWebExchangeDecoratorWrapper exchangeWrapper = (MyServerWebExchangeDecoratorWrapper) exchange;
+        return chain.filter(exchange).doFinally((se) -> { // 使用doFinally，無論前面的流操作是成功、失敗、取消，都會執行。
+            MyServerWebExchangeDecoratorWrapper exchangeWrapper = (MyServerWebExchangeDecoratorWrapper) exchange;
 
-        return chain.filter(exchangeWrapper).doFinally((se) -> { // 使用doFinally，無論前面的流操作是成功、失敗、取消，都會執行。
             try {
                 this.logReqAndRes(exchangeWrapper.getRequest(), exchangeWrapper.getResponse(), exchangeWrapper.getAttribute("myContext"));
             } catch (IOException e) {

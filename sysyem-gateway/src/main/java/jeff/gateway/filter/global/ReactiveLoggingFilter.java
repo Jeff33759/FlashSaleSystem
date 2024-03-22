@@ -52,11 +52,11 @@ public class ReactiveLoggingFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        MyServerWebExchangeDecoratorWrapper exchangeWrapper = (MyServerWebExchangeDecoratorWrapper) exchange;
-
-        return chain.filter(exchangeWrapper).doFinally((signalType) -> { // 使用doFinally，無論前面的流操作是成功、失敗、取消，都會執行，且會在流的最後才執行，而不是在filter post logic的當下就執行。
+        return chain.filter(exchange).doFinally((signalType) -> { // 使用doFinally，無論前面的流操作是成功、失敗、取消，都會執行，且會在流的最後才執行，而不是在filter post logic的當下就執行。
 
             if(signalType == SignalType.ON_COMPLETE) { //前面的流沒有發生任何異常(例如timeout等等)
+                MyServerWebExchangeDecoratorWrapper exchangeWrapper = (MyServerWebExchangeDecoratorWrapper) exchange;
+
                 try {
                     this.logReqAndRes(exchangeWrapper.getRequest(), exchangeWrapper.getResponse(), exchangeWrapper.getAttribute("myContext"));
                 } catch (IOException e) {
