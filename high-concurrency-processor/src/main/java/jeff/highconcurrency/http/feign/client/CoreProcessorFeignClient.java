@@ -17,7 +17,6 @@ import reactor.core.publisher.Mono;
 @Component
 @ReactiveFeignClient(
         name = "core-processor", //如果開啟負載均衡模式，那麼這個名字要和你要打過去的服務集群名稱一樣(或者說要跟該集群註冊進服務治理中心的名稱一樣)
-        path = "/inner",
         configuration = ReactiveFeignConfigForCoreProcessor.class
 )
 public interface CoreProcessorFeignClient {
