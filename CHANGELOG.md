@@ -8,6 +8,8 @@
 - 系統所有API，對外統一回應狀態碼200(做在gateway)
 - UUID統一由gateway生成
 - 各應用的dev模式，設定logging等級為debug
+- gateway整合resilience4j
+- gateway filter/error handler客製化，當接到下游Server非2XX狀態碼，也可以累加斷路器
 
 ### Changed
 - 微服務之間溝通，當下游Server遭遇非預期錯誤時，回應Http狀態碼為非2XX，預期內錯誤則回200。兩者差別在於會不會觸發上游Server的斷路器。

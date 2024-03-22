@@ -36,14 +36,22 @@ spring.cloud.gateway:
     connect-timeout: 1000 #must be specified in milliseconds
     response-timeout: 5s #可以當成是read-timeout。must be specified as a java.time.Duration
 
-  routes: #Api路由的設置
-    - id: core-prosessor-router #路由器的ID，須為唯一值。
-      predicates: #本路由器的斷言配置。當打進來的請求路徑匹配時，由本路由器來處理後續路由。
-        ##會寫在這裡的，都是對系統外部開放的Api。##
-        - Path=/order/normal, /finish-order, /sale-event/update-state, /flash-sale-event/close
-      uri: lb://core-processor #路由的位址。lb開頭打開負載均衡功能(ReactiveLoadBalancerClientFilter)，會根據從服務註冊中心拿到core-processor服務集群的實例列表，以某種策略去訪問實例位址，預設策略為輪詢。
 
-    - id: high-concurrency-processor-router
-      predicates:
-        - Path=/order/flash, /flash-sale-event/query/**
-      uri: lb://high-concurrency-processor
+####【服務降級、融斷、限流配置(不同環境可能要有不同的配置)】 ####
+###以下配置要根據下游Server的熔斷配置，去決定參數。最上游Server設成比較不容易觸發熔斷###
+## 斷路器配置 ##
+my.circuitbreaker.configs: #針對環境與不同router去寫不同的斷路器配置，再用java config去註冊實例。參考MyFaultToleranceComponentConfig
+  high-concurrency-processor-cb-config:
+    failureRateThreshold: 70 #故障率閥值，預設50(%)。當總請求數到達minimumNumberOfCalls，且錯誤請求占比>=此閥值，則打開斷路器
+    slowCallRateThreshold: 50 #慢調用閥值，預設100(%)。當調用執行時間大於slowCallDurationThreshold則視為慢調用。當慢調用的百分比>=此閥值，則打開斷路器
+    slowCallDurationThreshold: ${spring.cloud.gateway.httpclient.response-timeout} #多長時間視為慢調用。有些router是沒設CB的，所以不能只有設這個而沒設HttpClientResponseTimeout。
+    minimumNumberOfCalls: 20 #觸發"計算錯誤率或者慢調用"所必須滿足的調用數，預設100。如果調用數<此設置，則即使錯誤或慢調用占比100%也不會打開斷路器(畢竟根本沒觸發計算)
+    slidingWindowSize: 20 #配置當斷路器關閉時，記錄呼叫結果時所使用的滑動視窗的大小。根據窗口類型，單位可能是秒或者調用次數，預設100。可以簡單理解為，當觸發計算時，要抓取幾筆資料來計算? 這裡就是在設置那個範圍。例如類型為COUNT_BASED，大小100，那就是每當被觸發計算，都會抓過去最近的100個請求來計算占比，決定斷路器是否開啟。
+    slidingWindowType: COUNT_BASED #滑動窗口類型，預設COUNT_BASED。
+    permittedNumberOfCallsInHalfOpenState: 10 #半開狀態允許的最大請求數，預設10。在半開狀態下，斷路器將允許最多XX個請求通過去執行業務邏輯，超過則直接fallback。如果XX個請求中，錯誤占比又超過閥值，則斷路器將重新進入開啟狀態。
+    waitDurationInOpenState: 10s #開啟斷路的保持時間。當斷路器開啟斷路，會等待此時間過去後，轉為半開狀態。預設60000(ms)
+    #      maxWaitDurationInHalfOpenState: 0 #半開狀態的保持時間，預設為0，就是不限時間。只有當接收到permittedNumberOfCallsInHalfOpenState個請求，再依照錯誤占比去切換斷路器狀態，不然會一直維持半開。
+    automaticTransitionFromOpenToHalfOpenEnabled: true #是否啟用"自動從開啟狀態過渡到半開狀態"，預設值為false。如果啟用，斷路器將在時間到後，自動從開啟狀態過渡到半開狀態，缺點是為了實現自動的這件事，會在程式啟動時多建立一個執行緒去監聽各斷路器實例；否則，需要手動呼叫斷路器的transitionToHalfOpen方法。
+    recordExceptions: #異常列表，只有指定的異常和其子類，才會認為調用失敗；其它異常會被認為是調用成功，除非指定了ignoreExceptions
+      - java.lang.Exception
+    timeoutDuration: ${spring.cloud.gateway.httpclient.response-timeout} #設置執行超時(超過這時間，就中斷操作，拋TimeoutException。和HttpClient的responseTimeout不同的是，斷路器的執行時間，是方法級別，跟HttpClient是兩回事，所以若方法內部的DAO阻塞，那這個超時也可以作用)

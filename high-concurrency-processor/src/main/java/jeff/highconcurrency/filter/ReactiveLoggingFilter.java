@@ -26,7 +26,7 @@ import java.util.Set;
 
 /**
  * 紀錄請求參數與回應的過濾器。
- * 通常會是過濾鏈中的最後一層，所以到這裡的時候，MyRequestContext裡面該有的東西都會被賦值了，所以也可以進行log了。
+ * 通常會是自製過濾鏈中的最後一層，所以到這裡的時候，MyRequestContext裡面該有的東西都會被賦值了，所以也可以進行log了。
  * 但因為目前還沒實作登入認證，所以到這一層的時候MyRequestContext的AuthenticatedMemberId會是null。
  */
 @Slf4j
@@ -51,7 +51,7 @@ public class ReactiveLoggingFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         MyServerWebExchangeDecoratorWrapper exchangeWrapper = (MyServerWebExchangeDecoratorWrapper) exchange;
 
-        return chain.filter(exchangeWrapper).doFinally((se) -> { // 使用doFinally，無論流的操作是成功、失敗、取消，都會執行。
+        return chain.filter(exchangeWrapper).doFinally((se) -> { // 使用doFinally，無論前面的流操作是成功、失敗、取消，都會執行。
             try {
                 this.logReqAndRes(exchangeWrapper.getRequest(), exchangeWrapper.getResponse(), exchangeWrapper.getAttribute("myContext"));
             } catch (IOException e) {
@@ -63,9 +63,8 @@ public class ReactiveLoggingFilter implements WebFilter {
     /**
      * 印出API的請求、回應資訊。
      *
-     * WebFlux可能沒法像core-processor的LoggingFilter一樣，在進入controller前先印請求。
-     * 目前只能夠做到在controller處理完時，印出請求和回應。
-     *
+     * TODO WebFlux要像core-processor的LoggingFilter一樣，在進入controller前先印請求，很麻煩，需要在過濾鏈讀取reqBody的流。讀取後還要把流重置讓後面的可以再讀一次，因為控制器預設就是讀流。
+     * TODO 先做成在controller處理完時，印出請求和回應。
      */
     private void logReqAndRes(MyServerHttpRequestDecoratorWrapper reqWrapper, MyServerHttpResponseDecoratorWrapper resWrapper, MyRequestContext myContext) throws IOException {
 
@@ -77,13 +76,14 @@ public class ReactiveLoggingFilter implements WebFilter {
                 log,
                 logUtil.composeLogPrefixForBusiness(myContext.getAuthenticatedMemberId(), myContext.getUUID()),
                 String.format(
-                        "The info of request, clientIP: %s, method: %s, path: %s, queryString: %s, body: %s. The info of response, body: %s",
+                        "The info of request, clientIP: %s, method: %s, path: %s, queryString: %s, body: %s. The info of response, status:%s, body: %s",
                         reqWrapper.getRemoteAddress(),
                         reqWrapper.getMethod(),
                         reqWrapper.getPath(),
                         this.decodeQueryString(reqWrapper.getURI().getRawQuery()), // 會回傳沒經過編碼的原始字串，例如空白鍵不會被轉譯成%20
                         reqWrapper.getBodyDataAsString(),
-                        this.decodeQueryString(resWrapper.getBodyDataAsString())
+                        resWrapper.getRawStatusCode(),
+                        resWrapper.getBodyDataAsString()
                 )
         );
     }

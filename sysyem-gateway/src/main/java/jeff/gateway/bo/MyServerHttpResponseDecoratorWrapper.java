@@ -1,6 +1,8 @@
 package jeff.gateway.bo;
 
+import jeff.gateway.filter.global.ReactiveLoggingFilter;
 import org.reactivestreams.Publisher;
+import org.springframework.cloud.gateway.filter.NettyWriteResponseFilter;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.http.server.reactive.ServerHttpResponseDecorator;
@@ -32,7 +34,18 @@ public class MyServerHttpResponseDecoratorWrapper extends ServerHttpResponseDeco
         );
     }
 
+    /**
+     * Gateway和Circuitbreaker的整合沒有很好，當收到下游Server狀態碼非2XX，觸發轉址fallBackUri時，會呼叫到兩次writeWith。
+     * 第一次是fallbackUri接口某個環節呼叫，第二次是經過{@link NettyWriteResponseFilter}又呼叫一次，造成在{@link ReactiveLoggingFilter}印log時印到了兩個body。
+     * 第二次writeWith的時候，response已經是committed的狀態，代表客戶端已經收到回應了，所以第二次的writeWith其實是沒有意義的。
+     * 要想取消第二次writeWith的行為，可能要去覆寫{@link NettyWriteResponseFilter#filter}，但太麻煩了，所以直接在這裡加個判斷。
+     * 如果已經被committed，那就不要把body寫進resBodyBuilder，讓{@link ReactiveLoggingFilter}取值正常。
+     */
     private void appendResDataBufferToStringBuilder(DataBuffer buffer) {
+        if(this.getDelegate().isCommitted()) {
+            return;
+        }
+
         this.resBodyBuilder.append(StandardCharsets.UTF_8.decode(buffer.asByteBuffer()).toString());
     }
 

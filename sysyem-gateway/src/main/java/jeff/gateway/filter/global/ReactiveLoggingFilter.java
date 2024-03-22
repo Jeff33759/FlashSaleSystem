@@ -18,6 +18,7 @@ import org.springframework.core.Ordered;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SignalType;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -28,7 +29,7 @@ import java.util.Set;
 
 /**
  * 紀錄請求參數與回應的過濾器。
- * 通常會是過濾鏈中的最後一層，所以到這裡的時候，MyRequestContext裡面該有的東西都會被賦值了，所以也可以進行log了。
+ * 通常會是自製過濾鏈中的最後一層，所以到這裡的時候，MyRequestContext裡面該有的東西都會被賦值了，所以也可以進行log了。
  * 但因為目前還沒實作登入認證，所以到這一層的時候MyRequestContext的AuthenticatedMemberId會是null。
  */
 @Slf4j
@@ -48,23 +49,32 @@ public class ReactiveLoggingFilter implements GlobalFilter, Ordered {
                     "/actuator/health" //actuator套件的健康檢測接口，consul會一直發Get過來監測伺服器健康度
             }));
 
+
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         MyServerWebExchangeDecoratorWrapper exchangeWrapper = (MyServerWebExchangeDecoratorWrapper) exchange;
 
-        return chain.filter(exchangeWrapper).doFinally((se) -> { // 使用doFinally，無論流的操作是成功、失敗、取消，都會執行。
-            try {
-                this.logReqAndRes(exchangeWrapper.getRequest(), exchangeWrapper.getResponse(), exchangeWrapper.getAttribute("myContext"));
-            } catch (IOException e) {
-                new MyException("Some error occur when logging api info", e);
+        return chain.filter(exchangeWrapper).doFinally((signalType) -> { // 使用doFinally，無論前面的流操作是成功、失敗、取消，都會執行，且會在流的最後才執行，而不是在filter post logic的當下就執行。
+
+            if(signalType == SignalType.ON_COMPLETE) { //前面的流沒有發生任何異常(例如timeout等等)
+                try {
+                    this.logReqAndRes(exchangeWrapper.getRequest(), exchangeWrapper.getResponse(), exchangeWrapper.getAttribute("myContext"));
+                } catch (IOException e) {
+                    new MyException("Some error occur when logging api info", e);
+                }
             }
+
+            // 當遭遇timeout，因為在NettyRoutingFilter時發布Mono.error了，所以到這裡的Mono是error的
+            // 只有前面的流都沒異常，才印log，錯誤的情況，則由Handler那邊去處理並log
         });
     }
 
     /**
      * 印出API的請求、回應資訊。
      *
-     * 當HttpClient遭遇例外，跑進{@link MyGatewayGlobalExceptionHandler#handle}時，這裡獲取response的body會為空，原因要再看下源碼。
+     * 因為是寫在doFinally，不管前面流結果怎樣，都會跑此方法。
+     * 當HttpClient遭遇錯誤時，例如readTimeout，那會造成resWrapper.getBodyDataAsString()取到空值。因為{@link NettyWriteResponseFilter}不會在Mono.error時，做writeWith。
+     * 因此當遭遇readTimeout時，改由後續的{@link MyGatewayGlobalExceptionHandler}來logging。
      */
     private void logReqAndRes(MyServerHttpRequestDecoratorWrapper reqWrapper, MyServerHttpResponseDecoratorWrapper resWrapper, MyRequestContext myContext) throws IOException {
 
@@ -74,15 +84,16 @@ public class ReactiveLoggingFilter implements GlobalFilter, Ordered {
 
         logUtil.logDebug( //gateway為最上游的節點，會乘載大量請求，所以指定為debug級別供開發使用
                 log,
-                logUtil.composeLogPrefixForBusiness(myContext.getAuthenticatedMemberId(), myContext.getUUID()),
+                logUtil.composeLogPrefixForBusiness(null, myContext.getUUID()),
                 String.format(
-                        "The info of request, clientIP: %s, method: %s, path: %s, queryString: %s, body: %s. The info of response, body: %s",
+                        "The info of request, clientIP: %s, method: %s, path: %s, queryString: %s, body: %s. The info of response, status: %s, body: %s",
                         reqWrapper.getRemoteAddress(),
                         reqWrapper.getMethod(),
                         reqWrapper.getPath(),
                         this.decodeQueryString(reqWrapper.getURI().getRawQuery()), // 會回傳沒經過編碼的原始字串，例如空白鍵不會被轉譯成%20
                         reqWrapper.getBodyDataAsString(),
-                        this.decodeQueryString(resWrapper.getBodyDataAsString())
+                        resWrapper.getRawStatusCode(),
+                        resWrapper.getBodyDataAsString()
                 )
         );
     }
@@ -97,7 +108,7 @@ public class ReactiveLoggingFilter implements GlobalFilter, Ordered {
 
 
     /**
-     * 這個順序要小於{@link NettyWriteResponseFilter}，responseBody才會取的到東西，才印得到log。
+     * 順序要小於{@link NettyWriteResponseFilter}，正常情況下{@link MyServerHttpResponseDecoratorWrapper#getBodyDataAsString()}才會取得到東西，因為要先有人呼叫writeWith。
      */
     @Override
     public int getOrder() {
