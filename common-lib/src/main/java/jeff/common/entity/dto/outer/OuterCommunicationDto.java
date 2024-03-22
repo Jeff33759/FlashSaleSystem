@@ -1,4 +1,4 @@
-package jeff.common.entity.dto.send;
+package jeff.common.entity.dto.outer;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
@@ -13,7 +13,7 @@ import java.io.Serializable;
  */
 @AllArgsConstructor
 @Getter //加上getter，SpringBoot才可以利用Jackson對此物件進行序列化，否則會跳HttpMessageNotWritableException
-public class ResponseObject implements Serializable {
+public class OuterCommunicationDto implements Serializable {
 
     private int code;
 

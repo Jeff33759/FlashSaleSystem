@@ -5,7 +5,7 @@
     <parent>
         <artifactId>my-flashsale-system</artifactId>
         <groupId>jeff.flash</groupId>
-        <version>0.9.1-SNAPSHOT</version>
+        <version>0.9.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -23,7 +23,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webflux</artifactId>
         </dependency>
-        <dependency> <!-- 非同步響應式服務降級方案 -->
+        <dependency> <!-- 非同步響應式系統容錯方案 -->
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
         </dependency>
@@ -61,18 +61,18 @@
         <dependency> <!-- 共用包 -->
             <groupId>jeff.flash</groupId>
             <artifactId>common-lib</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
         </dependency>
         <dependency> <!-- 測試工具包 -->
             <groupId>jeff.flash</groupId>
             <artifactId>my-test-lib</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
             <scope>test</scope> <!-- 設為test，此函式庫專門用於測試，不會打包 -->
         </dependency>
         <dependency> <!-- MQ相關 -->
             <groupId>jeff.flash</groupId>
             <artifactId>my-mq-lib</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
         </dependency>
 
     </dependencies>

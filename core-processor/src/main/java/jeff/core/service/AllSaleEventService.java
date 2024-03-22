@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.bo.MyRequestContext;
-import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
+import jeff.common.entity.dto.inner.InnerCommunicationDto;
 import jeff.common.exception.MyNotFoundException;
 import jeff.persistent.model.mongo.dao.FlashSaleEventLogRepo;
 import jeff.persistent.model.mysql.dao.FlashSaleEventDAO;
@@ -46,10 +46,10 @@ public class AllSaleEventService {
      *
      * @param {"se_id":1,"is_public":false}
      */
-    public ResponseObjectFromInnerSystem updateStateOfNormalSaleEvent(JsonNode param, MyRequestContext context) {
+    public InnerCommunicationDto updateStateOfNormalSaleEvent(JsonNode param, MyRequestContext context) {
         saleEventDAO.updateStateById(param.get("se_id").asInt(), param.get("is_public").asBoolean());
 
-        return new ResponseObjectFromInnerSystem(ResponseCode.Success.getCode(), objectMapper.createObjectNode(), "The state of sale-event updated successfully.");
+        return new InnerCommunicationDto(ResponseCode.Success.getCode(), objectMapper.createObjectNode(), "The state of sale-event updated successfully.");
     }
 
     /**
@@ -61,7 +61,7 @@ public class AllSaleEventService {
      *
      * @param {"fse_id":1}
      */
-    public ResponseObjectFromInnerSystem closeFlashSaleEvent(JsonNode param, MyRequestContext context) {
+    public InnerCommunicationDto closeFlashSaleEvent(JsonNode param, MyRequestContext context) {
         int fseId = param.get("fse_id").asInt();
 
 //      1、更改MySQL的狀態為已下架
@@ -73,7 +73,7 @@ public class AllSaleEventService {
 //      3、清掉mongo裡面is_consumed=false的資料
         flashSaleEventLogRepo.deleteByFseIdAndIsConsumed(fseId, false);
 
-        return new ResponseObjectFromInnerSystem(ResponseCode.Success.getCode(), objectMapper.createObjectNode(), "The flash-sale-event removed successfully.");
+        return new InnerCommunicationDto(ResponseCode.Success.getCode(), objectMapper.createObjectNode(), "The flash-sale-event removed successfully.");
     }
 
     /**
@@ -82,7 +82,7 @@ public class AllSaleEventService {
      *
      * @param {"fse_id":1}
      */
-    public ResponseObjectFromInnerSystem getCacheOfFlashSaleEventInfo(JsonNode param, MyRequestContext context) {
+    public InnerCommunicationDto getCacheOfFlashSaleEventInfo(JsonNode param, MyRequestContext context) {
         int fseId = param.get("fse_id").asInt();
 
 //      1、從redis撈資料
@@ -110,7 +110,7 @@ public class AllSaleEventService {
             return flashSaleEventInfoToBeCached;
         });
 
-        return new ResponseObjectFromInnerSystem(ResponseCode.Success.getCode(), flashSaleEventInfo, "Query data successfully.");
+        return new InnerCommunicationDto(ResponseCode.Success.getCode(), flashSaleEventInfo, "Query data successfully.");
     }
 
 

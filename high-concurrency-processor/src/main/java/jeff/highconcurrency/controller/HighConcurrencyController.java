@@ -5,8 +5,7 @@ import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jeff.common.consts.DemoMember;
 import jeff.common.entity.bo.MyRequestContext;
-import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
-import jeff.common.exception.MyException;
+import jeff.common.entity.dto.inner.InnerCommunicationDto;
 import jeff.common.exception.BusyException;
 import jeff.highconcurrency.entity.bo.MyServerWebExchangeDecoratorWrapper;
 import jeff.highconcurrency.service.FlashSaleEventService;
@@ -33,7 +32,7 @@ public class HighConcurrencyController {
     /**
      * 因為fallback的情況可能會一瞬間做很多次，而BusyException也沒要特別再針對場景包不同的cause，所以用同實例，就不用每次都new了。
      */
-    private BusyException busyExceptionForFallback = new BusyException("Server is busy, please try again later");
+    private BusyException busyExceptionForFallback = new BusyException("Server is busy, please try again later.");
 
     /**
      * 客戶端快閃銷售案件的商品下單時的接口。
@@ -43,7 +42,7 @@ public class HighConcurrencyController {
      */
     @PostMapping("/order/flash")
     @RateLimiter(name = "fse-order-creation-rl", fallbackMethod = "createAnOrderFromFlashSalesEventFallback")
-    public Mono<ResponseEntity<ResponseObjectFromInnerSystem>> createAnOrderFromFlashSalesEvent(MyServerWebExchangeDecoratorWrapper serverWebExchange, @RequestBody JsonNode param) throws MyException {
+    public Mono<ResponseEntity<InnerCommunicationDto>> createAnOrderFromFlashSalesEvent(MyServerWebExchangeDecoratorWrapper serverWebExchange, @RequestBody JsonNode param) {
         MyRequestContext myReqContext = serverWebExchange.getAttribute("myContext");
         myReqContext.setAuthenticatedMemberId(DemoMember.CUSTOMER.getId()); // TODO 此API的請求者就是買家，目前先寫死，所以前端也不用傳這個參數
 
@@ -57,7 +56,7 @@ public class HighConcurrencyController {
      * 會由high-concurrency-processor來承接請求，並做為上游Server打請求到core-processor要資料，core-processor做為下游Server提供資料。
      */
     @GetMapping("/flash-sale-event/query/{fse_id}")
-    public Mono<ResponseEntity<Mono<ResponseObjectFromInnerSystem>>> getFlashSaleEventInfo(MyServerWebExchangeDecoratorWrapper serverWebExchange, @PathVariable("fse_id") int fseId) throws MyException {
+    public Mono<ResponseEntity<Mono<InnerCommunicationDto>>> getFlashSaleEventInfo(MyServerWebExchangeDecoratorWrapper serverWebExchange, @PathVariable("fse_id") int fseId) {
         MyRequestContext myReqContext = serverWebExchange.getAttribute("myContext");
 
         return flashSaleEventService.getFlashSaleEventInfo(fseId, myReqContext);
@@ -68,7 +67,7 @@ public class HighConcurrencyController {
      *
      * 這裡直接拋例外，讓AOP那裡去統一處理。
      */
-    private Mono<ResponseEntity<ResponseObjectFromInnerSystem>> createAnOrderFromFlashSalesEventFallback(MyServerWebExchangeDecoratorWrapper serverWebExchange, JsonNode param, Exception e) throws Exception {
+    private Mono<ResponseEntity<InnerCommunicationDto>> createAnOrderFromFlashSalesEventFallback(MyServerWebExchangeDecoratorWrapper serverWebExchange, JsonNode param, Exception e) throws Exception {
         if (e instanceof RequestNotPermitted) { // 如果是限流觸發時就會拋此例外，處理成自己的例外
             throw this.busyExceptionForFallback;
         }

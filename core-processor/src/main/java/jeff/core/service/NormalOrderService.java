@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import jeff.common.consts.ResponseCode;
 import jeff.common.entity.bo.MyContext;
 import jeff.common.entity.bo.MyRequestContext;
-import jeff.common.entity.dto.receive.ResponseObjectFromInnerSystem;
+import jeff.common.entity.dto.inner.InnerCommunicationDto;
 import jeff.common.interfaces.IOrderService;
 import jeff.common.util.LogUtil;
 import jeff.core.entity.bo.OrderCreationFlowContext;
@@ -44,7 +44,7 @@ public class NormalOrderService implements IOrderService {
      * @param context 實際上應是MyRequestContext的實例
      */
     @Override
-    public ResponseObjectFromInnerSystem createOrder(JsonNode param, MyContext context) throws OrderException {
+    public InnerCommunicationDto createOrder(JsonNode param, MyContext context) throws OrderException {
         MyRequestContext reqContext = (MyRequestContext) context;
 
         OrderCreationFlowContext orderCreationFlowContext = generateContextForOrderCreationFlowByParam(param, reqContext); // 這個context是for訂單流程的，作用域跟MyRequestContext不同
@@ -52,7 +52,7 @@ public class NormalOrderService implements IOrderService {
         try{
             int newOrderId = orderManager.startOrderCreationFlow(orderCreationFlowContext);
 
-            return new ResponseObjectFromInnerSystem(ResponseCode.Success.getCode(), objectMapper.createObjectNode().put("oId",newOrderId), "Order created successfully.");
+            return new InnerCommunicationDto(ResponseCode.Success.getCode(), objectMapper.createObjectNode().put("oId",newOrderId), "Order created successfully.");
         } catch (DataAccessException dae) { //Spring JDBC當操作DB遇到問題時會拋出的例外的基類，先印log後，統一包裝成OrderException
             logUtil.logWarn(
                     log,
@@ -71,13 +71,13 @@ public class NormalOrderService implements IOrderService {
      * @param param 範例資料: {"o_id":1}
      */
     @Override
-    public ResponseObjectFromInnerSystem finishOrder(JsonNode param, MyContext context) {
+    public InnerCommunicationDto finishOrder(JsonNode param, MyContext context) {
         MyRequestContext reqContext = (MyRequestContext) context;
 
         int oId = param.get("o_id").asInt();
         orderManager.startOrderFinishFlow(oId, reqContext);
 
-        return new ResponseObjectFromInnerSystem(ResponseCode.Success.getCode(), objectMapper.createObjectNode().put("o_id", oId), "Order completed successfully.");
+        return new InnerCommunicationDto(ResponseCode.Success.getCode(), objectMapper.createObjectNode().put("o_id", oId), "Order completed successfully.");
     }
 
     /**

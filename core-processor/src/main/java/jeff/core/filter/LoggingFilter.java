@@ -4,6 +4,7 @@ package jeff.core.filter;
 import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.util.LogUtil;
 import jeff.core.entity.bo.MyContentCachingReqWrapper;
+import jeff.core.filter.consts.FilterOrderNumberConst;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -89,7 +90,8 @@ public class LoggingFilter extends OncePerRequestFilter {
                 log,
                 logUtil.composeLogPrefixForBusiness(myContext.getAuthenticatedMemberId(), myContext.getUUID()),
                 String.format(
-                        "The info of response, body: %s",
+                        "The info of response, status: %s, body: %s",
+                        resWrapper.getStatus(),
                         convertContentByteArrToUTF8String(resWrapper.getContentAsByteArray()) //要放在doFilter下面，getContentAsByteArray才有東西，因為getContentAsByteArray是獲取快取的資料，而快取要在原本的Stream被消耗後才會快取進去。
                 )
         );

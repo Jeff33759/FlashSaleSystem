@@ -5,7 +5,7 @@
     <parent>
         <artifactId>my-flashsale-system</artifactId>
         <groupId>jeff.flash</groupId>
-        <version>0.9.1-SNAPSHOT</version>
+        <version>0.9.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -24,7 +24,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
-        <dependency> <!-- 服務降級方案 -->
+        <dependency> <!-- 系統容錯方案 -->
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
         </dependency>
@@ -44,22 +44,22 @@
         <dependency> <!-- DB相關 -->
             <groupId>jeff.flash</groupId>
             <artifactId>my-double-datasource-api</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
         </dependency>
         <dependency> <!-- Redis相關 -->
             <groupId>jeff.flash</groupId>
             <artifactId>my-redis-api</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
         </dependency>
         <dependency> <!-- MQ相關 -->
             <groupId>jeff.flash</groupId>
             <artifactId>my-mq-lib</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
         </dependency>
         <dependency> <!-- 共用包 -->
             <groupId>jeff.flash</groupId>
             <artifactId>common-lib</artifactId>
-            <version>0.9.1-SNAPSHOT</version>
+            <version>0.9.1</version>
         </dependency>
 
     </dependencies>
