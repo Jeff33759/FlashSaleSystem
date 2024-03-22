@@ -1,6 +1,6 @@
 # 更新日誌
 
-## [Unreleased]
+## [0.9.1] - 2024-03-22
 
 ### Added
 - 當high-concurrency-processor調用下游Server時，遭遇readTimeout的處理
