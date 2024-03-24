@@ -22,7 +22,6 @@ import java.net.URI;
 /**
  * 斷路器或限流器觸發時的fallback轉址接口。
  */
-@Slf4j
 @RestController
 @RequestMapping(produces = org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
 public class FallbackController {

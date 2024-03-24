@@ -12,7 +12,6 @@ import jeff.persistent.model.mysql.dao.FlashSaleEventDAO;
 import jeff.persistent.model.mysql.dao.SaleEventDAO;
 import jeff.persistent.model.mysql.po.FlashSaleEvent;
 import jeff.redis.util.MyRedisUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.time.Instant;
@@ -20,7 +19,6 @@ import java.time.Instant;
 /**
  * 所有類型的銷售案件相關的服務器，包括一般銷售案件和快閃銷售案件。
  */
-@Slf4j
 @Service
 public class AllSaleEventService {
 

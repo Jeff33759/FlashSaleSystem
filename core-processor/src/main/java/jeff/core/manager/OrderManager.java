@@ -10,7 +10,6 @@ import jeff.persistent.model.mysql.po.Goods;
 import jeff.persistent.model.mysql.po.Members;
 import jeff.persistent.model.mysql.po.Orders;
 import jeff.persistent.model.mysql.po.OrdersDetail;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Component;
@@ -22,7 +21,6 @@ import java.util.*;
 /**
  * OrderService與相關DAO的中間層，讓業務邏輯別下沉到DAO。
  */
-@Slf4j
 @Component
 public class OrderManager {
 

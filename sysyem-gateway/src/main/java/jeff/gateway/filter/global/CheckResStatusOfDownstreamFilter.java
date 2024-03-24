@@ -18,7 +18,6 @@ import reactor.core.publisher.Mono;
 /**
  * 檢查從下游Server回傳的狀態碼是否合乎預期。
  */
-@Slf4j
 @Component
 public class CheckResStatusOfDownstreamFilter implements GlobalFilter, Ordered {
 
