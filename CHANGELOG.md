@@ -2,6 +2,9 @@
 
 ## [Unreleased]
 
+### Added
+- 各服務當dev模式時，log寫入路徑為./my-log
+
 ## [0.9.1] - 2024-03-22
 
 ### Added

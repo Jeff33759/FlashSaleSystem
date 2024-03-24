@@ -7,10 +7,12 @@ app:
     hostname: localhost #實例所在主機的對外位址(或域名)。多個實例放於不同機器的話，要在啟動命令用-Dapp.instance.hostname指定。
     name: Core01 #若要啟動多個實例，記得啟動命令要指定此參數，"-Dapp.instance.name"，否則預設Core01
 
-####【日誌等級】####
+####【日誌配置】####
 logging:
-  level:
+  level: #日誌等級
     jeff: debug #設定jeff目錄底下的所有class的日誌等級
+  file: #output配置
+    name: ./my-log/${app.instance.name}
 
 ####【系統容錯配置(不同環境可能要有不同的配置)】 ####
 ### 官方文件: https://resilience4j.readme.io/v1.7.0/docs/getting-started，本應用使用版本為v1.7.0 ###
