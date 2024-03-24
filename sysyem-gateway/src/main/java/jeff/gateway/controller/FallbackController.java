@@ -4,7 +4,6 @@ import jeff.common.entity.bo.MyRequestContext;
 import jeff.common.entity.dto.outer.OuterCommunicationDto;
 import jeff.common.exception.MyException;
 import jeff.gateway.util.MyOuterHttpCommunicationUtil;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.NettyRoutingFilter;
 import org.springframework.cloud.gateway.filter.factory.FallbackHeadersGatewayFilterFactory;
