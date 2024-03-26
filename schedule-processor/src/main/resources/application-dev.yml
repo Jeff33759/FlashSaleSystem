@@ -11,5 +11,4 @@ app:
 logging:
   level: #日誌等級
     jeff: debug #設定jeff目錄底下的所有class的日誌等級
-  file: #output配置
-    name: ./my-log/${app.instance.name}.log
+  config: classpath:log4j2-dev.xml #log的配置檔去哪抓

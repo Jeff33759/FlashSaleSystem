@@ -21,6 +21,10 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-gateway</artifactId>
         </dependency>
+        <dependency> <!-- logging框架，效能比logback好 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
         <dependency> <!-- 非同步響應式系統容錯方案 -->
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
@@ -28,6 +32,12 @@
         <dependency> <!-- spring-boot-starter-webflux裡面沒有含webMvc，而aop是被包在webMvc的。所以這裡手動引入aop，讓resilience4j的@可以生效 -->
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId> <!-- 預設用logback作為日誌輸出，因想替換為log4j2，所以排除 -->
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency> <!-- 服務治理方案(網關本身也是個服務，需要訪問其他服務集群，所以需要註冊) -->
             <groupId>org.springframework.cloud</groupId>
