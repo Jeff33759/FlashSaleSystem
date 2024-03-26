@@ -4,6 +4,7 @@
 
 ### Added
 - 各服務當dev模式時，log寫入路徑為./my-log
+- SLF4J實作替換為log4j2(比Spring預設的logback效能還要好)
 
 ## [0.9.1] - 2024-03-22
 
