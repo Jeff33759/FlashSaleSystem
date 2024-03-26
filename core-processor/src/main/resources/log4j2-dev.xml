@@ -9,6 +9,7 @@
     <!-- 定義變數 -->
     <Properties>
         <property name="myPattern">[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%-5level] [%thread] [%class] - %message%n</property>
+        <property name="myPath">./my-log/core-processor/</property>
         <property name="myFileName">coreLog</property>
     </Properties>
 
