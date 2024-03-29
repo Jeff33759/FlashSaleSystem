@@ -4,7 +4,6 @@ import jeff.common.exception.MyInnerCommunicationStatusFailureException;
 import jeff.common.util.MyHttpCommunicationUtil;
 import jeff.gateway.filter.global.consts.GatewayGlobalFilterOrderNumberConst;
 import jeff.gateway.handler.MyGatewayGlobalExceptionHandler;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -18,7 +17,6 @@ import reactor.core.publisher.Mono;
 /**
  * 檢查從下游Server回傳的狀態碼是否合乎預期。
  */
-@Slf4j
 @Component
 public class CheckResStatusOfDownstreamFilter implements GlobalFilter, Ordered {
 

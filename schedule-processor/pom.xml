@@ -19,8 +19,18 @@
     <dependencies>
         <!-- web相關 -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
+            <groupId>org.springframework.boot</groupId> <!-- 預設容器為Tomcat -->
             <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId> <!-- 預設用logback作為日誌輸出，因想替換為log4j2，所以排除 -->
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency> <!-- logging框架，效能比logback好 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
         <dependency> <!-- 資源文件的加載與解析，要讓bootstrap.yml認得@@佔位符，就要用這個。(如果之後要引入配置中心，那這個依賴可能要拿掉，也許會有版本衝突。) -->
             <groupId>org.springframework.cloud</groupId>

@@ -1,7 +1,6 @@
 package jeff.persistent;
 
 import jeff.persistent.service.InitService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Component;
 /**
  * 在各應用啟動後，根據環境去決定是否要做一些例如初始化DB資料的行為。
  */
-@Slf4j
 @Component
 public class DataSourceRunner implements CommandLineRunner {
 
