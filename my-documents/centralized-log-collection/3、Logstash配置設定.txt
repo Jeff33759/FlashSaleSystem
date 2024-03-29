@@ -1,0 +1,50 @@
+input {
+    beats { #有幾個beat輸入源，就要寫幾個beats{}
+        port => "5044" #設定LS用哪一個port監聽資料，要跟file beats那邊的output設定匹配
+    }
+}
+
+filter { #過濾鏈，把純文字的log格式化，優化ES查詢
+
+    grok { #把FileBeats蒐集過來的JSON資料，取其中的message欄位(其為LOG本體)，將LOG本體再依照正則表達式拆成幾個欄位，優化ES查詢
+        match => { "message" => "\[%{TIMESTAMP_ISO8601:logTimestamp:date}\] \[%{DATA:logLevel}\] \[%{DATA:threadName}\] \[%{DATA:className}\] - \[%{DATA:logType}\]\[%{DATA:appType}\]\[%{DATA:appInstanceId}\]%{GREEDYDATA:logDetail}" }
+    }
+
+    date { #將上面的logTimestamp欄位，解析成期望的時間格式，並且賦值到之後要傳給ES的JSON的@timestamp欄位，ES排序LOG時，就是依照@timestamp排序。有時候LOG產生時間跟LS推到ES的時間不一樣，造成LOG順序亂掉，這樣做可以確保LOG排序=LOG生成順序。logTimestamp需要帶時區(去log4j2.xml設置)，這個過濾器要轉成某些時區時，才知道要增減多少小時。
+        match => [ "logTimestamp", "ISO8601" ]
+        timezone => "Etc/UTC"
+        target => "@timestamp"
+    }
+
+    mutate{ #將多餘的欄位幹掉，節省LS->ES的傳輸量
+      remove_field => "message"
+    }
+
+}
+
+output {
+  elasticsearch {
+    hosts => ["http://localhost:9200"]
+    index => "flash-sale-sys-log-rollover-alias" #指定別名，此別名指向要寫的索引ID。因為在ES那邊有設定rollover，當rollover觸發，別名就會被指到最新的索引(位於hot階段，因此可寫)，所以logstash一定會傳到最新的索引。
+  }
+
+  #stdout { codec => rubydebug } #輸出到控制台，要用的時候再打開
+}
+
+------------------------------
+
+成立一個.CONF檔案，例如「myLogstashConf.conf」，然後把上面的東西複製進去，之後在logstash啟動命令指定讀取該配置檔，告訴LS它的input從哪裡來，output往哪裡去。
+
+--------------------------------
+啟動命令範例如下(目錄切到bin資料夾，假設myLogstashConf.conf放在config資料夾裡)：
+
+logstash -f ../config/myLogstashConf.conf --config.reload.automatic
+
+
+啟動命令參數說明:
+
+「-f」:
+指定Logstash的配置文件的路徑，要讀哪個配置檔的意思啦。
+
+「--config.reload.automatic」:
+是可以在runtime去reload配置檔，只要myLogstashConf.conf有變動，可以不用重啟logstash。

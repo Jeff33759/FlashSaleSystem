@@ -2,11 +2,14 @@
 
 ## [Unreleased]
 
+## [0.10.1] - 2024-03-30
+
 ### Added
 - 各服務當dev模式時，log寫入路徑為./my-log/<服務集群名稱>/XXX.log
 - SLF4J實作替換為log4j2(比Spring預設的logback效能還要好)
 - 建立log4j2滾動策略，防止log檔無限增長
 - log4j2格式調整，與Elastic stack整合，完成日誌集中蒐集
+- Elastic stack佈署文檔新增
 
 ## [0.9.1] - 2024-03-22
 

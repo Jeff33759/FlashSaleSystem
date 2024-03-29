@@ -1,0 +1,23 @@
+POST _aliases
+{
+  "actions": [
+    {
+      "add": { //把flash-sale-sys-log-rollover-alias，指向flash-sale-sys-log-000001。
+        "index": "flash-sale-sys-log-000001",
+        "alias": "flash-sale-sys-log-rollover-alias" //用於rollover的別名
+      }
+    }
+  ]
+}
+
+-----------
+動作說明:
+
+以上POST請求，創建一個名為"flash-sale-sys-log-rollover-alias"的別名，該別名指向名為"flash-sale-sys-log-000001"的索引。
+
+----------
+
+只有最初佈署ES的時候，需要這樣手動透過API新增flash-sale-sys-log-rollover-alias，並讓其指向flash-sale-sys-log-000001，跑起來以後就可以自動化了。
+當觸發rollover，flash-sale-sys-log-rollover-alias會自己指向下個索引，例如flash-sale-sys-log-000002。
+
+注意LS那邊的output設定，要把資料送到flash-sale-sys-log-rollover-alias，而不是index name。
