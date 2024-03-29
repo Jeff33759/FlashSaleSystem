@@ -7,10 +7,12 @@
 <configuration status="ERROR" monitorInterval="60">
 
     <!-- 定義變數 -->
+    <!-- 時間要帶時區，logStash在轉換時間時，才知道要增減幾小時 -->
     <Properties>
-        <property name="myPattern">[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%-5level] [%thread] [%class] - %message%n</property>
+        <property name="myPatternForConsole">[%d{yyyy-MM-dd HH:mm:ss.SSSZZZZ}] [%-5level] [%thread] [%class] - %message%n</property>
+        <property name="myPatternForFile">[%d{yyyy-MM-dd HH:mm:ss.SSSZZZZ}] [%level] [%thread] [%class] - %message%n</property>
         <property name="myPath">./my-log/high-concurrency-processor/</property>
-        <property name="myFileName">highConcurrencyLog</property>
+        <property name="myFileName">highCurrencyLog</property>
     </Properties>
 
     <!--定義所有的appender-->
@@ -20,13 +22,13 @@
         <console name="myConsole" target="SYSTEM_OUT">
             <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/> <!-- DEBUG級別以上的LOG要抓，以下的忽略 -->
             <!--輸出日誌的格式-->
-            <PatternLayout pattern="${myPattern}"/>
+            <PatternLayout pattern="${myPatternForConsole}"/>
         </console>
 
         <!-- rolling策略 -->
-        <RollingFile name="myRollingFile" fileName="${myPath}${myFileName}.log" filePattern="${myPath}${myFileName}-%i.log">
+        <RollingFile name="myRollingFile" fileName="${myPath}${myFileName}.log" filePattern="${myPath}${myFileName}Backup-%i.txt">
             <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/> <!-- DEBUG級別以上的LOG要抓，以下的忽略 -->
-            <PatternLayout pattern="${myPattern}"/>
+            <PatternLayout pattern="${myPatternForFile}"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="50KB"/> <!-- 只要log檔滿50KB，就觸發rolling -->
             </Policies>
