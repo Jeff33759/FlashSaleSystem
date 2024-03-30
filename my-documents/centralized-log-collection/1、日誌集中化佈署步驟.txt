@@ -1,3 +1,5 @@
+===以下Elastic stack建議安裝版本7.17.18===
+
 日誌集中化佈署步驟：
 
 1、ElasticSearch & Kibana安裝
