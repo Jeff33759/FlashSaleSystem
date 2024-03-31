@@ -38,7 +38,7 @@ public class HighConcurrencyController {
      * 客戶端快閃銷售案件的商品下單時的接口。
      * 通常是搶門票的頁面，進入快閃銷售案件特有的結帳頁面後，按下送出所打的API。
      *
-     * 這裡不用斷路器的原因，是因為此功能不能接受斷路器長時間開啟，假如門票12點開賣，11:59斷路器被打開，那可能會變成12點到了，大家還辦法送出搶門票請求的情況。
+     * 這裡不用斷路器的原因，是因為此功能不能接受斷路器長時間開啟，假如門票12點開賣，11:59斷路器被打開，那可能會變成12點到了，搶門票API還沒有提供服務的情況。
      */
     @PostMapping("/order/flash")
     @RateLimiter(name = "fse-order-creation-rl", fallbackMethod = "createAnOrderFromFlashSalesEventFallback")
