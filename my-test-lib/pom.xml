@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>my-flashsale-system</artifactId>
+        <groupId>jeff.flash</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>my-test-lib</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+
+        <dependency> <!-- scope不設為test，讓my-test-lib被其他專案引用時，此函式庫可以跟著被引用進去，但my-test-lib本身需要設為test scope，以免佈署時連同一大包測試工具都打包進各專案 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
+        <dependency> <!-- scope不設為test，讓my-test-lib被其他專案引用時，此函式庫可以跟著被引用進去，但my-test-lib本身需要設為test scope，以免佈署時連同一大包測試工具都打包進各專案 -->
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-inline</artifactId> <!-- 讓Mockito.mockStatic可以用 -->
+        </dependency>
+
+        <dependency> <!-- scope不設為test，讓my-test-lib被其他專案引用時，此函式庫可以跟著被引用進去，但my-test-lib本身需要設為test scope，以免佈署時連同一大包測試工具都打包進各專案 -->
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId> <!-- reactive的測試函式庫。如果要自己指定版本，記得去看看spring-webflux整合進去的reactor-core本版號是多少。 -->
+        </dependency>
+
+    </dependencies>
+
+</project>

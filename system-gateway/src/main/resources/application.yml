@@ -1,0 +1,31 @@
+####【應用種類(服務集群名稱)】####
+app:
+  type: system-gateway
+
+####【Gateway配置】####
+### 官方文件(本專題使用3.1.4版本): https://docs.spring.io/spring-cloud-gateway/docs/3.1.4/reference/html/ ###
+spring.cloud.gateway:
+  default-filters: #To add a filter and apply it to all routes. 這裡的過濾器都是官方寫好的，在router裡面的過濾鏈，加個參數就可以開啟。
+    - CacheRequestBody #官方既有的過濾器，把發進gateway的請求body給暫存起來。配置此過濾器，為了讓handler可以拿到請求的body資訊去log。
+#    - SetStatus=OK #官方既有的過濾器，把回應的狀態碼統一改成OK(200)。
+
+  routes: #Api路由的設置
+    - id: core-prosessor-router #路由器的ID，須為唯一值。
+      predicates: #本路由器的斷言配置。當打進來的請求路徑匹配時，由本路由器來處理後續路由。
+        ##會寫在這裡的，都是對系統外部開放的Api。##
+        - Path=/order/normal, /finish-order, /sale-event/update-state, /flash-sale-event/close
+      uri: lb://core-processor #路由的位址。lb開頭打開負載均衡功能(ReactiveLoadBalancerClientFilter)，會根據從服務註冊中心拿到core-processor服務集群的實例列表，以某種策略去訪問實例位址，預設策略為輪詢。
+
+    - id: high-concurrency-processor-router
+      predicates:
+        - Path=/order/flash, /flash-sale-event/query/**
+      uri: lb://high-concurrency-processor
+      filters:
+        - name: CircuitBreaker #為這個router配置一個CircuitBreakerFilter
+          args:
+            name: high-concurrency-processor-cb #filter裡面的CB元件，要用啥名字抓。和MyCircuitBreakerConfigs.class要匹配。
+            fallbackUri: forward:/cb/fallback/default
+#            statusCodes:
+#              - 408 #Api鏈路任何一段遭遇timeout
+#              - 429 #下游Server的服務降級
+#              - 500 #下游Server異常

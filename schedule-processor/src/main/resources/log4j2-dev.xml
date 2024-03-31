@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 用於dev環境的log4j2配置 -->
+
+<!--日誌級別以及優先順序排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--Configuration後面的status，這個用於設定log4j2自身內部的資訊輸出，可以不設定，當設定成trace時，你會看到log4j2內部各種詳細輸出-->
+<!--monitorInterval：Log4j能夠自動檢測修改配置檔案和重新配置本身(當修改配置檔可以不用重啟)，設定間隔秒數-->
+<configuration status="ERROR" monitorInterval="60">
+
+    <!-- 定義變數 -->
+    <!-- 時間要帶時區，logStash在轉換時間時，才知道要增減幾小時 -->
+    <Properties>
+        <property name="myPatternForConsole">[%d{yyyy-MM-dd HH:mm:ss.SSSZZZZ}] [%-5level] [%thread] [%class] - %message%n</property>
+        <property name="myPatternForFile">[%d{yyyy-MM-dd HH:mm:ss.SSSZZZZ}] [%level] [%thread] [%class] - %message%n</property>
+        <property name="myPath">./my-log/schedule-processor/</property>
+        <property name="myFileName">scheduleLog</property>
+    </Properties>
+
+    <!--定義所有的appender-->
+    <appenders>
+
+        <!--輸出控制檯的配置-->
+        <console name="myConsole" target="SYSTEM_OUT">
+            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/> <!-- DEBUG級別以上的LOG要抓，以下的忽略 -->
+            <!--輸出日誌的格式-->
+            <PatternLayout pattern="${myPatternForConsole}"/>
+        </console>
+
+        <!-- rolling策略 -->
+        <RollingFile name="myRollingFile" fileName="${myPath}${myFileName}.log" filePattern="${myPath}${myFileName}Backup-%i.txt">
+            <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/> <!-- DEBUG級別以上的LOG要抓，以下的忽略 -->
+            <PatternLayout pattern="${myPatternForFile}"/>
+            <Policies>
+                <SizeBasedTriggeringPolicy size="50KB"/> <!-- 只要log檔滿50KB，就觸發rolling -->
+            </Policies>
+            <DefaultRolloverStrategy max="3"/> <!-- 指定同一個資料夾下最多有幾個日誌檔案。刪除最舊的，建立新的 -->
+        </RollingFile>
+
+    </appenders>
+
+    <!--定義logger，只有定義了logger並引入的appender，appender才會生效-->
+    <loggers>
+        <root level="INFO"> <!-- 指定專案的根日誌，如果沒有單獨指定Logger，那麼就會預設使用此Root日誌輸出。 -->
+            <appender-ref ref="myConsole"/>
+            <appender-ref ref="myRollingFile"/>
+        </root>
+    </loggers>
+
+</configuration>

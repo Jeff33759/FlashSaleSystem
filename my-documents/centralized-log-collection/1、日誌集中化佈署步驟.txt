@@ -1,0 +1,35 @@
+===以下Elastic stack建議安裝版本7.17.18===
+
+日誌集中化佈署步驟：
+
+1、ElasticSearch & Kibana安裝
+
+2、啟動ElasticSearch & Kibana
+
+2、ElasticSearch設定
+
+2-1、建立ILM policy
+
+2-2、建立index template
+
+2-3、建立第一個index(套用上面的index template)
+
+2-4、建立rollover的alias，指向2-3建立的索引
+
+3、Logstash安裝、配置設定(output要設置傳到2-4建立的alias，而不是index)
+
+4、file beats安裝、配置設定
+
+5、啟動Logstash(啟動命令，參照「3、Logstash配置設定.txt」)
+
+6、啟動file beats(啟動命令，參照「4、file beats配置設定.txt」)
+
+7、完成到這步，「java log -> file beats -> logstash -> elastic search」應該都成功了，接下來要針對Kibana設置
+
+8、kibana設置Index Patterns。
+因為有在2-2的index template中，把"flash-sale-sys-log-read-alias"別名指向每一個套用該模板創建的Index，所以這裡的Index Pattern name，就設置為flash-sale-sys-log-read-alias即可。
+Timestamp field則設定為@timestamp(logTimestamp也可，可專題兩個欄位的型別和值都一樣)，它預設會desc。
+
+9、Kibana進入Discover或Dashboard頁面，指定Index pattern為第8步所創建的pattern，就會看到該抓出來的資料都抓出來了。
+
+10、Kibana進入Index Management頁面，可以觀察一下rollover是否正常。

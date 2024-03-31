@@ -6,7 +6,18 @@
 
     <groupId>jeff.flash</groupId>
     <artifactId>my-flashsale-system</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
+    <modules>
+        <module>common-lib</module>
+        <module>my-double-datasource-api</module>
+        <module>core-processor</module>
+        <module>my-redis-api</module>
+        <module>high-concurrency-processor</module>
+        <module>schedule-processor</module>
+        <module>my-test-lib</module> <!-- 自己寫的測試函式庫，裡面放一些專門用於測試的工具，也會依賴一些第三方測試函式庫。因為只有用於測試，所以各專案引用時，Scope可設為test，讓佈署時此函式庫不會跟著打包進去 -->
+        <module>my-mq-lib</module>
+        <module>system-gateway</module>
+    </modules>
     <packaging>pom</packaging> <!-- 父項目打包為pom -->
 
     <!--  統一管理JAR包版本  -->
@@ -18,8 +29,8 @@
         <mysql.version>8.0.30</mysql.version> <!-- 嚴格匹配安裝的MySQL版本 -->
         <spring.boot.ver>2.7.2</spring.boot.ver>
         <spring.cloud.ver>2021.0.5</spring.cloud.ver> <!-- 嚴格匹配Spring Boot版本 -->
+        <feignReactive.ver>3.2.10</feignReactive.ver> <!-- 要稍微對一下Spring Cloud的版本 -->
     </properties>
-
 
     <!--  在此規範引入JAR包的規格，用於讓子項目繼承這裡的屬性，如版本號  -->
     <dependencyManagement>
@@ -51,7 +62,35 @@
                 <version>${lombok.version}</version>
                 <optional>true</optional>
             </dependency>
+            <!-- 統一控管feign-reactive相關組件的版本 -->
+            <dependency>
+                <groupId>com.playtika.reactivefeign</groupId>
+                <artifactId>feign-reactor-bom</artifactId>
+                <version>${feignReactive.ver}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin> <!-- 統一升級各專案版本所需的插件，可以下mvn versions指令 -->
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.7</version>
+            </plugin>
+        </plugins>
+
+        <resources> <!-- 告訴Maven在構建項目的過程中如何處理資源文件 -->
+            <resource>
+                <directory>src/main/resources</directory> <!-- 指定了資源文件的所在目錄 -->
+                <filtering>true</filtering> <!-- 是否開啟過濾器功能，設置為true可去替換yml或properties的@@佔位符。預設false -->
+                <includes> <!-- resource指定的一些功能要奏效到directory所指定的目錄中的哪些檔案 -->
+                    <include>**/*.*</include> <!-- 所有檔案，不論檔名與副檔名 -->
+                </includes>
+            </resource>
+        </resources>
+    </build>
 
 </project>

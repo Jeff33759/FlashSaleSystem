@@ -1,0 +1,57 @@
+PUT _index_template/flash-sale-system-log-template
+{
+  "version": 1, //自訂義template版本
+  "template": { //針對模板做設定
+    "settings": {
+      "index": {
+        "lifecycle": { //搭配ILMPolicy那邊的設定，配置一個Index的生命週期
+          "name": "flash-sale-sys-log-policy", //要套用哪一個policy
+          "rollover_alias": "flash-sale-sys-log-rollover-alias" //policy如果有開啟rollover功能，那就在此宣告一個別名，此別名會指向最新的索引，當LS傳資料過來的時候，會傳給此別名指到的索引
+        },
+        "number_of_shards": "1", //node只有一個，先不用分片
+        "number_of_replicas": "0" //node只有一個，先不用副本
+      }
+    },
+    "mappings": {
+      "_routing": {
+        "required": false
+      },
+      "numeric_detection": false,
+      "dynamic_date_formats": [
+        "strict_date_optional_time",
+        "yyyy/MM/dd HH:mm:ss Z||yyyy/MM/dd Z"
+      ],
+      "_source": {
+        "excludes": [],
+        "includes": [],
+        "enabled": true
+      },
+      "dynamic": true,
+      "dynamic_templates": [],
+      "date_detection": true,
+      "properties": {
+        "logTimestamp": { //把LS傳來的這個欄位，預設是字串，在ES解析成date格式
+          "format": "yyyy-MM-dd HH:mm:ss.SSSXXX", //2024-03-29 01:12:12.949+08:00，這裡要配合log4j2.xml的配置，看傳啥時間格式
+          "index": true,
+          "ignore_malformed": false,
+          "store": false,
+          "type": "date",
+          "doc_values": true
+        }
+      }
+    },
+    "aliases": { //index被下列別名指到
+      "flash-sale-sys-log-read-alias": {} //指向所有可以被query的索引。
+    }
+  },
+  "index_patterns": [ //新創建的Index如果符合以下pattern，即套用模板
+    "flash-sale-sys-log*"
+  ],
+  "composed_of": []
+}
+
+-------------
+
+動作說明:
+
+以上PUT請求，創建一個名為"flash-sale-system-log-template"的索引模板。

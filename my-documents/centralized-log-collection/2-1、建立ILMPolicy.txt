@@ -1,0 +1,58 @@
+PUT _ilm/policy/flash-sale-sys-log-policy
+{
+  "policy": {
+    "phases": {
+      "hot": {
+        "min_age": "0ms", //新索引一創建，馬上進入hot階段
+        "actions": { //這階段要做的行為
+          "rollover": { //滿足以下條件，便觸發rollover -> 創新索引 & 索引別名指到新索引(兩者皆在index template那邊設置)
+            "max_age": "1m" //索引創建開始算起，到達幾分鐘就觸發rollover
+          }
+        }
+      },
+      "warm": {
+        "min_age": "0ms", //rollover觸發後，過多久進入此階段，這裡設置馬上進入
+        "actions": {
+          "readonly": {} //設定此階段的索引，只能讀不能被寫
+        }
+      },
+      "cold": {
+        "min_age": "1m", //rollover觸發後，過多久進入此階段
+        "actions": {
+          "readonly": {} //設定此階段的索引，只能讀不能被寫
+        }
+      },
+      "delete": {
+        "min_age": "2m", //rollover觸發後，過多久進入此階段，下面的phase不能小於上面的phase。
+        "actions": {
+          "delete": { //幹掉索引
+            "delete_searchable_snapshot": true
+          }
+        }
+      }
+    }
+  }
+}
+
+
+-------------
+動作說明:
+
+以上PUT請求，會創建一個名為flash-sale-sys-log-policy的索引生命週期管理策略(Index Lifecycle Management Policy)。
+
+--------------
+ILM過程拆解:
+
+1、創索引1(hot)，別名指到索引1 
+2、1分鐘後
+3、索引1觸發rollover，索引1馬上變成warm階段，同時創索引2(hot)，別名指到索引2。由於LS的output設置是傳到index別名，所以LS傳的資料會變成由索引2接收。
+4、1分鐘後
+5、索引2觸發rollover。創索引3(hot)，索引1轉到cold，索引2轉到warm。
+6、1分鐘後
+7、新索引4(hot)，索引1不見(因為一進到delete階段就馬上刪除)，索引2(cold)，索引3(warm)
+
+------
+ILM效果體現:
+
+以上設置，同時間最多存在3個索引。
+以索引1為視點出發，創建出來後，在hot待一分鐘，在warm待一分鐘，在cold待一分鐘，然後被幹掉。

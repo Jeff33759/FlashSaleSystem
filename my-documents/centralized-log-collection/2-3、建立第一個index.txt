@@ -1,0 +1,10 @@
+PUT flash-sale-sys-log-000001
+
+------
+
+動作說明:
+
+以上PUT請求，創建一個名為"flash-sale-sys-log-000001"的索引。
+
+後面帶數字，是為了rollover，最多六位數的編號。
+當rollover觸發時，新的索引會自動把編號+1。

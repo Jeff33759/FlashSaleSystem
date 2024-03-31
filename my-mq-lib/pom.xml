@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>my-flashsale-system</artifactId>
+        <groupId>jeff.flash</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>my-mq-lib</artifactId> <!-- 把關於MQ的一些共用，抽到此lib，減少重複程式碼 -->
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency> <!-- 針對MQ的抽象封裝，目前只支援rabbitMQ和Kafka -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-stream-rabbit</artifactId>
+        </dependency>
+
+        <!-- 常用配置 -->
+        <dependency> <!-- 共用包 -->
+            <groupId>jeff.flash</groupId>
+            <artifactId>common-lib</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency> <!-- 測試工具包 -->
+            <groupId>jeff.flash</groupId>
+            <artifactId>my-test-lib</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope> <!-- 設為test，此函式庫專門用於測試，不會打包 -->
+        </dependency>
+    </dependencies>
+
+</project>

@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>my-flashsale-system</artifactId>
+        <groupId>jeff.flash</groupId>
+        <version>1.0.0</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>system-gateway</artifactId>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency> <!-- 網關方案，預設是WebFlux應用 -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway</artifactId>
+        </dependency>
+        <dependency> <!-- logging框架，效能比logback好 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+        <dependency> <!-- 非同步響應式系統容錯方案 -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-circuitbreaker-reactor-resilience4j</artifactId>
+        </dependency>
+        <dependency> <!-- spring-boot-starter-webflux裡面沒有含webMvc，而aop是被包在webMvc的。所以這裡手動引入aop，讓resilience4j的@可以生效 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId> <!-- 預設用logback作為日誌輸出，因想替換為log4j2，所以排除 -->
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency> <!-- 服務治理方案(網關本身也是個服務，需要訪問其他服務集群，所以需要註冊) -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-consul-discovery</artifactId>
+        </dependency>
+        <dependency> <!-- 服務健康檢測方案 -->
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency> <!-- 資源文件的加載與解析，要讓bootstrap.yml認得@@佔位符，就要用這個。(如果之後要引入配置中心，那這個依賴可能要拿掉，也許會有版本衝突。) -->
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-bootstrap</artifactId>
+        </dependency>
+        <!-- 自己寫的函式庫 -->
+        <dependency> <!-- 共用包 -->
+            <groupId>jeff.flash</groupId>
+            <artifactId>common-lib</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency> <!-- 測試工具包 -->
+            <groupId>jeff.flash</groupId>
+            <artifactId>my-test-lib</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope> <!-- 設為test，此函式庫專門用於測試，不會打包 -->
+        </dependency>
+    </dependencies>
+
+    <profiles> <!-- mvn打包的時候，下mvn clean package -P <profile-id>，決定要打包出來的東西是for哪個環境。 -->
+        <profile>
+            <id>dev</id> <!-- mvn clean package -P <profile-id> -->
+            <activation>
+                <activeByDefault>true</activeByDefault> <!-- 如果mvn package沒帶-P參數，又或者帶的P參數沒有匹配到這裡的任一profile-id，則預設是mvn package -P dev -->
+            </activation>
+            <properties>
+                <activeProfile>dev</activeProfile> <!-- 當有人在配置檔@activeProfile@時，要映射給他什麼值 -->
+            </properties>
+        </profile>
+    </profiles>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId> <!-- Spring-boot與maven整合的打包插件，spring-boot:repackage指令打包出來的東西，才能夠直接執行 -->
+                <version>2.7.2</version> <!-- 此插件若用太新版，會不支援JDK8 -->
+                <executions>
+                    <execution>
+                        <phase>package</phase> <!-- 指定哪個phase -->
+                        <goals>
+                            <goal>repackage</goal> <!-- 當跑到package-phase時，要做啥goal。當執行mvn package時，spring-boot:repackage將被自動執行。 -->
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
