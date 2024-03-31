@@ -38,8 +38,6 @@ public class MyMQConsumer {
      * 快閃銷售案件的訂單相關事件。
      * 配置請看application.yml，只會訂閱routingKey=fse.order的Queue。
      *
-     * 若有需要，這裡也可以考慮弄個限流或者熔斷機制，queue設定為手動確認模式，fallback則不要確認，做成功則確認。
-     *
      * 範例payload(成立訂單事件): {"title":"generation","content":"{\"id\":\"65db8bab8ffcd84a6d4906e2\",\"fseId\":1,\"transNum\":3,\"isConsumed\":true,\"smid\":2,\"gid\":3,\"cmid\":1}","publishTimestamp":1708886969528}
      */
     @Bean(name = "coreProcessor_BusinessExchangeConsumerChannelForOrderCase")
@@ -66,7 +64,9 @@ public class MyMQConsumer {
                         jpe
                 );
 
-                // MQ的手動確認模式先沒開，所以消費完後，做失敗訊息就會丟失
+                // MQ的應答模式設置為none，所以消費完後若做失敗，訊息就會丟失
+                // 如果設定為auto，則當throw出例外時，同實例會重試2遍消費邏輯，接著走死信機制。
+                // TODO 失敗的情況，有機會再設計。
 
             } catch (Exception e) { // 路由開始到業務邏輯的任何一層失敗
                 logUtil.logError(
@@ -76,10 +76,11 @@ public class MyMQConsumer {
                         e
                 );
 
-                // MQ的手動確認模式先沒開，所以消費完後，做失敗訊息就會丟失
+                // MQ的應答模式設置為none，所以消費完後若做失敗，訊息就會丟失
+                // 如果設定為auto，則當throw出例外時，同實例會重試2遍消費邏輯，接著走死信機制。
+                // TODO 失敗的情況，有機會再設計。
 
             }
-
         };
     }
 
