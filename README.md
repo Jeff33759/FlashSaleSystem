@@ -6,7 +6,7 @@
 
 前陣子日本超人氣歌手LiSA宣布來台舉辦演唱會，門票在一分鐘內被一掃而空，雖不到"秒"殺級別，但高併發的場景往往會對系統與DB造成極大負擔。
 
-本專題不針對DB端做任何設置，志在先從應用程式端的角度切入，利用各種解決方案學習應付高併發的業務需求，實作一個分散式、高擴充性、高容錯率、非阻塞、好除錯的後端電商系統。
+本專題不針對DB端做任何設置，志在先從應用程式端的角度切入，利用各種解決方案學習應付高併發的業務需求，實作一個分散式、高擴充性、高容錯率、低阻塞、好除錯的後端電商系統。
 
 <br>
 
@@ -20,6 +20,13 @@
 6. 網關(gateway)
 7. Elastic stack-日誌集中化、分散式日誌追蹤
 8. Maven專案管理-函式庫版本控管、打包
+
+<br>
+DEMO影片: https://www.youtube.com/watch?v=GdbPlm1FK0A
+
+
+開發文件: https://drive.google.com/file/d/1PCAUZ6Xtj2HiwxnP7gbFcCWZRcM16kil/view?usp=sharing
+
 
 <br><br>
 ## 我做到了什麼
@@ -35,8 +42,8 @@
 ### 2. Maven專案管理
 + 把模組的共同方法抽出，封裝成共用函式庫，再用Maven去注入，統一控制板號。
 + 結合spring-cloud-starter-bootstrap函式庫，讓同一包Source code可以打包(package)成各個環境都可以正常運行的執行檔(jar)。
-    + 利用mvn clean package -P <profile-id>指令，在打包時指定bootstrap.yml的profile，打包出來的jar在啟動時，便會根據profile再去讀取不同的application.yml。 
-    + 例如同一包Source code想要發布到dev環境與prod環境，這兩個環境的DB連線位址不同，這時候只要先寫好application-dev.yml和application.prod.yml，利用mvn指令打包時，就可以藉由參數打包出兩種jar，一種跑在dev環境，一種跑在prod環境。
+    + 利用mvn clean package -P \<profile-id\>指令，在打包時指定bootstrap.yml的profile，打包出來的jar在啟動時，便會根據profile再去讀取不同的application.yml。 
+    + 例如同一包Source code想要發布到dev環境與prod環境，這兩個環境的DB連線位址不同，這時候只要先寫好application-dev.yml和application-prod.yml，利用mvn指令打包時，就可以藉由參數打包出兩種jar，一種跑在dev環境，一種跑在prod環境。
 
 
 
@@ -78,8 +85,8 @@
 
 
 ### 8. MQ做為流量削峰及各微服務間的廣播、解耦方案。
-+ 秒殺級搶購活動一開賣，瞬間湧入大量的搶購請求，本專題的"消化搶購請求"以及"實際成立訂單的流程(有訪問DB)"被拆到了兩個Server。
-    + 消化搶購請求的Server接到請求後，會先回給客戶端一些東西，並發message給成立訂單的Server，藉此削減秒殺級搶購活動的"成立訂單流程"的峰值，不要一瞬間大量的搶購請求都直接打進DB，DB可能承受不了那一瞬間。
++ 秒殺級搶購活動一開賣，瞬間湧入大量的搶購請求，本專題的"消化搶購請求"以及"實際成立訂單的流程(有訪問DB)"被拆到了兩個微服務。
+    + 消化搶購請求的微服務接到請求後，會先回給客戶端一些東西，並發message給成立訂單的微服務，藉此削減秒殺級搶購活動的"成立訂單流程"的峰值，不要一瞬間大量的搶購請求都直接打進DB，DB可能承受不了那一瞬間。
 + 當MQ用在非廣播的場景時，設置channel group，防止同一則message被不同實例重複消費。
 + 使用函式庫為:
     + spring-cloud-starter-stream-rabbit
@@ -106,7 +113,7 @@
 ### 11. 針對一些高併發的業務鏈路設置降級、熔斷、限流機制，避免服務雪崩，保障系統容錯率。
 + Spring官方推薦Resilience4j做為系統容錯方案，使用到的組件為服務熔斷用的「CircuitBreaker」，以及服務限流用的「RateLimiter」。
 + 服務雪崩:
-    + 某些高併發的場景，會有短時間大量請求打到上游Server，上游Server又請求到下游Server，這時如果下游Server一時之間阻塞了而沒回應，會造成上游Server一直等待也跟著塞住(前提是上游Server的HttpClient沒設超時)，上游Server之上可能又有個上上游Server，這樣問題會越滾越大，此微服務雪崩，何況下游Server在阻塞的同時也會有其他請求接二連三打進去，惡性循環。
+    + 某些高併發的場景，會有短時間大量請求打到上游Server，上游Server又請求到下游Server，這時如果下游Server一時之間阻塞了而沒回應，會造成上游Server一直等待也跟著塞住(前提是上游Server的HttpClient沒設超時)，上游Server之上可能又有個上上游Server，這樣問題會越滾越大，此為服務雪崩，何況下游Server在阻塞的同時也會有其他請求接二連三打進去，惡性循環。
 + 服務降級:    
     + 上游Server依賴於下游Server，當下游Server某些開給上游Server的Api阻塞了(可能做到一半某個I/O塞住了)，這時馬上回給上游Server降級後的服務(fallback)，讓上游Server不要因此卡住，此為服務降級。     
 + 服務熔斷:
@@ -154,6 +161,11 @@
 + Elastic stack相關的個人配置與佈署步驟，參考「my-documents > centralized-log-collection」
 
 <br><br>
+## git tag版號說明
+開發版(未完成品): v0.x.x
+
+正式版(dev模式可以demo): v1.x.x
+
 ## 環境需求(各Server都一樣)
 
 ### dev環境(本地)
@@ -200,7 +212,7 @@
 #### 欲執行於dev環境(本地)
 + mvn clean package -P dev
 
-本專題v1.0.x尚沒有配置其他環境，如要配置，除了各應用要寫對應的yml以外，也要去pom裡面新增profile標籤
+本專題v1.0.x尚沒有配置其他環境，如要配置，除了各應用要寫對應的yml以外，也要去pom裡面新增 \<profile\>
 
 
 ## 如何啟動系統
@@ -224,7 +236,7 @@
 <br><br>
 ## 系統架構示意圖
 
-![image](https://github.com/Jeff33759/FlashSaleSystem/blob/develop/my-documents/system-introduction/System_Architecture_Diagram.jpg)
+![image](https://github.com/Jeff33759/FlashSaleSystem/blob/master/my-documents/system-introduction/System_Architecture_Diagram.jpg)
 
 <br><br>
 ## 各java微服務職責大致說明
@@ -234,7 +246,7 @@
 2. 對API進行路由
 3. 流量控管、服務熔斷
 
-### [high-currency-processor]
+### [high-concurrency-processor]
 1. 所有高併發的業務請求都由這個服務承接，例如"搶購LiSA門票"等等...... 因此這個服務和gateway一樣，都使用NIO的WebFlux開發。
 2. 因為是處理高併發業務，所以不會直接存取MySQL，但會存取MongoDB和Redis。
 3. 通常是Message provider。
@@ -242,13 +254,11 @@
 ### [core-processor]
 1. 實例啟動後，執行SQL腳本，自動化建置DB、新增DEMO資料
 2. 其他非高併發的業務，都由這個服務來做，例如"發布銷售案件"、"成立訂單"等等......其實可以再根據需求拆成更細的微服務，但懶得拆了，一切雜事都由這個服務來做。
-3. 會直接存取MySQL，所以有些需要操作MySQL的業務場景，high-currency-processor會發HTTP請求來向core-processor要資料。
+3. 會直接存取MySQL，所以有些需要操作MySQL的業務場景，high-concurrency-processor會發HTTP請求來向core-processor要資料。
 4. 通常是Message consumer，所以不管上游Server的併發量多大，到這裡的時候已經被削峰過。 
 
 ### [schedule-processor]
-1. 專門跑排程的應用程式(整理報表資料等等...)
-2. 使用排程預先把熱點資料快取進redis，以避免類似快取擊穿的問題。
-    + 例如LiSA的門票銷售活動，預計中午12:00開賣，但是在那之前就會先開放銷售頁面讓會員進入了。渲染銷售頁面的資料來源是DB裡的商品資訊(Query)。如果沒有預先把DB的商品資訊快取進redis，很可能會變成...鄰近12:00前，開放銷售頁面的瞬間(只是開放頁面，但還沒開放搶購)，大家開始瘋狂F5，湧入了大量請求query請求，那個瞬間因為redis還沒有快取，所以通通會去query DB，如果DB承受住了，那麼查詢成功的資料快取進redis，之後的請求都會存取redis，那就沒問題，但萬一DB沒承受住那一瞬間，那就會出事。
+1. 專門跑排程的應用程式(例如整理報表資料等等...)
 
 <br><br>
 ## API列表
