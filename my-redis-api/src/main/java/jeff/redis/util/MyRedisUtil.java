@@ -252,7 +252,7 @@ public class MyRedisUtil {
     /**
      * 根據 key 獲取 Redis 中儲存的 JSON 陣列，並轉換為 List<T>
      *
-     * @param key Redis key
+     * @param key Redis key (記住key對應型別要是string(jsonArr形式的字串)，但key對應型別不能是redis list)
      * @param clazz 欲轉換的物件類型
      * @return 若 key 不存在則回傳 Optional.empty()，否則回傳對應的 List<T>
      */
