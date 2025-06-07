@@ -5,9 +5,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import jeff.redis.exception.MyRedisException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisCallback;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -121,8 +123,20 @@ public class MyRedisUtil {
      * @param expiration   key的有效時間
      */
     public void rightPushStrListByKeyAndSetExpiration(String key, List<String> cacheStrList, Instant expiration) {
-        sRedisTemplate.opsForList().rightPushAll(key, cacheStrList);
-        sRedisTemplate.expireAt(key, expiration);
+        if (cacheStrList.isEmpty()) {
+            return;
+        }
+
+        sRedisTemplate.executePipelined((RedisCallback<Void>) connection -> {
+            byte[] rawKey = key.getBytes(StandardCharsets.UTF_8);
+
+            for (String value : cacheStrList) {
+                connection.rPush(rawKey, value.getBytes(StandardCharsets.UTF_8));
+            }
+
+            connection.expireAt(rawKey, expiration.getEpochSecond());
+            return null;
+        });
     }
 
     /**
@@ -153,6 +167,10 @@ public class MyRedisUtil {
      * @param expiration 有效時間
      */
     public void rightPushObjListByKeyAndSetExpiration(String key, List cacheList, Instant expiration) {
+        if (cacheList == null) {
+            throw new MyRedisException("cacheList cannot be null.");
+        }
+
         ArrayNode jsonArr = mapper.valueToTree(cacheList);
         List<String> jsonStrList = new ArrayList<>();
 
